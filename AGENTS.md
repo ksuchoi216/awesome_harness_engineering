@@ -2,10 +2,6 @@
 Automatically build harness by using the templates. it is for both terminal command and codex usage.
 
 
-```
-
-
-
 ## Startup Workflow
 
 Before writing code:

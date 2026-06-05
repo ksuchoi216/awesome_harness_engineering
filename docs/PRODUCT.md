@@ -7,15 +7,16 @@ you should prepare like "npm install ahe or brew install ahe" because you should
 [x] AGENTS.md
     - [x] Project name
     - [x] Project objectives
+    - [x] GLOBAL_CONSTRAINTS
     - [x] PRIMARY_VERIFICATION_COMMAND
     - [x] VERIFICATION_COMMANDS
 [ ] init.sh
 [ ] feature-list.json
-[ ] progress.md
-
+[ ] PROGRESS.md
 ```
 
-## To build commands
+
+## main commands
 1. if user commend "ahe init", then ask for project name and project objectives one by one.
 after completing user's input, then generate AGENTS.md in working directory.
 
@@ -30,6 +31,14 @@ for example, the following text to be presented after execution of this command.
     - [x] Project objectives
 [ ] init.sh
 [ ] feature-list.json
-[ ] progress.md
+[ ] PROGRESS.md
 ...
 ```
+
+
+## optional commands
+1. "ahe arch {dir_name}": create architecture.md file in certain directory
+
+2. "ahe const {dir_name}": create constraints.md file in certain directory
+
+3. "ahe agent": to keep abt 600 lines in AGENTS.md. 

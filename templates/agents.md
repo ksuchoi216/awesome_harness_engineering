@@ -2,6 +2,9 @@
 
 {{PROJECT_PURPOSE}}
 
+## Global Constraints
+{{GLOBAL_CONSTRAINTS}}
+
 ## Startup Workflow
 
 Before writing code:
