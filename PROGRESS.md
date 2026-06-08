@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-08 16:01 +0900
-**Session ID:** feat-004-product-workflow
-**Active Feature:** feat-004 - Product Workflow
+**Last Updated:** 2026-06-08 16:18 +0900
+**Session ID:** feat-006-session-tracking-handoff
+**Active Feature:** feat-006 - Session Tracking and Handoff
 
 ## Completed
 
@@ -15,11 +15,15 @@
 - [x] Implemented `feat-003 Init Workflow` by adding step-by-step instructions to `.codex/skills/ahe/SKILL.md` and creating `tests/test_init_workflow.py`.
 - [x] Implemented `feat-004 Product Workflow` by adding a dedicated `ahe product` workflow contract to `.codex/skills/ahe/SKILL.md` and creating `tests/test_product_workflow.py`.
 - [x] Fixed the `npx ahe install` smoke-test path resolution in `bin/ahe` so packaged installs work when the shell entrypoint is invoked through npm's `.bin` symlink.
+- [x] Implemented `feat-005 Check and Resume Workflows` by adding dedicated `ahe check` and `ahe resume` workflow contracts to `.codex/skills/ahe/SKILL.md`.
+- [x] Added `tests/test_check_resume_workflows.py` to verify validation scope, report behavior, resume-state inspection, and next-question handling.
+- [x] Implemented `feat-006 Session Tracking and Handoff` by adding a cross-workflow tracking sync contract to `.codex/skills/ahe/SKILL.md`.
+- [x] Added `tests/test_session_tracking_handoff.py` to verify process-status synchronization and progress/handoff update rules.
 
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-004 Product Workflow` is complete and verified. The next queued feature is `feat-005 Check and Resume Workflows`.
+  - Details: `feat-006 Session Tracking and Handoff` is complete and verified. The current planned feature sequence is fully implemented.
   - Blockers: None.
 
 ## Blocked
@@ -40,6 +44,12 @@
 - **The installer must resolve its real package path before copying skill files**: `npx` executes `bin/ahe` through npm's `.bin` symlink, so the installer has to follow symlinks before computing `PACKAGE_ROOT`.
   - Context: The full pytest run exposed a failure where the installer looked for `.codex/skills/ahe` under `node_modules/.codex` instead of `node_modules/ahe/.codex`.
   - Alternatives considered: Weakening the smoke test would hide a real packaging defect and would not verify the published install path.
+- **Workflow contracts should be explicit in the installed skill, not only in `docs/PRODUCT.md`**: `ahe check` and `ahe resume` now have dedicated sections in `.codex/skills/ahe/SKILL.md`.
+  - Context: The installed skill is the artifact Codex will actually use in chat, so relying on the product spec alone leaves runtime behavior underspecified.
+  - Alternatives considered: Leaving the behavior only in `docs/PRODUCT.md` would keep the implementation contract incomplete for the actual installed skill surface.
+- **Tracking rules should live in one cross-workflow section instead of being inferred from scattered command steps**: `.ahe/process_status.json`, `PROGRESS.md`, and `SESSION-HANDOFF.md` now have explicit synchronization rules in the installed skill.
+  - Context: The schema defined the shape of runtime state, but not when all three tracking artifacts must move together during active workflows.
+  - Alternatives considered: Repeating partial tracking rules in each command section would leave the sync contract fragmented and easier to drift.
 
 ## Change Log
 
@@ -53,3 +63,5 @@
 - `tests/test_project_setup.py` - Fixed case-sensitivity issue for macOS compatibility.
 - `.codex/skills/ahe/SKILL.md`, `tests/test_product_workflow.py` - Added the Product Workflow contract and verification coverage.
 - `bin/ahe`, `tests/test_project_setup.py` - Made the installer smoke test hermetic and fixed symlink-aware package root resolution for `npx` installs.
+- `.codex/skills/ahe/SKILL.md`, `tests/test_check_resume_workflows.py` - Added explicit Check and Resume workflow contracts and verification coverage.
+- `.codex/skills/ahe/SKILL.md`, `tests/test_session_tracking_handoff.py` - Added explicit cross-workflow tracking and handoff synchronization rules and verification coverage.

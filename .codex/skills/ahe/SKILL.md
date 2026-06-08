@@ -111,3 +111,55 @@ When executing the `ahe product` command, Codex must follow these instructions s
    - Update `SESSION-HANDOFF.md` with the current product context, open questions, and the recommended next action.
    - Update `.ahe/process_status.json` so `product.spec_path` remains `docs/PRODUCT.md`, `product.exists` is `true`, `product.complete` reflects whether all required fields are filled, `current_command` is `null`, `current_step` is `null`, `workflow_complete` is `true`, and `updated_at` is refreshed to the current ISO timestamp.
    - Run the validation check (equivalent to `ahe check`) and display the results to the user.
+
+## Command Workflow: ahe check
+
+When executing the `ahe check` command, Codex must follow these instructions step-by-step:
+
+1. **Validation Scope**:
+   - Inspect the current workspace state for all AHE-managed files.
+   - Validate that these required files exist where expected: `AGENTS.md`, `docs/PRODUCT.md`, `PROGRESS.md`, `SESSION-HANDOFF.md`, `init.sh`, `feature-list.json`, and `.ahe/process_status.json`.
+   - Validate these required rules: `Required files exist`, `Required sections exist`, `Required fields are filled`, `Filename casing is correct`, `AGENTS.md references docs/PRODUCT.md`, `.ahe/process_status.json matches the actual workspace state`, `init.sh exists and is executable or clearly marked as a script`, and `feature-list.json is valid JSON`.
+   - Validate product-specific completeness using the current contents of `docs/PRODUCT.md` when that file exists.
+
+2. **Check Reporting**:
+   - Summarize the validation result in a compact checklist-style report that the user can read directly in chat.
+   - When all checks pass, report that the AHE harness is complete and ready for the next workflow step.
+   - When something is missing or inconsistent, identify the exact missing file, section, or field and report the issue explicitly.
+   - End the report with the recommended next action, such as `Run ahe product` when `docs/PRODUCT.md` is missing or `Run ahe resume` when unfinished workflow state exists.
+
+## Command Workflow: ahe resume
+
+When executing the `ahe resume` command, Codex must follow these instructions step-by-step:
+
+1. **Resume State Inspection**:
+   - Read `.ahe/process_status.json`.
+   - Identify the previous `current_command`.
+   - Identify the previous `current_step`.
+   - Determine whether `workflow_complete` is `false` and whether enough collected data exists to resume the prior command.
+
+2. **Resume Decision and Next Prompt**:
+   - If unfinished workflow state exists, Summarize already collected fields, then Ask the next missing question for that workflow.
+   - Resume the prior command in its original mode: continue `ahe init` if the global harness workflow is unfinished, or continue `ahe product` if the product workflow is unfinished.
+   - Ask exactly one focused question at a time after the resume summary.
+   - If no unfinished workflow exists, Run a lightweight AHE status check and Recommend the next useful command.
+   - Use a fallback message shaped like: `No unfinished AHE workflow found.` followed by the current status summary and the recommended next action.
+
+## Session Tracking and Handoff Sync
+
+These rules apply across every AHE workflow, not only at the end of `ahe init` or `ahe product`.
+
+1. **Tracking Update Rules**:
+   - Update `.ahe/process_status.json` at workflow start.
+   - Update `.ahe/process_status.json` after every answered question.
+   - Refresh `updated_at` every time workflow state changes.
+   - Keep `current_command`, `current_step`, and `workflow_complete` aligned with the active workflow state.
+   - Keep the `files` status map aligned with the actual workspace files.
+   - Preserve already collected `project` and `product` data unless the active workflow intentionally replaces it.
+
+2. **Progress and Handoff Content Requirements**:
+   - Update `PROGRESS.md` whenever the active feature, workflow status, blockers, or verification state changes.
+   - Update `SESSION-HANDOFF.md` whenever the current objective, completed work, important files, verification evidence, or recommended next step changes.
+   - PROGRESS.md must reflect the current active feature and latest completed work.
+   - SESSION-HANDOFF.md must leave the next Codex session with a concrete startup path.
+   - When a workflow pauses mid-conversation, both documents should make the unfinished command and next missing question easy to recover.

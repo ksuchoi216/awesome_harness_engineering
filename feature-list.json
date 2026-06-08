@@ -45,8 +45,8 @@
       "dependencies": [
         "feat-004"
       ],
-      "status": "not-started",
-      "evidence": ""
+      "status": "done",
+      "evidence": "Expanded `.codex/skills/ahe/SKILL.md` with dedicated `ahe check` and `ahe resume` workflow sections covering validation scope, checklist-style reporting, resume-state inspection, and next-question behavior. Added `tests/test_check_resume_workflows.py` and verified with `python3 tests/test_check_resume_workflows.py` and `pytest tests/ -x`."
     },
     {
       "id": "feat-006",
@@ -55,8 +55,8 @@
       "dependencies": [
         "feat-005"
       ],
-      "status": "not-started",
-      "evidence": ""
+      "status": "done",
+      "evidence": "Expanded `.codex/skills/ahe/SKILL.md` with a cross-workflow `Session Tracking and Handoff Sync` section covering when `.ahe/process_status.json`, `PROGRESS.md`, and `SESSION-HANDOFF.md` must be updated together. Added `tests/test_session_tracking_handoff.py` and verified with `python3 tests/test_session_tracking_handoff.py` and `pytest tests/ -x`."
     }
   ]
 }
