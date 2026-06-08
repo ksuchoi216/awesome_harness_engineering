@@ -15,6 +15,8 @@ def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
             "ahe-architecture",
             "ahe-clear",
             "ahe-constraints",
+            "ahe-help",
+            "ahe-copy",
             "ahe-init",
             "ahe-product",
             "ahe-todo",

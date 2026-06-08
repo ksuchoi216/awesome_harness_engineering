@@ -6,7 +6,13 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILL_MD_PATHS = (
     REPO_ROOT / ".codex/skills/ahe-init/SKILL.md",
+    REPO_ROOT / ".codex/skills/ahe-agent/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-product/SKILL.md",
+    REPO_ROOT / ".codex/skills/ahe-todo/SKILL.md",
+    REPO_ROOT / ".codex/skills/ahe-constraints/SKILL.md",
+    REPO_ROOT / ".codex/skills/ahe-architecture/SKILL.md",
+    REPO_ROOT / ".codex/skills/ahe-clear/SKILL.md",
+    REPO_ROOT / ".codex/skills/ahe-copy/SKILL.md",
 )
 
 

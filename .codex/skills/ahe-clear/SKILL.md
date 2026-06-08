@@ -39,3 +39,18 @@ Use this skill when the user invokes `$ahe-clear`.
 - If the product specification is clear, finish it.
 - Update `.ahe/process_status.json` so `current_command` is `$ahe-clear`.
 - Update `.ahe/process_status.json` so `workflow_complete` is `true`.
+
+## Clarification Rule
+
+If a user answer needs clarification or a more detailed description, use this exact prompt:
+
+Please choose one option:
+
+1. Yes
+
+2. No
+
+3. Custom input
+
+Enter 1, 2, or type your own answer:
+

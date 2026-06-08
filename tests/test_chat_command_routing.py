@@ -13,6 +13,8 @@ SKILL_PATHS = (
     REPO_ROOT / ".codex/skills/ahe-architecture/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-update/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-clear/SKILL.md",
+    REPO_ROOT / ".codex/skills/ahe-help/SKILL.md",
+    REPO_ROOT / ".codex/skills/ahe-copy/SKILL.md",
 )
 
 
@@ -46,6 +48,8 @@ def test_skill_files_match_expected_command_names() -> None:
         "ahe-architecture": "$ahe-architecture",
         "ahe-update": "$ahe-update",
         "ahe-clear": "$ahe-clear",
+        "ahe-help": "$ahe-help",
+        "ahe-copy": "$ahe-copy",
     }
     for skill_name, command_name in expected_pairs.items():
         content = (REPO_ROOT / f".codex/skills/{skill_name}/SKILL.md").read_text(encoding="utf-8")

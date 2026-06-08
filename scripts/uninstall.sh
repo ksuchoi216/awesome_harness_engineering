@@ -12,6 +12,8 @@ readonly MANAGED_SKILLS=(
   "ahe-architecture"
   "ahe-update"
   "ahe-clear"
+  "ahe-help"
+  "ahe-copy"
 )
 
 echo "Uninstalling AHE skills from ${CODEX_HOME}..."

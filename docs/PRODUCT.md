@@ -18,6 +18,8 @@ The user works in Codex chat, not primarily in the terminal. The package install
 - `$ahe-architecture`
 - `$ahe-update`
 - `$ahe-clear`
+- `$ahe-help`
+- `$ahe-copy`
 
 ## 3. Installed Layout
 
@@ -42,6 +44,10 @@ The packaged install must create the following structure inside Codex home or th
       SKILL.md
     ahe-clear/
       SKILL.md
+    ahe-help/
+      SKILL.md
+    ahe-copy/
+      SKILL.md
   ahe-shared/
     templates/
       AGENTS.md
@@ -55,7 +61,7 @@ The packaged install must create the following structure inside Codex home or th
       feature-list-schema.json
 ```
 
-Only the eight `ahe-*` skill directories should appear as AHE skills in Codex. Shared templates and schemas must live outside `skills/`.
+Only the ten `ahe-*` skill directories should appear as AHE skills in Codex. Shared templates and schemas must live outside `skills/`.
 
 ## 4. Workspace Runtime State
 
@@ -81,6 +87,12 @@ The installed skills must not store workspace runtime state under `.codex/`.
 ### `$ahe-agent`
 
 - Modify only the purpose in `AGENTS.md`.
+- If `AGENTS.md` does not exist in the workspace:
+  1. Copy `agents.md` from the template assets (e.g. `.codex/ahe-shared/templates/`).
+  2. Rename it to `AGENTS.md` (uppercase).
+  3. Update the project purpose in the copied `AGENTS.md`.
+  4. Ask the user the exact prompt: "Is your language Python? 1. Yes 2. No 3. Custom input".
+  5. If the user answers "No", ask again: "Which language do you use?".
 
 ### `$ahe-product`
 
@@ -132,6 +144,16 @@ The installed skills must not store workspace runtime state under `.codex/`.
 6. Ask recursively for the new product specification.
 7. Finish when the new product specification is clear.
 
+### `$ahe-help`
+
+- Print a list of all available AHE skills and commands with brief descriptions.
+
+### `$ahe-copy`
+
+- Copy template files from `ahe-shared/templates/` to the workspace.
+- Place `PRODUCT.md` under `docs/PRODUCT.md` and copy all other files into the workspace root.
+- Convert markdown filenames to uppercase (e.g. `agents.md` -> `AGENTS.md`) when copying.
+
 ## 6. Clarification Prompt
 
 If a user response needs clarification or more detail, AHE must ask with this exact format:
@@ -156,11 +178,11 @@ Enter 1, 2, or type your own answer:
   - `npx ahe install`
 - Helper scripts:
   - `scripts/install.sh` installs into `~/.codex`
-  - `scripts/uninstall.sh` removes the eight installed AHE skills and `.codex/ahe-shared`
+  - `scripts/uninstall.sh` removes the ten installed AHE skills and `.codex/ahe-shared`
 
 ## 8. Success Criteria
 
-- Codex shows the eight split AHE skills instead of one monolithic `ahe` skill.
-- The installer copies all eight skill directories and the shared assets.
+- Codex shows the ten split AHE skills instead of one monolithic `ahe` skill.
+- The installer copies all ten skill directories and the shared assets.
 - The uninstall script removes the installed AHE skills and shared assets cleanly.
 - Tests validate the split-skill structure and expected workflow contracts.

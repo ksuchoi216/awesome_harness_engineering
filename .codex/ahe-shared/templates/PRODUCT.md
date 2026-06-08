@@ -5,5 +5,3 @@
 ## Product Objective
 
 ## Requirements
-
-## Verification Commands

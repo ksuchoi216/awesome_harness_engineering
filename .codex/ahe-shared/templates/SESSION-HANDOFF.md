@@ -1,13 +1,40 @@
-# SESSION-HANDOFF.md
+# Session Handoff
 
-## Current Product Context
+## Current Objective
 
-## Last Completed Work
+- Goal:
+- Current status:
+- Branch / commit:
 
-## Current Open Questions
+## Completed This Session
 
-## Important Files
+- [ ] 
 
-## Next Recommended Action
+## Verification Evidence
 
-## Verification Status
+| Check | Command | Result | Notes |
+|---|---|---|---|
+|  |  |  |  |
+
+## Files Changed
+
+- 
+
+## Decisions Made
+
+- 
+
+## Blockers / Risks
+
+- 
+
+## Next Session Startup
+
+1. Read `AGENTS.md`.
+2. Read `feature_list.json` and `progress.md`.
+3. Review this handoff.
+4. Run `./init.sh` or the documented verification command before editing.
+
+## Recommended Next Step
+
+- 

@@ -10,6 +10,24 @@ Use this skill when the user invokes `$ahe-constraints`.
 ## Command Workflow: ahe-constraints
 
 - Read `docs/constraints.md` if it exists.
-- Ask for the constraint changes that should be preserved for future work.
-- Update `docs/constraints.md`.
+- Engage in an interactive conversation with the user to clarify and document project constraints:
+  - Ask clarifying questions about technical limits, environment constraints, and rules.
+  - Draft suggestions for the constraint definitions in chat and ask for user approval.
+  - Recursively ask for feedback or additional constraints until the details are clear and approved.
+- Once finalized, update `docs/constraints.md`.
 - Keep `PROGRESS.md` and `SESSION-HANDOFF.md` aligned when constraints change active work.
+
+## Clarification Rule
+
+If a user answer needs clarification or a more detailed description, use this exact prompt:
+
+Please choose one option:
+
+1. Yes
+
+2. No
+
+3. Custom input
+
+Enter 1, 2, or type your own answer:
+

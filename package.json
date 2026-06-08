@@ -7,8 +7,7 @@
   },
   "files": [
     "bin/",
-    ".codex/skills/",
-    ".codex/ahe-shared/"
+    ".codex/"
   ],
   "license": "MIT"
 }

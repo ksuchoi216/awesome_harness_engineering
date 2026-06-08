@@ -10,10 +10,10 @@ Use this skill when the user invokes `$ahe-update`.
 ## Command Workflow: ahe-update
 
 - Read `feature-list.json`.
-- Read `PROGRESS.md`.
+- Read `PROGRESS.md` if it exists.
 - Read `SESSION-HANDOFF.md`.
 - Read `docs/todo.md` when it exists.
-- Apply the queued `docs/todo.md` content to `docs/PRODUCT.md`.
+- Apply the queued `docs/todo.md` content to `docs/PRODUCT.md`. if `docs/PRODUCT.md` does not exist, create it.
 - Remove the applied content from `docs/todo.md` because that todo content was already applied in `docs/PRODUCT.md`.
 - Update `feature-list.json`.
 - Update `PROGRESS.md`.

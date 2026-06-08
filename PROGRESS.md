@@ -2,12 +2,23 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-08 22:47 +0900
-**Session ID:** feat-014-todo-queue-skill
-**Active Feature:** feat-014 - Todo Queue Skill
+**Last Updated:** 2026-06-09 02:46 +0900
+**Session ID:** feat-017-agent-init-absence
+**Active Feature:** None
 
 ## Completed
 
+- [x] Implemented `feat-017 AHE Agent Initialize Workflow on AGENTS.md Absence` by extending `$ahe-agent` to copy/rename the `agents.md` template, update the project purpose, and ask the user about their language choice.
+
+- [x] Implemented `feat-016 Copy Skill` by adding `ahe-copy` which copies template files (excluding `AGENTS.md` and `PRODUCT.md`) from `ahe-shared/templates/` to the workspace root, converting markdown names to uppercase.
+- [x] Updated the split-skill installer, uninstaller, and package file list to include `ahe-copy`.
+- [x] Documented the new copy skill in `docs/PRODUCT.md` across sections defining capabilities, layout, responsibilities, and success criteria.
+- [x] Expanded the test suite (routing, command set, setup, specialized workflows, and clarification prompt validation) to verify `ahe-copy`.
+- [x] Implemented `feat-015 Help Skill` by adding `ahe-help` which lists all available `ahe` commands to the user.
+- [x] Updated the split-skill installer, uninstaller, and package file list to include `ahe-help`.
+- [x] Documented the new help skill in `docs/PRODUCT.md` across sections defining capabilities, layout, responsibilities, and success criteria.
+- [x] Fixed `bin/ahe` post-install variable expansion bug by escaping dollar signs and preventing bash unbound variable crashes.
+- [x] Added split-skill test coverage and specialized workflow checks for `ahe-help`.
 - [x] Implemented `feat-014 Todo Queue Skill` by adding `ahe-todo` and teaching `ahe-update` to consume `docs/todo.md` into `docs/PRODUCT.md`.
 - [x] Updated the split-skill installer and uninstall lists to include `ahe-todo`.
 - [x] Extended the split-skill tests and product specification to cover `docs/todo.md` queue behavior.
@@ -48,7 +59,7 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-014 Todo Queue Skill` is complete. `ahe-todo` now queues work in `docs/todo.md`, and `ahe-update` consumes that queue into `docs/PRODUCT.md`.
+  - Details: `feat-017 AHE Agent Initialize Workflow on AGENTS.md Absence` is complete. `$ahe-agent` now handles workspace setup when `AGENTS.md` is missing.
   - Blockers: None.
 
 ## Blocked
@@ -57,6 +68,18 @@
 
 ## Decisions
 
+- **ahe-copy ignores AGENTS.md and PRODUCT.md**: The `ahe-copy` skill explicitly ignores the agents and product files, copying all other templates directly to the workspace root.
+  - Context: The user requested a skill to copy the other template files for initialization while leaving agents/product handling separate.
+  - Alternatives considered: Copying product spec to `docs/` and agents.md to root, which was the previous plan.
+- **AHE-help lists all command details inside SKILL.md**: `$ahe-help` prints the full split-skill command set and descriptions.
+  - Context: The user requested a skill to show a list of commands in AHE.
+  - Alternatives considered: Implementing a dynamic listing in Node/Bash versus placing the descriptions in `SKILL.md`. Documenting inside `SKILL.md` is standard for Codex split skills.
+- **Escape dollar signs in heredoc success messages**: Changed `cat <<EOF` post-install outputs to escape `$` to avoid bash unbound variable crashes under `set -u`.
+  - Context: Bash crashed because it attempted to expand `$ahe` as a variable during installation.
+  - Alternatives considered: Removing the command list or changing heredoc quote style. Escaping preserves both variable interpolation for other parts and the exact command symbols.
+- **Package.json files whitelist should target the parent dotfolder**: Changed `package.json` `files` array to target `.codex/` instead of `.codex/skills/` and `.codex/ahe-shared/`.
+  - Context: npm pack ignored the subfolders starting with a dot, but targets the parent dotfolder correctly when listed directly.
+  - Alternatives considered: Renaming `.codex` or omitting it from packaging. Specifying `.codex/` allows local and remote npx runs to successfully install the skill files.
 - **Fast todo capture should bypass immediate `docs/PRODUCT.md` editing**: `ahe-todo` writes queued work to `docs/todo.md`, and `ahe-update` is responsible for applying it to `docs/PRODUCT.md` later.
   - Context: The user wants a lighter-weight capture path that still updates `feature-list.json`.
   - Alternatives considered: Writing directly to `docs/PRODUCT.md` from `ahe-todo` would collapse the separation between quick capture and later structured application.
@@ -84,6 +107,9 @@
 
 ## Change Log
 
+- `.codex/skills/ahe-copy/SKILL.md`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `tests/`, `feature-list.json` - Implemented the `ahe-copy` skill to copy workspace templates except AGENTS/PRODUCT, capitalizing markdown filenames, and validated it with tests.
+- `.codex/skills/` (agent, constraints, architecture, todo, clear), `tests/test_clarification_prompt.py` - Added Clarification Rule section and interactive conversation flows across all interactive AHE skills to enforce multi-turn dialogs and precise clarification prompts.
+- `.codex/skills/ahe-help/SKILL.md`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `package.json`, `tests/`, `feature-list.json` - Implemented the `ahe-help` skill, corrected post-install success output escaping, resolved npm packaging dotfolder omissions, and updated the test suite.
 - `.codex/skills/ahe-todo/SKILL.md`, `.codex/skills/ahe-update/SKILL.md`, `docs/PRODUCT.md`, `feature-list.json`, `tests/`, `bin/ahe`, `scripts/uninstall.sh` - Added the todo queue skill and taught update to consume queued todo content into the product spec.
 - `.codex/skills/`, `.codex/ahe-shared/`, `bin/ahe`, `package.json`, `scripts/uninstall.sh`, `tests/`, `docs/PRODUCT.md` - Reorganized AHE into seven separate skills with shared assets outside the skills directory and updated installation plus verification coverage.
 - `.ahe/backups/20260608-215651/`, `.ahe/process_status.json`, `PROGRESS.md`, `SESSION-HANDOFF.md` - Started `ahe clear`, backed up `AGENTS.md` and `docs/PRODUCT.md`, and advanced the workflow to the new-goal question.

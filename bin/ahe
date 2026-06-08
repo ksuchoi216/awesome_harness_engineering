@@ -27,6 +27,8 @@ readonly MANAGED_SKILLS=(
   "ahe-architecture"
   "ahe-update"
   "ahe-clear"
+  "ahe-help"
+  "ahe-copy"
 )
 
 usage() {
@@ -133,7 +135,7 @@ AHE Codex skill installed.
 
 Next:
 1. Open Codex chat in this workspace.
-2. Use one of: \`$ahe-init\`, \`$ahe-product\`, \`$ahe-update\`, or \`$ahe-clear\`.
+2. Use one of: \`\$ahe-init\`, \`\$ahe-product\`, \`\$ahe-update\`, \`\$ahe-clear\`, \`\$ahe-help\`, or \`\$ahe-copy\`.
 EOF
 }
 

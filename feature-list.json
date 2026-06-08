@@ -137,6 +137,35 @@
       ],
       "status": "done",
       "evidence": "Added `.codex/skills/ahe-todo/SKILL.md`, extended `.codex/skills/ahe-update/SKILL.md` with `docs/todo.md` consumption rules, updated installer-managed skill lists, refreshed `docs/PRODUCT.md`, and expanded split-skill verification tests."
+    },
+    {
+      "id": "feat-015",
+      "name": "Help Skill",
+      "description": "Add `ahe-help` to list all AHE skills and commands to the user.",
+      "dependencies": [
+        "feat-014"
+      ],
+      "status": "done",
+      "evidence": "Created .codex/skills/ahe-help/SKILL.md listing all 9 AHE commands, updated installer/uninstaller in bin/ahe and scripts/uninstall.sh, updated package.json files array to correctly pack .codex dotfolder, updated docs/PRODUCT.md, and validated all with 31/31 passing tests (pytest, ruff, mypy) and successful local dry-run packaging and installation smoke tests."
+    },
+    {
+      "id": "feat-016",
+      "name": "Copy Skill",
+      "description": "Add `ahe-copy` to copy template files from ahe-shared/templates to the workspace, capitalizing MD files and putting PRODUCT.md in docs/.",
+      "dependencies": [
+        "feat-015"
+      ],
+      "status": "done",
+      "evidence": "Created .codex/skills/ahe-copy/SKILL.md to copy templates excluding agents/product to the workspace root while capitalizing markdown filenames, updated installer/uninstaller in bin/ahe and scripts/uninstall.sh, updated docs/PRODUCT.md, and validated all with 32/32 passing tests (pytest, ruff, mypy) and successful local global installation."
+    },
+      "id": "feat-017",
+      "name": "AHE Agent Initialize Workflow on AGENTS.md Absence",
+      "description": "Extend $ahe-agent to copy and capitalize agents.md from templates if AGENTS.md is missing, update the project purpose, and ask the user about their language choice.",
+      "dependencies": [
+        "feat-016"
+      ],
+      "status": "done",
+      "evidence": "Extended .codex/skills/ahe-agent/SKILL.md with a workflow for missing AGENTS.md that copies/renames templates/agents.md to AGENTS.md, updates the project purpose, and asks the language question sequence. Documented behavior in docs/PRODUCT.md, and added tests in tests/test_specialized_workflows.py which pass."
     }
   ]
 }

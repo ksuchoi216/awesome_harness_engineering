@@ -17,6 +17,8 @@ REQUIRED_SKILL_FILES = (
     Path(".codex/skills/ahe-architecture/SKILL.md"),
     Path(".codex/skills/ahe-update/SKILL.md"),
     Path(".codex/skills/ahe-clear/SKILL.md"),
+    Path(".codex/skills/ahe-help/SKILL.md"),
+    Path(".codex/skills/ahe-copy/SKILL.md"),
     Path(".codex/ahe-shared/templates/AGENTS.md"),
     Path(".codex/ahe-shared/templates/PRODUCT.md"),
     Path(".codex/ahe-shared/templates/PROGRESS.md"),
