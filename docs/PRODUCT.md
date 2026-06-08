@@ -165,9 +165,10 @@ The installed skills must not store workspace runtime state under `.codex/`.
 
 ## 6. Clarification Prompt
 
-If a user response needs clarification or more detail, AHE must ask with this exact format:
+If a user response needs clarification or more detail, AHE must ask recursively to clarify the response, using this exact format:
 
 ```text
+Question: {question}
 Please choose one option:
 
 1. Yes

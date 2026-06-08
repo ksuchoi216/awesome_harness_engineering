@@ -2,17 +2,16 @@
 
 ## Current Product Context
 
-- Goal: Support fast todo capture through `ahe-todo` and let `ahe-update` consume queued todo content into `docs/PRODUCT.md`.
-- Current status: `feat-014 Todo Queue Skill` is complete.
+- Goal: Include recursive clarification and update clarification rule format with Question parameter in all interactive skills.
+- Current status: `feat-019 Clarification Prompt Question Inclusion and Recursive Clarification` is complete.
 - Branch / commit: Current working tree changes only. No commit created in this session.
 
 ## Last Completed Work
 
+- [x] Updated all 8 interactive skill markdown files (`SKILL.md` under `ahe-init`, `ahe-agent`, `ahe-product`, `ahe-todo`, `ahe-constraints`, `ahe-architecture`, `ahe-clear`, `ahe-copy`) to include recursive clarification rule descriptions and formatting.
+- [x] Updated `docs/PRODUCT.md` with the new clarification prompt format and recursive instruction.
+- [x] Updated `tests/test_clarification_prompt.py` to check for the new format containing "Question: {question}" and recursive clarification assertions.
 - [x] Added `.codex/skills/ahe-todo/SKILL.md`.
-- [x] Updated `.codex/skills/ahe-update/SKILL.md` so it reads `docs/todo.md`, applies the queued content to `docs/PRODUCT.md`, and removes the applied todo content.
-- [x] Updated installer-managed skill lists and split-skill verification for the new `ahe-todo` skill.
-- [x] Replaced the monolithic `.codex/skills/ahe/` structure with split skill directories.
-- [x] Added `.codex/ahe-shared/templates/` and `.codex/ahe-shared/schemas/` for reusable non-skill assets.
 - [x] Updated `bin/ahe` to install the split skill set and shared assets.
 - [x] Updated `scripts/uninstall.sh` to remove the split skill set and shared assets from `${HOME}/.codex`.
 - [x] Rewrote the setup and workflow tests to validate the split skill layout.

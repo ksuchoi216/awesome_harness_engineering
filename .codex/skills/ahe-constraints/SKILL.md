@@ -19,8 +19,9 @@ Use this skill when the user invokes `$ahe-constraints`.
 
 ## Clarification Rule
 
-If a user answer needs clarification or a more detailed description, use this exact prompt:
+If a user answer needs clarification or a more detailed description, ask question recursively to clarify the response, and use this exact prompt:
 
+Question: {question}
 Please choose one option:
 
 1. Yes

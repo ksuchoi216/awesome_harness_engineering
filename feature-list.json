@@ -177,6 +177,16 @@
       ],
       "status": "done",
       "evidence": "Updated .codex/skills/ahe-init/SKILL.md, .codex/ahe-shared/schemas/process_status.schema.json, docs/PRODUCT.md, and tests/test_init_workflow.py. Verified that all 33 tests passed using pytest tests/ -x."
+    },
+    {
+      "id": "feat-019",
+      "name": "Clarification Prompt Question Inclusion and Recursive Clarification",
+      "description": "Enforce recursive questioning for clarifications, and update the clarification rule in all skill files to include Question: {question}.",
+      "dependencies": [
+        "feat-018"
+      ],
+      "status": "done",
+      "evidence": "Updated all 8 interactive skill markdown files under .codex/skills/, updated docs/PRODUCT.md, updated tests/test_clarification_prompt.py assertions, and verified with pytest tests/ -x."
     }
   ]
 }

@@ -21,10 +21,12 @@ def test_skill_md_contains_clarification_prompt_rule() -> None:
         content = skill_path.read_text(encoding="utf-8")
         assert "## Clarification Rule" in content
         assert "needs clarification or a more detailed description" in content
+        assert "ask question recursively to clarify the response" in content
 
 
 def test_skill_md_contains_exact_clarification_prompt_format() -> None:
     required_lines = [
+        "Question: {question}",
         "Please choose one option:",
         "1. Yes",
         "2. No",
