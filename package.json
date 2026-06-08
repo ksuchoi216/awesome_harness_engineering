@@ -1,0 +1,13 @@
+{
+  "name": "ahe",
+  "version": "0.1.0",
+  "description": "Codex chat workflow skill installer for Awesome Harness Engineering",
+  "bin": {
+    "ahe": "./bin/ahe"
+  },
+  "files": [
+    "bin/",
+    ".codex/"
+  ],
+  "license": "MIT"
+}

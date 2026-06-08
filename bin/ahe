@@ -1,0 +1,194 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly VERSION="0.1.0"
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+
+while [ -L "${SCRIPT_PATH}" ]; do
+  SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${SCRIPT_PATH}")" && pwd)"
+  SCRIPT_PATH="$(readlink "${SCRIPT_PATH}")"
+
+  case "${SCRIPT_PATH}" in
+    /*) ;;
+    *) SCRIPT_PATH="${SCRIPT_DIR}/${SCRIPT_PATH}" ;;
+  esac
+done
+
+readonly SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${SCRIPT_PATH}")" && pwd)"
+readonly PACKAGE_ROOT="$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)"
+readonly SOURCE_SKILLS_DIR="${PACKAGE_ROOT}/.codex/skills"
+readonly SOURCE_SHARED_DIR="${PACKAGE_ROOT}/.codex/ahe-shared"
+readonly MANAGED_SKILLS=(
+  "ahe-init"
+  "ahe-agent"
+  "ahe-product"
+  "ahe-todo"
+  "ahe-constraints"
+  "ahe-architecture"
+  "ahe-update"
+  "ahe-clear"
+  "ahe-help"
+  "ahe-copy"
+)
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ahe install [--force] [--backup]
+  ahe doctor
+  ahe version
+EOF
+}
+
+backup_existing_installation() {
+  local target_dir="$1"
+  local backup_root="$2"
+  local backup_name="$3"
+  local timestamp
+
+  timestamp="$(date '+%Y%m%d-%H%M%S')"
+  mkdir -p "${backup_root}"
+  mv "${target_dir}" "${backup_root}/${backup_name}-${timestamp}"
+}
+
+install_skill() {
+  local force="false"
+  local backup="false"
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --force)
+        force="true"
+        ;;
+      --backup)
+        backup="true"
+        ;;
+      *)
+        printf 'Unknown install option: %s\n' "$1" >&2
+        usage >&2
+        exit 1
+        ;;
+    esac
+    shift
+  done
+
+  if [ ! -d "${SOURCE_SKILLS_DIR}" ]; then
+    printf 'Packaged skill files are missing: %s\n' "${SOURCE_SKILLS_DIR}" >&2
+    exit 1
+  fi
+
+  if [ ! -d "${SOURCE_SHARED_DIR}" ]; then
+    printf 'Packaged shared files are missing: %s\n' "${SOURCE_SHARED_DIR}" >&2
+    exit 1
+  fi
+
+  local target_skills_dir="${PWD}/.codex/skills"
+  local target_shared_dir="${PWD}/.codex/ahe-shared"
+  local backup_dir="${PWD}/.codex/_backups"
+  local skill_name=""
+  local skill_target=""
+
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    skill_target="${target_skills_dir}/${skill_name}"
+
+    if [ -e "${skill_target}" ]; then
+      if [ "${backup}" = "true" ]; then
+        backup_existing_installation "${skill_target}" "${backup_dir}" "${skill_name}"
+      elif [ "${force}" != "true" ]; then
+        cat <<EOF >&2
+AHE skill is already installed at:
+  ${skill_target}
+
+Re-run with --force to overwrite or --backup to move the existing install aside first.
+EOF
+        exit 1
+      else
+        rm -rf "${skill_target}"
+      fi
+    fi
+  done
+
+  if [ -e "${target_shared_dir}" ]; then
+    if [ "${backup}" = "true" ]; then
+      backup_existing_installation "${target_shared_dir}" "${backup_dir}" "ahe-shared"
+    elif [ "${force}" = "true" ]; then
+      rm -rf "${target_shared_dir}"
+    else
+      cat <<EOF >&2
+AHE shared assets are already installed at:
+  ${target_shared_dir}
+
+Re-run with --force to overwrite or --backup to move the existing install aside first.
+EOF
+      exit 1
+    fi
+  fi
+
+  mkdir -p "${target_skills_dir}"
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    cp -R "${SOURCE_SKILLS_DIR}/${skill_name}" "${target_skills_dir}/${skill_name}"
+  done
+  cp -R "${SOURCE_SHARED_DIR}" "${target_shared_dir}"
+
+  cat <<EOF
+AHE Codex skill installed.
+
+Next:
+1. Open Codex chat in this workspace.
+2. Use one of: \`\$ahe-init\`, \`\$ahe-product\`, \`\$ahe-update\`, \`\$ahe-clear\`, \`\$ahe-help\`, or \`\$ahe-copy\`.
+EOF
+}
+
+doctor() {
+  local target_skills_dir="${PWD}/.codex/skills"
+  local target_shared_dir="${PWD}/.codex/ahe-shared"
+  local skill_name=""
+
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    if [ ! -f "${target_skills_dir}/${skill_name}/SKILL.md" ]; then
+      printf 'Missing: %s/%s/SKILL.md\n' "${target_skills_dir}" "${skill_name}" >&2
+      exit 1
+    fi
+  done
+
+  if [ ! -d "${target_shared_dir}/templates" ]; then
+    printf 'Missing: %s/templates\n' "${target_shared_dir}" >&2
+    exit 1
+  fi
+
+  if [ ! -d "${target_shared_dir}/schemas" ]; then
+    printf 'Missing: %s/schemas\n' "${target_shared_dir}" >&2
+    exit 1
+  fi
+
+  printf 'AHE skill installation looks healthy.\n'
+}
+
+main() {
+  if [ "$#" -eq 0 ]; then
+    usage
+    exit 1
+  fi
+
+  local command="$1"
+  shift
+
+  case "${command}" in
+    install)
+      install_skill "$@"
+      ;;
+    doctor)
+      doctor
+      ;;
+    version)
+      printf '%s\n' "${VERSION}"
+      ;;
+    *)
+      printf 'Unknown command: %s\n' "${command}" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

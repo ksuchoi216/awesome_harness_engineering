@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AHE Process Status",
+  "type": "object",
+  "required": [
+    "version",
+    "current_command",
+    "current_step",
+    "workflow_complete",
+    "updated_at"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "current_command": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_step": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The current step of the active workflow. For the ahe-init command, it represents the active subprocess being executed sequentially: 'ahe-agents', 'ahe-product', 'ahe-architecture', 'ahe-constraints', 'ahe-copy', or 'ahe-update'."
+    },
+    "workflow_complete": {
+      "type": "boolean"
+    },
+    "updated_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

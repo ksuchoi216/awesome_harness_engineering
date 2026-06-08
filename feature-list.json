@@ -1,0 +1,192 @@
+{
+  "features": [
+    {
+      "id": "feat-001",
+      "name": "Project Setup",
+      "description": "Create the packaged installer, conservative templates, installed skill scaffold, and runtime state for AHE.",
+      "dependencies": [],
+      "status": "done",
+      "evidence": "Verified with `bash -n init.sh`, `python3 -m json.tool feature-list.json`, `python3 -m json.tool .ahe/process_status.json`, `bash bin/ahe doctor`, `bash bin/ahe version`, installer smoke test into `/private/tmp/ahe-smoke.yILXJY`, and direct execution of `tests/test_project_setup.py` assertions via Python stdlib because pytest is not installed in this workspace."
+    },
+    {
+      "id": "feat-002",
+      "name": "Chat Command Routing",
+      "description": "Interpret `ahe` chat messages inside Codex and route them to the correct workflow entrypoint.",
+      "dependencies": [
+        "feat-001"
+      ],
+      "status": "done",
+      "evidence": "Updated .codex/skills/ahe/SKILL.md with explicit command routing instructions and added tests/test_chat_command_routing.py which passed."
+    },
+    {
+      "id": "feat-003",
+      "name": "Init Workflow",
+      "description": "Implement the `ahe init` conversation flow that creates or updates AGENTS.md and the supporting workspace files.",
+      "dependencies": [
+        "feat-002"
+      ],
+      "status": "done",
+      "evidence": "Updated .codex/skills/ahe/SKILL.md with detailed instructions for the step-by-step 'ahe init' workflow. Created tests/test_init_workflow.py and verified that all required sections, inputs, and output files are defined and tested successfully."
+    },
+    {
+      "id": "feat-004",
+      "name": "Product Workflow",
+      "description": "Implement the `ahe product` workflow that creates or updates docs/PRODUCT.md and synchronizes tracking artifacts.",
+      "dependencies": [
+        "feat-003"
+      ],
+      "status": "done",
+      "evidence": "Expanded `.codex/skills/ahe/SKILL.md` with a dedicated `ahe product` workflow covering workspace inspection, one-question-at-a-time product inputs, required `docs/PRODUCT.md` sections, and synchronization of `AGENTS.md`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `.ahe/process_status.json`. Added `tests/test_product_workflow.py` and verified with `python3 tests/test_product_workflow.py` and `pytest tests/ -x`."
+    },
+    {
+      "id": "feat-005",
+      "name": "Check and Resume Workflows",
+      "description": "Implement `ahe check` and `ahe resume` so AHE can validate the workspace and continue unfinished conversations.",
+      "dependencies": [
+        "feat-004"
+      ],
+      "status": "done",
+      "evidence": "Expanded `.codex/skills/ahe/SKILL.md` with dedicated `ahe check` and `ahe resume` workflow sections covering validation scope, checklist-style reporting, resume-state inspection, and next-question behavior. Added `tests/test_check_resume_workflows.py` and verified with `python3 tests/test_check_resume_workflows.py` and `pytest tests/ -x`."
+    },
+    {
+      "id": "feat-006",
+      "name": "Session Tracking and Handoff",
+      "description": "Keep PROGRESS.md, SESSION-HANDOFF.md, and .ahe/process_status.json in sync with the active AHE workflow.",
+      "dependencies": [
+        "feat-005"
+      ],
+      "status": "done",
+      "evidence": "Expanded `.codex/skills/ahe/SKILL.md` with a cross-workflow `Session Tracking and Handoff Sync` section covering when `.ahe/process_status.json`, `PROGRESS.md`, and `SESSION-HANDOFF.md` must be updated together. Added `tests/test_session_tracking_handoff.py` and verified with `python3 tests/test_session_tracking_handoff.py` and `pytest tests/ -x`."
+    },
+    {
+      "id": "feat-007",
+      "name": "Clear Workflow",
+      "description": "Add `ahe clear` so AHE backs up `docs/PRODUCT.md` and `AGENTS.md`, then asks for a new goal and new product specification.",
+      "dependencies": [
+        "feat-006"
+      ],
+      "status": "done",
+      "evidence": "Updated `.codex/skills/ahe/SKILL.md` and `docs/PRODUCT.md` with the `ahe clear` routing and workflow contract. Added `tests/test_clear_workflow.py` and verified with direct Python test-module execution because pytest is not installed in this workspace."
+    },
+    {
+      "id": "feat-008",
+      "name": "Clarification Prompt Format",
+      "description": "Require AHE to use a three-option clarification prompt when a user response needs clarification or more detail.",
+      "dependencies": [
+        "feat-007"
+      ],
+      "status": "done",
+      "evidence": "Added the Clarification Prompt Rule to `.codex/skills/ahe/SKILL.md`, documented it in `docs/PRODUCT.md`, and covered the exact prompt format in `tests/test_clarification_prompt.py`."
+    },
+    {
+      "id": "feat-009",
+      "name": "Clear Workflow Reset Semantics",
+      "description": "Change `ahe clear` so it backs up the full harness context, asks for a new goal, resets the AGENTS objective, removes the old product spec, and rewrites `docs/PRODUCT.md` recursively until clear.",
+      "dependencies": [
+        "feat-008"
+      ],
+      "status": "done",
+      "evidence": "Updated `.codex/skills/ahe/SKILL.md`, `docs/PRODUCT.md`, and `tests/test_clear_workflow.py` to match the new `ahe clear` semantics. The active clear-workflow backup directory was also expanded to include the full requested backup set."
+    },
+    {
+      "id": "feat-010",
+      "name": "Global Codex Helper Scripts",
+      "description": "Make `scripts/install.sh` and `scripts/uninstall.sh` operate on the global Codex home under `~/.codex`.",
+      "dependencies": [
+        "feat-009"
+      ],
+      "status": "done",
+      "evidence": "Updated `scripts/install.sh` to install into `${HOME}/.codex` via the packaged installer and `scripts/uninstall.sh` to remove `${HOME}/.codex/skills/ahe`. Added coverage in `tests/test_project_setup.py`."
+    },
+    {
+      "id": "feat-011",
+      "name": "Alias Commands and Update Workflow",
+      "description": "Add Codex-facing aliases like `$ahe-init`, `$ahe-product`, and `$ahe-update`, and define `ahe update` for feature-list, progress, and handoff maintenance.",
+      "dependencies": [
+        "feat-010"
+      ],
+      "status": "done",
+      "evidence": "Updated `.codex/skills/ahe/SKILL.md` and `docs/PRODUCT.md` with `$ahe-*` aliases plus the `ahe update` workflow. Added `tests/test_update_workflow.py` and expanded `tests/test_chat_command_routing.py`."
+    },
+    {
+      "id": "feat-012",
+      "name": "Reduced AHE Skill Surface",
+      "description": "Reduce AHE to the seven `$ahe-*` commands for init, agent, product, constraints, architecture, update, and clear.",
+      "dependencies": [
+        "feat-011"
+      ],
+      "status": "done",
+      "evidence": "Rewrote `.codex/skills/ahe/SKILL.md`, updated `docs/PRODUCT.md`, replaced the old check/resume expectations, and added command/workflow contract tests for the reduced `$ahe-*` surface."
+    },
+    {
+      "id": "feat-013",
+      "name": "Split AHE Skills",
+      "description": "Replace the monolithic AHE skill with seven separate Codex skills plus shared templates and schemas outside the skills directory.",
+      "dependencies": [
+        "feat-012"
+      ],
+      "status": "done",
+      "evidence": "Added `.codex/skills/ahe-init`, `ahe-agent`, `ahe-product`, `ahe-constraints`, `ahe-architecture`, `ahe-update`, and `ahe-clear`; moved shared assets to `.codex/ahe-shared`; updated `bin/ahe`, `package.json`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, and split-skill verification tests."
+    },
+    {
+      "id": "feat-014",
+      "name": "Todo Queue Skill",
+      "description": "Add `ahe-todo` to append fast todo items into `docs/todo.md`, update `feature-list.json`, and let `ahe-update` consume the queued todo content into `docs/PRODUCT.md`.",
+      "dependencies": [
+        "feat-013"
+      ],
+      "status": "done",
+      "evidence": "Added `.codex/skills/ahe-todo/SKILL.md`, extended `.codex/skills/ahe-update/SKILL.md` with `docs/todo.md` consumption rules, updated installer-managed skill lists, refreshed `docs/PRODUCT.md`, and expanded split-skill verification tests."
+    },
+    {
+      "id": "feat-015",
+      "name": "Help Skill",
+      "description": "Add `ahe-help` to list all AHE skills and commands to the user.",
+      "dependencies": [
+        "feat-014"
+      ],
+      "status": "done",
+      "evidence": "Created .codex/skills/ahe-help/SKILL.md listing all 9 AHE commands, updated installer/uninstaller in bin/ahe and scripts/uninstall.sh, updated package.json files array to correctly pack .codex dotfolder, updated docs/PRODUCT.md, and validated all with 31/31 passing tests (pytest, ruff, mypy) and successful local dry-run packaging and installation smoke tests."
+    },
+    {
+      "id": "feat-016",
+      "name": "Copy Skill",
+      "description": "Add `ahe-copy` to copy template files from ahe-shared/templates to the workspace, capitalizing MD files and putting PRODUCT.md in docs/.",
+      "dependencies": [
+        "feat-015"
+      ],
+      "status": "done",
+      "evidence": "Created .codex/skills/ahe-copy/SKILL.md to copy templates excluding agents/product to the workspace root while capitalizing markdown filenames, updated installer/uninstaller in bin/ahe and scripts/uninstall.sh, updated docs/PRODUCT.md, and validated all with 32/32 passing tests (pytest, ruff, mypy) and successful local global installation."
+    },
+    {
+      "id": "feat-017",
+      "name": "AHE Agent Initialize Workflow on AGENTS.md Absence",
+      "description": "Extend $ahe-agent to copy and capitalize agents.md from templates if AGENTS.md is missing, update the project purpose, and ask the user about their language choice.",
+      "dependencies": [
+        "feat-016"
+      ],
+      "status": "done",
+      "evidence": "Extended .codex/skills/ahe-agent/SKILL.md with a workflow for missing AGENTS.md that copies/renames templates/agents.md to AGENTS.md, updates the project purpose, and asks the language question sequence. Documented behavior in docs/PRODUCT.md, and added tests in tests/test_specialized_workflows.py which pass."
+    },
+    {
+      "id": "feat-018",
+      "name": "Init Workflow Multi-Step Execution",
+      "description": "Modify the ahe-init workflow to sequentially proceed through six steps (ahe-agents, ahe-product, ahe-architecture, ahe-constraints, ahe-copy, ahe-update) and update the process status to track these steps.",
+      "dependencies": [
+        "feat-017"
+      ],
+      "status": "done",
+      "evidence": "Updated .codex/skills/ahe-init/SKILL.md, .codex/ahe-shared/schemas/process_status.schema.json, docs/PRODUCT.md, and tests/test_init_workflow.py. Verified that all 33 tests passed using pytest tests/ -x."
+    },
+    {
+      "id": "feat-019",
+      "name": "Clarification Prompt Question Inclusion and Recursive Clarification",
+      "description": "Enforce recursive questioning for clarifications, and update the clarification rule in all skill files to include Question: {question}.",
+      "dependencies": [
+        "feat-018"
+      ],
+      "status": "done",
+      "evidence": "Updated all 8 interactive skill markdown files under .codex/skills/, updated docs/PRODUCT.md, updated tests/test_clarification_prompt.py assertions, and verified with pytest tests/ -x."
+    }
+  ]
+}
