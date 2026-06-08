@@ -1,6 +1,8 @@
 # Awesome Harness Engineering
-Automatically build harness by using the templates. it is for both terminal command and codex usage.
-
+Automatically build harness by using the templates.
+user will use codex to use this skill in codex's conversation(chat), not in terminal.
+finally, "npx ahe install" will install ahe to your computer.
+templates folder is for initilizing, and for agent, product, constraint, init.sh, feature_list.json, progress.md, session-handoff.md, schemas, examples
 
 ## Startup Workflow
 
@@ -50,14 +52,10 @@ Before ending a session:
 5. Leave repo clean enough for next session to run `./init.sh` immediately
 
 ## Verification Commands
-
-```bash
-# Full verification (recommended)
-{{PRIMARY_VERIFICATION_COMMAND}}
-```
-
-Required checks:
-{{VERIFICATION_COMMANDS}}
+- Tests: pytest tests/ -x
+- Type check: mypy src/ --strict
+- Lint: ruff check src/
+- Full verification: make check (includes all above)
 
 ## Escalation
 

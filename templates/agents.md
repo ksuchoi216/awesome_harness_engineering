@@ -2,9 +2,6 @@
 
 {{PROJECT_PURPOSE}}
 
-## Global Constraints
-{{GLOBAL_CONSTRAINTS}}
-
 ## Startup Workflow
 
 Before writing code:
@@ -53,14 +50,10 @@ Before ending a session:
 5. Leave repo clean enough for next session to run `./init.sh` immediately
 
 ## Verification Commands
-
-```bash
-# Full verification (recommended)
-{{PRIMARY_VERIFICATION_COMMAND}}
-```
-
-Required checks:
-{{VERIFICATION_COMMANDS}}
+- Tests: pytest tests/ -x
+- Type check: mypy src/ --strict
+- Lint: ruff check src/
+- Full verification: make check (includes all above)
 
 ## Escalation
 
