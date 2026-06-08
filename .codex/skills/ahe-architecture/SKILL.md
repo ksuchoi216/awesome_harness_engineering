@@ -19,16 +19,24 @@ Use this skill when the user invokes `$ahe-architecture`.
 
 ## Clarification Rule
 
-If a user answer needs clarification or a more detailed description, ask question recursively to clarify the response, and use this exact prompt:
+If a user answer needs clarification or a more detailed description, ask again recursively using a Codex-supported structured response request. Ask a short question, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
 
-Question: {question}
-Please choose one option:
+### User Response Target
 
-1. Yes
+- Collect the architecture direction needed to update `docs/achitecture.md`.
 
-2. No
+### Questions to Ask
 
-3. Custom input
+- Ask about the technical stack, major components, or system boundaries.
+- Ask about important design decisions, interfaces, or data flow when they matter.
+- Ask which architectural option is preferred when multiple directions are plausible.
 
-Enter 1, 2, or type your own answer:
+### Clarification Criteria
 
+- The answer must identify the stack, components, or decision direction clearly enough to document the architecture.
+- The answer must be concrete enough that the architecture description does not rely on unstated assumptions.
+
+### Re-ask When
+
+- Ask again when the answer is vague, contradictory, or only names a technology without the role it plays.
+- Ask again when component responsibilities or the overall direction are still unclear.

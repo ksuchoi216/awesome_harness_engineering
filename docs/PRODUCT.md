@@ -100,7 +100,7 @@ The installed skills must not store workspace runtime state under `.codex/`.
   2. Rename it to `AGENTS.md` (uppercase).
   3. Ask what the purpose of this project is to user.
   4. Update the project purpose in the copied `AGENTS.md`.
-  5. Ask the user the exact prompt: "Is your language Python? 1. Yes 2. No 3. Custom input".
+  5. Ask whether the project language is Python using a Codex-supported structured response request with meaningful options and custom input.
   6. If the user answers "No", ask again: "Which language do you use?".
 
 ### `$ahe-product`
@@ -165,20 +165,13 @@ The installed skills must not store workspace runtime state under `.codex/`.
 
 ## 6. Clarification Prompt
 
-If a user response needs clarification or more detail, AHE must ask recursively to clarify the response, using this exact format:
+If a user response needs clarification or more detail, each interactive AHE skill must ask again recursively using a Codex-supported structured response request.
 
-```text
-Question: {question}
-Please choose one option:
-
-1. Yes
-
-2. No
-
-3. Custom input
-
-Enter 1, 2, or type your own answer:
-```
+- Ask a short question matched to the active skill.
+- Provide 2-3 meaningful mutually exclusive options when possible.
+- Allow custom input when predefined options are not enough.
+- Keep asking until the answer satisfies the skill's clarification criteria.
+- Treat vague, off-topic, contradictory, or incomplete answers as not clarified yet.
 
 ## 7. Installation Behavior
 

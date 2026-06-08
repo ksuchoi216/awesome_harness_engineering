@@ -22,16 +22,24 @@ Use this skill when the user invokes `$ahe-todo`.
 
 ## Clarification Rule
 
-If a user answer needs clarification or a more detailed description, ask question recursively to clarify the response, and use this exact prompt:
+If a user answer needs clarification or a more detailed description, ask again recursively using a Codex-supported structured response request. Ask a short question, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
 
-Question: {question}
-Please choose one option:
+### User Response Target
 
-1. Yes
+- Collect an actionable todo entry for `docs/todo.md` and `feature-list.json`.
 
-2. No
+### Questions to Ask
 
-3. Custom input
+- Ask what work needs to be done.
+- Ask which file, feature area, or workflow the todo affects.
+- Ask what outcome or completion signal the todo should capture.
 
-Enter 1, 2, or type your own answer:
+### Clarification Criteria
 
+- The answer must describe actionable work, the affected area, and the intended outcome.
+- The answer must be specific enough to record as a useful queued task.
+
+### Re-ask When
+
+- Ask again when the answer is too broad, off-topic, or only names a topic without describing the work.
+- Ask again when dependencies, affected area, or intended outcome are still unclear.

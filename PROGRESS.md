@@ -2,11 +2,13 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-09 02:54 +0900
-**Session ID:** feat-019-clarification-prompt-question
+**Last Updated:** 2026-06-09 03:12 +0900
+**Session ID:** feat-020-codex-ui-clarification
 **Active Feature:** None
 
 ## Completed
+
+- [x] Implemented `feat-020 Codex UI-Compatible Clarification Requests` by replacing the fixed plain-text clarification prompt in all 8 interactive AHE skill files with Codex-supported structured response request guidance, adding skill-specific clarification criteria, updating `docs/PRODUCT.md`, and updating the clarification tests to match the new contract.
 
 - [x] Implemented `feat-019 Clarification Prompt Question Inclusion and Recursive Clarification` by updating the Clarification Rule block across all 8 interactive skill files, `docs/PRODUCT.md`, and `tests/test_clarification_prompt.py`.
 
@@ -63,7 +65,7 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-017 AHE Agent Initialize Workflow on AGENTS.md Absence` is complete. `$ahe-agent` now handles workspace setup when `AGENTS.md` is missing.
+  - Details: `feat-020 Codex UI-Compatible Clarification Requests` is complete. Interactive skill clarification guidance now targets Codex structured response UI instead of a fixed plain-text prompt.
   - Blockers: None.
 
 ## Blocked
@@ -72,6 +74,9 @@
 
 ## Decisions
 
+- **Clarification UI guidance should target Codex structured response requests, not a hardcoded text block**: Interactive AHE skills now instruct Codex to ask short structured questions with meaningful options and custom input, then re-ask until each skill's clarification criteria are satisfied.
+  - Context: The user wants the Codex response picker UI behavior rather than literal prompt text rendered in chat.
+  - Alternatives considered: Keeping the exact `Question: {question}` text block would preserve the old test contract but would not match the desired Codex UI behavior.
 - **ahe-copy ignores AGENTS.md and PRODUCT.md**: The `ahe-copy` skill explicitly ignores the agents and product files, copying all other templates directly to the workspace root.
   - Context: The user requested a skill to copy the other template files for initialization while leaving agents/product handling separate.
   - Alternatives considered: Copying product spec to `docs/` and agents.md to root, which was the previous plan.
@@ -111,6 +116,7 @@
 
 ## Change Log
 
+- `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-agent/SKILL.md`, `.codex/skills/ahe-product/SKILL.md`, `.codex/skills/ahe-todo/SKILL.md`, `.codex/skills/ahe-constraints/SKILL.md`, `.codex/skills/ahe-architecture/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `.codex/skills/ahe-copy/SKILL.md`, `docs/PRODUCT.md`, `tests/test_clarification_prompt.py`, `tests/test_specialized_workflows.py`, `feature-list.json` - Replaced the fixed clarification prompt format with Codex UI-compatible structured response request guidance and added skill-specific clarification criteria.
 - `.codex/skills/ahe-agent/SKILL.md`, `docs/PRODUCT.md`, `tests/test_specialized_workflows.py` - Updated `$ahe-agent` workflow (when `AGENTS.md` is missing) to ask what the purpose of the project is to the user.
 - `.codex/skills/ahe-init/SKILL.md`, `.codex/ahe-shared/schemas/process_status.schema.json`, `docs/PRODUCT.md`, `tests/test_init_workflow.py` - Updated `ahe-init` to execute the six sequential steps and update progress status tracking.
 - `.codex/skills/ahe-copy/SKILL.md`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `tests/`, `feature-list.json` - Implemented the `ahe-copy` skill to copy workspace templates except AGENTS/PRODUCT, capitalizing markdown filenames, and validated it with tests.

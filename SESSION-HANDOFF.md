@@ -2,12 +2,16 @@
 
 ## Current Product Context
 
-- Goal: Include recursive clarification and update clarification rule format with Question parameter in all interactive skills.
-- Current status: `feat-019 Clarification Prompt Question Inclusion and Recursive Clarification` is complete.
+- Goal: Use Codex UI-compatible structured response requests for clarification in all interactive AHE skills.
+- Current status: `feat-020 Codex UI-Compatible Clarification Requests` is complete.
 - Branch / commit: Current working tree changes only. No commit created in this session.
 
 ## Last Completed Work
 
+- [x] Updated all 8 interactive skill markdown files to replace the fixed plain-text clarification prompt with Codex-supported structured response request guidance, custom input handling, recursive re-asking, and skill-specific clarification criteria.
+- [x] Updated `docs/PRODUCT.md` so the clarification contract describes structured Codex response requests instead of the old literal prompt block.
+- [x] Updated `tests/test_clarification_prompt.py` and `tests/test_specialized_workflows.py` to verify the new clarification contract.
+- [x] Verified the change with `./init.sh` and `pytest tests/ -x`.
 - [x] Updated all 8 interactive skill markdown files (`SKILL.md` under `ahe-init`, `ahe-agent`, `ahe-product`, `ahe-todo`, `ahe-constraints`, `ahe-architecture`, `ahe-clear`, `ahe-copy`) to include recursive clarification rule descriptions and formatting.
 - [x] Updated `docs/PRODUCT.md` with the new clarification prompt format and recursive instruction.
 - [x] Updated `tests/test_clarification_prompt.py` to check for the new format containing "Question: {question}" and recursive clarification assertions.
@@ -46,6 +50,7 @@
 - `.ahe/backups/20260608-215651/SESSION-HANDOFF.md` - Clear-workflow backup of the current handoff file.
 - `.ahe/backups/20260608-215651/init.sh` - Clear-workflow backup of the current startup script.
 - `.codex/skills/ahe-init/SKILL.md` through `.codex/skills/ahe-clear/SKILL.md`, plus `.codex/skills/ahe-todo/SKILL.md` - The visible AHE skills now exposed in Codex.
+- `tests/test_clarification_prompt.py` - Contract coverage for Codex UI-compatible clarification guidance and skill-specific clarification sections.
 - `.codex/skills/ahe-update/SKILL.md` - Update workflow that now consumes `docs/todo.md` into `docs/PRODUCT.md`.
 - `.codex/ahe-shared/` - Shared templates and schemas used by the split skills and installer.
 - `scripts/install.sh`, `scripts/uninstall.sh` - Helper scripts for global Codex install and uninstall under `${HOME}/.codex`.
@@ -63,12 +68,14 @@
 2. Read `feature-list.json` and `PROGRESS.md`.
 3. Review this handoff.
 4. Run `./init.sh` or the documented verification command before editing.
-5. Decide the exact post-apply cleanup rule for `docs/todo.md` if future implementation needs more than the current contract text.
+5. If clarification UX changes again, update the structured-response wording and the markdown contract tests together.
 
 ## Verification Status
 
 | Check | Command | Result | Notes |
 |---|---|---|---|
+| Init sanity | `./init.sh` | Pass | Startup check still reports the expected Python-default environment guidance. |
+| Full tests | `pytest tests/ -x` | Pass | All 34 contract tests passed after the structured clarification update. |
 | Shell syntax | `bash -n init.sh` and `bash -n bin/ahe` | Pass | Startup script and installer script both parse cleanly. |
 | JSON validation | `python3 -m json.tool feature-list.json` | Pass | `feature-list.json` is valid JSON. |
 | Runtime state JSON | `python3 -m json.tool .ahe/process_status.json` | Pass | Process status file is valid JSON. |

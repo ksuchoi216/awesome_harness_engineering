@@ -42,16 +42,24 @@ Use this skill when the user invokes `$ahe-clear`.
 
 ## Clarification Rule
 
-If a user answer needs clarification or a more detailed description, ask question recursively to clarify the response, and use this exact prompt:
+If a user answer needs clarification or a more detailed description, ask again recursively using a Codex-supported structured response request. Ask a short question, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
 
-Question: {question}
-Please choose one option:
+### User Response Target
 
-1. Yes
+- Collect the new goal and replacement product direction required to finish the reset workflow.
 
-2. No
+### Questions to Ask
 
-3. Custom input
+- Ask what the new goal is.
+- Ask what the new product should do and who it is for.
+- Ask follow-up questions about scope or success criteria when the reset target is still unclear.
 
-Enter 1, 2, or type your own answer:
+### Clarification Criteria
 
+- The answer must define a concrete new goal.
+- The answer must give enough product direction to start the replacement specification.
+
+### Re-ask When
+
+- Ask again when the answer is vague, off-topic, or still tied to the previous objective without a clear reset direction.
+- Ask again when the new goal or product direction is too incomplete to finish the reset safely.
