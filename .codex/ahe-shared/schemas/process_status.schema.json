@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AHE Process Status",
+  "type": "object",
+  "required": [
+    "version",
+    "current_command",
+    "current_step",
+    "workflow_complete",
+    "updated_at"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "current_command": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_step": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "workflow_complete": {
+      "type": "boolean"
+    },
+    "updated_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

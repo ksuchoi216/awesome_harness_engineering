@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AHE Feature List",
+  "type": "object",
+  "required": [
+    "features"
+  ],
+  "properties": {
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false
+}

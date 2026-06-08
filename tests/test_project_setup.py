@@ -9,14 +9,22 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 REQUIRED_SKILL_FILES = (
-    Path(".codex/skills/ahe/SKILL.md"),
-    Path(".codex/skills/ahe/templates/AGENTS.md"),
-    Path(".codex/skills/ahe/templates/PRODUCT.md"),
-    Path(".codex/skills/ahe/templates/PROGRESS.md"),
-    Path(".codex/skills/ahe/templates/SESSION-HANDOFF.md"),
-    Path(".codex/skills/ahe/templates/init.sh"),
-    Path(".codex/skills/ahe/templates/feature-list.json"),
-    Path(".codex/skills/ahe/schemas/process_status.schema.json"),
+    Path(".codex/skills/ahe-init/SKILL.md"),
+    Path(".codex/skills/ahe-agent/SKILL.md"),
+    Path(".codex/skills/ahe-product/SKILL.md"),
+    Path(".codex/skills/ahe-todo/SKILL.md"),
+    Path(".codex/skills/ahe-constraints/SKILL.md"),
+    Path(".codex/skills/ahe-architecture/SKILL.md"),
+    Path(".codex/skills/ahe-update/SKILL.md"),
+    Path(".codex/skills/ahe-clear/SKILL.md"),
+    Path(".codex/ahe-shared/templates/AGENTS.md"),
+    Path(".codex/ahe-shared/templates/PRODUCT.md"),
+    Path(".codex/ahe-shared/templates/PROGRESS.md"),
+    Path(".codex/ahe-shared/templates/SESSION-HANDOFF.md"),
+    Path(".codex/ahe-shared/templates/init.sh"),
+    Path(".codex/ahe-shared/templates/feature-list.json"),
+    Path(".codex/ahe-shared/schemas/process_status.schema.json"),
+    Path(".codex/ahe-shared/schemas/feature-list-schema.json"),
 )
 
 
@@ -57,13 +65,9 @@ def test_installer_copies_skill_files_into_target_workspace(tmp_path: Path) -> N
     package_root.mkdir()
     workspace_root.mkdir()
 
-    package_json_source = REPO_ROOT / "package.json"
-    bin_source = REPO_ROOT / "bin"
-    skill_source = REPO_ROOT / ".codex"
-
-    shutil.copy2(package_json_source, package_root / "package.json")
-    shutil.copytree(bin_source, package_root / "bin")
-    shutil.copytree(skill_source, package_root / ".codex")
+    shutil.copy2(REPO_ROOT / "package.json", package_root / "package.json")
+    shutil.copytree(REPO_ROOT / "bin", package_root / "bin")
+    shutil.copytree(REPO_ROOT / ".codex", package_root / ".codex")
 
     completed_process = subprocess.run(
         (str(package_root / "bin" / "ahe"), "install"),
@@ -75,7 +79,9 @@ def test_installer_copies_skill_files_into_target_workspace(tmp_path: Path) -> N
 
     assert completed_process.returncode == 0, completed_process.stderr
     assert "AHE Codex skill installed." in completed_process.stdout
-    assert (workspace_root / ".codex/skills/ahe/SKILL.md").exists()
+    assert (workspace_root / ".codex/skills/ahe-init/SKILL.md").exists()
+    assert (workspace_root / ".codex/skills/ahe-clear/SKILL.md").exists()
+    assert (workspace_root / ".codex/ahe-shared/templates/AGENTS.md").exists()
 
 
 def test_installer_supports_local_npx_package_flow(tmp_path: Path) -> None:
@@ -116,7 +122,8 @@ def test_installer_supports_local_npx_package_flow(tmp_path: Path) -> None:
 
     assert completed_process.returncode == 0, completed_process.stderr
     assert "AHE Codex skill installed." in completed_process.stdout
-    assert (workspace_root / ".codex/skills/ahe/SKILL.md").exists()
+    assert (workspace_root / ".codex/skills/ahe-update/SKILL.md").exists()
+    assert (workspace_root / ".codex/ahe-shared/schemas/process_status.schema.json").exists()
 
 
 def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
@@ -144,7 +151,8 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
     )
 
     assert install_process.returncode == 0, install_process.stderr
-    assert (fake_home / ".codex/skills/ahe/SKILL.md").exists()
+    assert (fake_home / ".codex/skills/ahe-product/SKILL.md").exists()
+    assert (fake_home / ".codex/ahe-shared/templates/PRODUCT.md").exists()
 
     uninstall_process = subprocess.run(
         (str(REPO_ROOT / "scripts" / "uninstall.sh"),),
@@ -156,15 +164,14 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
     )
 
     assert uninstall_process.returncode == 0, uninstall_process.stderr
-    assert not (fake_home / ".codex/skills/ahe").exists()
+    assert not (fake_home / ".codex/skills/ahe-init").exists()
+    assert not (fake_home / ".codex/ahe-shared").exists()
 
 
 def test_template_directory_does_not_use_forbidden_lowercase_markdown_names() -> None:
-    template_dir = REPO_ROOT / ".codex/skills/ahe/templates"
-    if not template_dir.exists():
-        return
+    template_dir = REPO_ROOT / ".codex/ahe-shared/templates"
 
-    actual_names = {p.name for p in template_dir.iterdir()}
+    actual_names = {path.name for path in template_dir.iterdir()}
     forbidden_names = {"agents.md", "progress.md", "session-handoff.md"}
 
     existing_forbidden_names = forbidden_names.intersection(actual_names)

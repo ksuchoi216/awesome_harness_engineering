@@ -16,7 +16,18 @@ done
 
 readonly SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${SCRIPT_PATH}")" && pwd)"
 readonly PACKAGE_ROOT="$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)"
-readonly SOURCE_DIR="${PACKAGE_ROOT}/.codex/skills/ahe"
+readonly SOURCE_SKILLS_DIR="${PACKAGE_ROOT}/.codex/skills"
+readonly SOURCE_SHARED_DIR="${PACKAGE_ROOT}/.codex/ahe-shared"
+readonly MANAGED_SKILLS=(
+  "ahe-init"
+  "ahe-agent"
+  "ahe-product"
+  "ahe-todo"
+  "ahe-constraints"
+  "ahe-architecture"
+  "ahe-update"
+  "ahe-clear"
+)
 
 usage() {
   cat <<'EOF'
@@ -30,11 +41,12 @@ EOF
 backup_existing_installation() {
   local target_dir="$1"
   local backup_root="$2"
+  local backup_name="$3"
   local timestamp
 
   timestamp="$(date '+%Y%m%d-%H%M%S')"
   mkdir -p "${backup_root}"
-  mv "${target_dir}" "${backup_root}/ahe-${timestamp}"
+  mv "${target_dir}" "${backup_root}/${backup_name}-${timestamp}"
 }
 
 install_skill() {
@@ -58,57 +70,92 @@ install_skill() {
     shift
   done
 
-  if [ ! -d "${SOURCE_DIR}" ]; then
-    printf 'Packaged skill files are missing: %s\n' "${SOURCE_DIR}" >&2
+  if [ ! -d "${SOURCE_SKILLS_DIR}" ]; then
+    printf 'Packaged skill files are missing: %s\n' "${SOURCE_SKILLS_DIR}" >&2
     exit 1
   fi
 
-  local target_dir="${PWD}/.codex/skills/ahe"
-  local backup_dir="${PWD}/.codex/skills/_backups"
+  if [ ! -d "${SOURCE_SHARED_DIR}" ]; then
+    printf 'Packaged shared files are missing: %s\n' "${SOURCE_SHARED_DIR}" >&2
+    exit 1
+  fi
 
-  if [ -e "${target_dir}" ]; then
-    if [ "${backup}" = "true" ]; then
-      backup_existing_installation "${target_dir}" "${backup_dir}"
-    elif [ "${force}" != "true" ]; then
-      cat <<EOF >&2
+  local target_skills_dir="${PWD}/.codex/skills"
+  local target_shared_dir="${PWD}/.codex/ahe-shared"
+  local backup_dir="${PWD}/.codex/_backups"
+  local skill_name=""
+  local skill_target=""
+
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    skill_target="${target_skills_dir}/${skill_name}"
+
+    if [ -e "${skill_target}" ]; then
+      if [ "${backup}" = "true" ]; then
+        backup_existing_installation "${skill_target}" "${backup_dir}" "${skill_name}"
+      elif [ "${force}" != "true" ]; then
+        cat <<EOF >&2
 AHE skill is already installed at:
-  ${target_dir}
+  ${skill_target}
+
+Re-run with --force to overwrite or --backup to move the existing install aside first.
+EOF
+        exit 1
+      else
+        rm -rf "${skill_target}"
+      fi
+    fi
+  done
+
+  if [ -e "${target_shared_dir}" ]; then
+    if [ "${backup}" = "true" ]; then
+      backup_existing_installation "${target_shared_dir}" "${backup_dir}" "ahe-shared"
+    elif [ "${force}" = "true" ]; then
+      rm -rf "${target_shared_dir}"
+    else
+      cat <<EOF >&2
+AHE shared assets are already installed at:
+  ${target_shared_dir}
 
 Re-run with --force to overwrite or --backup to move the existing install aside first.
 EOF
       exit 1
-    else
-      rm -rf "${target_dir}"
     fi
   fi
 
-  mkdir -p "${PWD}/.codex/skills"
-  cp -R "${SOURCE_DIR}" "${target_dir}"
+  mkdir -p "${target_skills_dir}"
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    cp -R "${SOURCE_SKILLS_DIR}/${skill_name}" "${target_skills_dir}/${skill_name}"
+  done
+  cp -R "${SOURCE_SHARED_DIR}" "${target_shared_dir}"
 
   cat <<EOF
 AHE Codex skill installed.
 
 Next:
 1. Open Codex chat in this workspace.
-2. Type \`ahe init\`.
+2. Use one of: \`$ahe-init\`, \`$ahe-product\`, \`$ahe-update\`, or \`$ahe-clear\`.
 EOF
 }
 
 doctor() {
-  local target_dir="${PWD}/.codex/skills/ahe"
+  local target_skills_dir="${PWD}/.codex/skills"
+  local target_shared_dir="${PWD}/.codex/ahe-shared"
+  local skill_name=""
 
-  if [ ! -f "${target_dir}/SKILL.md" ]; then
-    printf 'Missing: %s/SKILL.md\n' "${target_dir}" >&2
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    if [ ! -f "${target_skills_dir}/${skill_name}/SKILL.md" ]; then
+      printf 'Missing: %s/%s/SKILL.md\n' "${target_skills_dir}" "${skill_name}" >&2
+      exit 1
+    fi
+  done
+
+  if [ ! -d "${target_shared_dir}/templates" ]; then
+    printf 'Missing: %s/templates\n' "${target_shared_dir}" >&2
     exit 1
   fi
 
-  if [ ! -d "${target_dir}/templates" ]; then
-    printf 'Missing: %s/templates\n' "${target_dir}" >&2
-    exit 1
-  fi
-
-  if [ ! -d "${target_dir}/schemas" ]; then
-    printf 'Missing: %s/schemas\n' "${target_dir}" >&2
+  if [ ! -d "${target_shared_dir}/schemas" ]; then
+    printf 'Missing: %s/schemas\n' "${target_shared_dir}" >&2
     exit 1
   fi
 

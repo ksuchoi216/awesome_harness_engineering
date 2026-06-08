@@ -2,12 +2,19 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-08 22:01 +0900
-**Session ID:** feat-012-reduced-ahe-skill-surface
-**Active Feature:** feat-012 - Reduced AHE Skill Surface
+**Last Updated:** 2026-06-08 22:47 +0900
+**Session ID:** feat-014-todo-queue-skill
+**Active Feature:** feat-014 - Todo Queue Skill
 
 ## Completed
 
+- [x] Implemented `feat-014 Todo Queue Skill` by adding `ahe-todo` and teaching `ahe-update` to consume `docs/todo.md` into `docs/PRODUCT.md`.
+- [x] Updated the split-skill installer and uninstall lists to include `ahe-todo`.
+- [x] Extended the split-skill tests and product specification to cover `docs/todo.md` queue behavior.
+- [x] Implemented `feat-013 Split AHE Skills` by replacing the monolithic AHE skill with seven separate skill directories and moving templates/schemas into `.codex/ahe-shared`.
+- [x] Updated `bin/ahe`, `package.json`, and `scripts/uninstall.sh` so install and uninstall operate on the split-skill layout.
+- [x] Rewrote the skill contract tests to validate the split AHE skills instead of `.codex/skills/ahe/SKILL.md`.
+- [x] Verified the split-skill layout with `python3 tests/test_*.py`, `bash -n` checks, `bash bin/ahe version`, and `./init.sh`.
 - [x] Implemented `feat-012 Reduced AHE Skill Surface` by reducing AHE to `$ahe-init`, `$ahe-agent`, `$ahe-product`, `$ahe-constraints`, `$ahe-architecture`, `$ahe-update`, and `$ahe-clear`.
 - [x] Rewrote the skill and product contracts around the reduced command surface.
 - [x] Replaced the old check/resume test expectations with the new reduced-command workflow tests.
@@ -41,7 +48,7 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-012 Reduced AHE Skill Surface` is complete. The previous `ahe clear` runtime is no longer aligned with the new command surface and should not be resumed as-is.
+  - Details: `feat-014 Todo Queue Skill` is complete. `ahe-todo` now queues work in `docs/todo.md`, and `ahe-update` consumes that queue into `docs/PRODUCT.md`.
   - Blockers: None.
 
 ## Blocked
@@ -50,6 +57,12 @@
 
 ## Decisions
 
+- **Fast todo capture should bypass immediate `docs/PRODUCT.md` editing**: `ahe-todo` writes queued work to `docs/todo.md`, and `ahe-update` is responsible for applying it to `docs/PRODUCT.md` later.
+  - Context: The user wants a lighter-weight capture path that still updates `feature-list.json`.
+  - Alternatives considered: Writing directly to `docs/PRODUCT.md` from `ahe-todo` would collapse the separation between quick capture and later structured application.
+- **AHE should be exposed as separate Codex skills, not one command router file**: the repository now installs seven `ahe-*` skill directories and keeps reusable templates and schemas under `.codex/ahe-shared`.
+  - Context: The user wants each AHE capability visible and invokable directly in Codex.
+  - Alternatives considered: Keeping one `ahe` skill with internal subcommand routing still shows only one skill in Codex and does not satisfy the requested UX.
 - **Installer implementation is part of feat-001**: `npx ahe install` now has a concrete package scaffold instead of staying as a later placeholder.
   - Context: The product goal and user instructions both require installation to be included now.
   - Alternatives considered: Deferring the installer to a later feature would leave the setup feature incomplete.
@@ -71,6 +84,8 @@
 
 ## Change Log
 
+- `.codex/skills/ahe-todo/SKILL.md`, `.codex/skills/ahe-update/SKILL.md`, `docs/PRODUCT.md`, `feature-list.json`, `tests/`, `bin/ahe`, `scripts/uninstall.sh` - Added the todo queue skill and taught update to consume queued todo content into the product spec.
+- `.codex/skills/`, `.codex/ahe-shared/`, `bin/ahe`, `package.json`, `scripts/uninstall.sh`, `tests/`, `docs/PRODUCT.md` - Reorganized AHE into seven separate skills with shared assets outside the skills directory and updated installation plus verification coverage.
 - `.ahe/backups/20260608-215651/`, `.ahe/process_status.json`, `PROGRESS.md`, `SESSION-HANDOFF.md` - Started `ahe clear`, backed up `AGENTS.md` and `docs/PRODUCT.md`, and advanced the workflow to the new-goal question.
 - `.codex/skills/ahe/SKILL.md`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_clear_workflow.py` - Changed `ahe clear` to back up the full harness files, reset `AGENTS.md` objective guidance, remove the old product spec after backup, and rewrite `docs/PRODUCT.md` recursively.
 - `scripts/install.sh`, `scripts/uninstall.sh`, `tests/test_project_setup.py`, `docs/PRODUCT.md` - Changed the helper scripts to install/uninstall under `${HOME}/.codex` and added verification coverage.

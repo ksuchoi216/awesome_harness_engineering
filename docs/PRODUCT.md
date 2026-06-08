@@ -4,463 +4,163 @@
 
 AHE
 
-Recommended meaning:
-
-text Agent Harness Engineering 
-
 ## 2. Product Definition
 
-AHE is a Codex chat workflow skill.
-
-AHE lets the user type command-like messages inside Codex chat, such as:
-
-text $ahe-init $ahe-agent $ahe-product $ahe-constraints $ahe-architecture $ahe-update $ahe-clear 
-
-Codex must interpret these messages as AHE workflow commands through the installed AHE skill.
-
-AHE is not primarily a terminal CLI.  
-AHE is a conversation-first workflow for creating and maintaining agent-facing project harness files.
-
-The primary goal is to help Codex understand:
-
-- what the project is
-- how the project should be developed
-- what constraints Codex must follow
-- how to verify changes
-- what product or feature is currently being built
-- how to resume work across future Codex chat sessions
-
-## 3. Primary User Experience
-
-The main user interface is Codex chat.
-
-Example:
-
-text User: ahe init  Codex: AHE init workflow started. First, what is the project name? 
-
-The user should not need to manually run terminal commands during the normal AHE workflow.
-
-AHE should behave like a command-driven conversation system inside Codex.
-
-## 4. Core Scenario
-
-A typical AHE session works like this:
-
-text 1. User opens Codex chat in a workspace. 2. User types `ahe init`. 3. Codex starts the harness engineering workflow. 4. Codex asks focused questions to create `AGENTS.md`. 5. Codex creates or updates supporting workspace files. 6. Codex stores progress in `.ahe/process_status.json`. 7. User leaves the chat before finishing. 8. User later opens Codex chat again. 9. User types `ahe` or `ahe resume`. 10. Codex reads `.ahe/process_status.json`. 11. Codex resumes the workflow from the previous step. 12. When harness engineering is complete, Codex moves to product specification discussion. 13. Codex creates or updates `docs/PRODUCT.md`. 
-
-## 5. Architecture
-
-AHE has three separate layers.
-
-text 1. Installed Codex Skill 2. Workspace Runtime State 3. Generated Harness Files 
-
-These layers must not be mixed.
-
-## 6. Installed Codex Skill
-
-The installed AHE skill lives under:
-
-text .codex/skills/ahe/ 
-
-Recommended structure:
-
-text .codex/   skills/     ahe/       SKILL.md       templates/         AGENTS.md         PRODUCT.md         PROGRESS.md         SESSION-HANDOFF.md         init.sh         feature-list.json       schemas/         process_status.schema.json 
-
-### Responsibility
-
-.codex/skills/ahe/ contains reusable AHE workflow definition files.
-
-It contains:
-
-- SKILL.md
-- templates
-- schemas
-- examples if needed
-
-It must not contain workspace-specific runtime state.
-
-Do not store the following under .codex/skills/ahe/:
-
-text .ahe/process_status.json .ahe/backups/ workspace-specific product status workspace-specific progress state 
-
-## 7. Workspace Runtime State
-
-Workspace-specific AHE state lives under:
-
-text .ahe/ 
-
-Recommended structure:
-
-text .ahe/   process_status.json   backups/ 
-
-### Responsibility
-
-.ahe/ belongs to the current workspace.
-
-It stores the current AHE workflow state, including:
-
-- current command
-- current step
-- collected answers
-- completion status
-- generated file status
-- inferred project environment
-- last updated timestamp
-
-.ahe/process_status.json is not part of the AHE skill package.  
-It is runtime state for the current workspace.
-
-## 8. Generated Harness Files
-
-AHE creates and maintains the following files in the workspace:
-
-text AGENTS.md docs/PRODUCT.md PROGRESS.md SESSION-HANDOFF.md init.sh feature-list.json .ahe/process_status.json 
-
-Recommended workspace structure after initialization:
-
-text {workspace}/   AGENTS.md   PROGRESS.md   SESSION-HANDOFF.md   init.sh   feature-list.json   docs/     PRODUCT.md   .ahe/     process_status.json     backups/   .codex/     skills/       ahe/         SKILL.md         templates/         schemas/ 
-
-## 9. File Responsibilities
-
-### 9.1 AGENTS.md
-
-AGENTS.md is the global project instruction file for Codex.
-
-It contains stable, project-level guidance.
-
-AHE should create AGENTS.md through conversation with the user.
-
-Required sections:
-
-text # AGENTS.md  ## Project Name  ## Project Objectives  ## Product Specification  ## Global Constraints  ## Working Rules  ## Default Environment  ## Primary Verification Command  ## Verification Commands  ## File Ownership  ## Handoff Rules  ## Do Not Do 
-
-AGENTS.md should not contain detailed product requirements.  
-Detailed product requirements belong in docs/PRODUCT.md.
-
-### 9.2 docs/PRODUCT.md
-
-docs/PRODUCT.md is the current product specification.
-
-It replaces numbered task documents.
-
-There should be one canonical product specification file:
-
-text docs/PRODUCT.md 
-
-It contains the current product goal, requirements, completion criteria, and implementation notes.
-
-Required sections:
-
-text # PRODUCT.md  ## Product Name  ## Product Objective  ## Background  ## Current Goal  ## Requirements  ## Completion Criteria  ## User Workflow  ## Files to Create or Modify  ## Verification Commands  ## Out of Scope  ## Open Questions  ## Notes 
-
-docs/PRODUCT.md is the main product-level working document that Codex should read before implementation.
-
-### 9.3 PROGRESS.md
-
-PROGRESS.md is a human-readable progress log.
-
-Suggested sections:
-
-text # PROGRESS.md  ## Current Status  ## Completed  ## In Progress  ## Blocked  ## Decisions  ## Change Log 
-
-### 9.4 SESSION-HANDOFF.md
-
-SESSION-HANDOFF.md is a compact handoff document for future Codex sessions.
-
-Suggested sections:
-
-text # SESSION-HANDOFF.md  ## Current Product Context  ## Last Completed Work  ## Current Open Questions  ## Important Files  ## Next Recommended Action  ## Verification Status 
-
-### 9.5 init.sh
-
-init.sh is a workspace initialization helper.
-
-For v0.1, the default environment is Python.
-
-The default script should be conservative and non-destructive.
-
-It should detect common Python environment files and print recommended setup commands instead of blindly changing the environment.
-
-It may detect:
-
-text pyproject.toml requirements.txt uv.lock poetry.lock conda.yaml environment.yml 
-
-Default behavior:
-
-text - detect project environment - print recommended setup commands - print default verification commands - avoid destructive changes - avoid installing dependencies without user confirmation 
-
-### 9.6 feature-list.json
-
-feature-list.json is a structured product feature inventory.
-
-Initial template:
-
-json {   "features": [] } 
-
-AHE may update this file when the user defines product features during the ahe product workflow.
-
-### 9.7 .ahe/process_status.json
-
-.ahe/process_status.json stores machine-readable workflow state for the current workspace.
-
-Example:
-
-json {   "version": "0.1.0",   "mode": "codex-chat-workflow",   "current_command": "ahe init",   "current_step": "ask_project_objectives",   "workflow_complete": false,   "environment": {     "language": "python",     "detected_from_workspace": false   },   "project": {     "name": null,     "objectives": null   },   "product": {     "spec_path": "docs/PRODUCT.md",     "exists": false,     "complete": false   },   "files": {     "AGENTS.md": {       "exists": false,       "complete": false     },     "docs/PRODUCT.md": {       "exists": false,       "complete": false     },     "PROGRESS.md": {       "exists": false,       "complete": false     },     "SESSION-HANDOFF.md": {       "exists": false,       "complete": false     },     "init.sh": {       "exists": false,       "complete": false     },     "feature-list.json": {       "exists": false,       "complete": false     }   },   "updated_at": null } 
-
-## 10. Command Model
-
-AHE commands are conversation-level pseudo-commands.
-
-They are typed inside Codex chat.
-
-Supported v0.1 commands:
-
-text $ahe-init $ahe-agent $ahe-product $ahe-constraints $ahe-architecture $ahe-update $ahe-clear 
-
-These commands should not be executed as shell commands unless the user explicitly asks to run them in the terminal.
-
-## 11. Command Router Rule
-
-When the user message starts with one of the `$ahe-` commands, Codex must treat it as an AHE workflow command.
-
-General routing:
-
-text $ahe-init         -> initialize harness engineering $ahe-agent        -> modify only the purpose in AGENTS.md $ahe-product      -> modify docs/PRODUCT.md $ahe-constraints  -> modify docs/constraints.md $ahe-architecture -> modify docs/achitecture.md $ahe-update       -> update feature-list.json, PROGRESS.md, and SESSION-HANDOFF.md $ahe-clear        -> back up and remove docs/PRODUCT.md, PROGRESS.md, SESSION-HANDOFF.md, and feature-list.json 
-
-## 11.1 Clarification Prompt Rule
-
-When the user's response needs clarification or a more detailed description, Codex should ask with this exact prompt:
-
-text Please choose one option:  1. Yes  2. No  3. Custom input  Enter 1, 2, or type your own answer: 
-
-If the user enters `1`, Codex should treat the answer as yes.  
-If the user enters `2`, Codex should treat the answer as no.  
-If the user enters `3` or custom text, Codex should treat that text as the clarification input and continue the active AHE workflow.
-
-## 12. Command: $ahe-init
-
-### Purpose
-
-$ahe-init starts or refreshes the harness engineering workflow.
-
-The main file created through conversation is:
-
-text AGENTS.md 
-
-Supporting files are created or updated from workspace-aware defaults.
-
-### Behavior
-
-When the user types:
-
-text $ahe-init 
-
-Codex should:
-
-text 1. Inspect `AGENTS.md`. 2. If `AGENTS.md` already exists, ask the user whether it is right. 3. If it is not right, ask for the purpose of this project. 4. If `AGENTS.md` does not exist, ask for the purpose of this project immediately. 5. Replace only the `PROJECT_PURPOSE` portion of `AGENTS.md`. 6. Update `.ahe/process_status.json`. 
-
-## 13. Command: $ahe-agent
-
-### Purpose
-
-$ahe-agent modifies only the project purpose in `AGENTS.md`.
-
-## 14. Command: $ahe-product
-
-### Purpose
-
-$ahe-product creates or updates the canonical product specification:
-
-text docs/PRODUCT.md 
-
-This workflow starts after the global harness is complete.
-
-### Behavior
-
-When the user types:
-
-text $ahe-product 
-
-Codex should:
-
-text 1. Inspect `docs/PRODUCT.md`. 2. Ask for the product specification inputs. 3. Ask recursively for more detail whenever the specification is incomplete or unclear. 4. If the product specification is clear, finish writing `docs/PRODUCT.md`. 5. Update `.ahe/process_status.json`. 
-
-### Required Product Fields
-
-text Product name Product objective Background Current goal Requirements Completion criteria User workflow Files to create or modify Verification commands Out of scope Open questions Notes 
-
-### Completion Condition
-
-The product workflow is complete when:
-
-## 14.1 Command: $ahe-constraints
-
-### Purpose
-
-$ahe-constraints creates or updates:
-
-text docs/constraints.md 
-
-## 14.2 Command: $ahe-architecture
-
-### Purpose
-
-$ahe-architecture creates or updates:
-
-text docs/achitecture.md 
-
-## 14.3 Command: $ahe-update
-
-### Purpose
-
-$ahe-update refreshes the tracking artifacts for the current implementation cycle:
-
-text feature-list.json PROGRESS.md SESSION-HANDOFF.md 
-
-### Behavior
-
-When the user types:
-
-text $ahe-update 
-
-Codex should:
-
-text 1. Inspect `feature-list.json`, `PROGRESS.md`, and `SESSION-HANDOFF.md`. 2. Ask what changed and which feature entries need updating. 3. Ask what verification evidence, blockers, or status changes should be recorded. 4. Ask what next recommended action should be written into `SESSION-HANDOFF.md`. 5. Update `feature-list.json`, `PROGRESS.md`, and `SESSION-HANDOFF.md`. 6. Update `.ahe/process_status.json`. 
-
-## 15. Command: $ahe-clear
-
-### Purpose
-
-$ahe-clear removes the previous product-tracking files after creating backups.
-
-### Behavior
-
-When the user types:
-
-text $ahe-clear 
-
-Codex should:
-
-text 1. Create a timestamped backup directory under `.ahe/backups/`. 2. Copy `docs/PRODUCT.md`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `feature-list.json` to the backup directory, preserving their relative paths. 3. Remove `docs/PRODUCT.md`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `feature-list.json`. 4. Update `.ahe/process_status.json` so the clear workflow is complete. 
-
-### Required Backup Files
-
-text docs/PRODUCT.md PROGRESS.md SESSION-HANDOFF.md feature-list.json 
-
-## 17. Default Environment
-
-The default environment is Python.
-
-If AHE cannot confidently infer the project language, it should assume Python.
-
-AHE may infer Python from files such as:
-
-text pyproject.toml requirements.txt setup.py setup.cfg uv.lock poetry.lock Pipfile conda.yaml environment.yml src/ tests/ 
-
-If another language is clearly detected, AHE may adapt commands and templates accordingly.
-
-Examples:
-
-text package.json       -> JavaScript or TypeScript go.mod             -> Go Cargo.toml         -> Rust pom.xml            -> Java build.gradle       -> Java or Kotlin 
-
-## 18. Default Python Verification Commands
-
-For Python projects, use the following default verification commands unless the workspace indicates otherwise:
-
-markdown ## Verification Commands  - Tests: `pytest tests/ -x` - Type check: `mypy src/ --strict` - Lint: `ruff check src/` - Full verification: `make check` if a `Makefile` exists; otherwise run all commands above manually. 
-
-If the workspace has different commands, AHE should ask the user whether to use the detected commands or the default Python commands.
-
-## 19. Default Python init.sh
-
-For Python projects, generate a conservative init.sh.
-
-Default template:
-
-bash #!/usr/bin/env bash set -euo pipefail  echo "AHE workspace initialization" echo "Detected or default environment: Python" echo  if [ -f "pyproject.toml" ]; then   echo "Detected pyproject.toml" fi  if [ -f "requirements.txt" ]; then   echo "Detected requirements.txt"   echo "Recommended install command:"   echo "  pip install -r requirements.txt" fi  if [ -f "uv.lock" ]; then   echo "Detected uv.lock"   echo "Recommended install command:"   echo "  uv sync" fi  if [ -f "poetry.lock" ]; then   echo "Detected poetry.lock"   echo "Recommended install command:"   echo "  poetry install" fi  if [ -f "environment.yml" ]; then   echo "Detected environment.yml"   echo "Recommended install command:"   echo "  conda env update -f environment.yml" fi  if [ -f "conda.yaml" ]; then   echo "Detected conda.yaml"   echo "Recommended install command:"   echo "  conda env update -f conda.yaml" fi  echo echo "Recommended verification commands:" echo "  pytest tests/ -x" echo "  mypy src/ --strict" echo "  ruff check src/"  if [ -f "Makefile" ]; then   echo "  make check" fi 
-
-This script should not install dependencies automatically by default.  
-It should print safe, inspectable setup recommendations.
-
-## 20. Safety Rules
-
-AHE must be conservative.
-
-Rules:
-
-text Do not silently overwrite existing files. Create backups under `.ahe/backups/` before rewriting existing AHE-managed files. Ask one focused question at a time. Use uppercase filenames for root harness documents. Keep skill definition and workspace runtime state separate. Do not use hooks in v0.1. Do not perform automatic background actions. Do not execute shell commands unless the user explicitly asks. Do not treat `ahe init` as a shell command by default. 
-
-## 21. Filename Rules
-
-Generated root harness markdown files must use uppercase names:
-
-text AGENTS.md PROGRESS.md SESSION-HANDOFF.md 
-
-The product specification path must be:
-
-text docs/PRODUCT.md 
-
-Do not generate:
-
-text agents.md progress.md session-handoff.md docs/product.md 
-
-## 22. No Hooks in v0.1
-
-AHE v0.1 does not use hooks.
-
-Excluded:
-
-text pre-task hooks post-task hooks automatic session-end hooks automatic file modification hooks automatic product transition hooks 
-
-Reason:
-
-AHE v0.1 should only act when the user explicitly types an AHE command.
-
-## 23. v0.1 Scope
-
-### Include
-
-text Codex chat workflow AHE SKILL.md Command router $ahe-init $ahe-agent $ahe-product $ahe-constraints $ahe-architecture $ahe-update $ahe-clear AGENTS.md generation docs/PRODUCT.md generation docs/constraints.md generation docs/achitecture.md generation PROGRESS.md generation SESSION-HANDOFF.md init.sh generation feature-list.json generation .ahe/process_status.json runtime state Python default environment npm installer with local development flow `npx --yes --package=file:. ahe install` and deployment target `npx ahe install` No hooks No automatic background behavior 
-
-### Exclude
-
-text Hooks Subagents Automatic session-end behavior Automatic commits Remote registry GUI Multiple numbered work documents 
-
-## 23.1 Installer Distribution
-
-AHE also ships as an npm package so a workspace can install the Codex skill files with:
-
-text npx ahe install
-
-The installer is intentionally small.
-
-Before deployment, after cloning the repository, local development should use:
-
-text npx --yes --package=file:. ahe install
-
-If the install target is a different workspace than the cloned package directory, local development should use:
-
-text npx --yes --package=/path/to/awesome_harness_engineering ahe install
-
-Helper scripts:
-
-text scripts/install.sh installs the packaged skill into ~/.codex scripts/uninstall.sh removes ~/.codex/skills/ahe 
-
-Required behavior:
-
-text 1. Create `.codex/skills/ahe/` if missing. 2. Copy the packaged `SKILL.md`, templates, and schemas into `.codex/skills/ahe/`. 3. Do not create workspace runtime files under `.ahe/`. 4. Do not create `AGENTS.md` or other root harness files. 5. Fail instead of silently overwriting an existing install unless the user explicitly passes an overwrite option. 
-
-## 24. Completion Definition
-
-AHE harness engineering is complete when:
-
-text AGENTS.md exists and has required global sections docs/PRODUCT.md exists and has required product sections PROGRESS.md exists SESSION-HANDOFF.md exists init.sh exists feature-list.json exists and is valid JSON .ahe/process_status.json exists AGENTS.md references docs/PRODUCT.md ahe check reports no missing required fields 
-
-## 25. Final Design Principle
-
-AHE is not a project generator.
-
-AHE is a Codex workflow harness generator.
-
-It does not build the user's application directly.  
-It prepares the workspace so Codex can understand the project, preserve context across sessions, and work from a clear product specification.
+AHE is a Codex chat workflow package for building and maintaining harness files in a repository.
+
+The user works in Codex chat, not primarily in the terminal. The package installs multiple Codex skills so the user can invoke focused commands directly in chat:
+
+- `$ahe-init`
+- `$ahe-agent`
+- `$ahe-product`
+- `$ahe-todo`
+- `$ahe-constraints`
+- `$ahe-architecture`
+- `$ahe-update`
+- `$ahe-clear`
+
+## 3. Installed Layout
+
+The packaged install must create the following structure inside Codex home or the current workspace:
+
+```text
+.codex/
+  skills/
+    ahe-init/
+      SKILL.md
+    ahe-agent/
+      SKILL.md
+    ahe-product/
+      SKILL.md
+    ahe-todo/
+      SKILL.md
+    ahe-constraints/
+      SKILL.md
+    ahe-architecture/
+      SKILL.md
+    ahe-update/
+      SKILL.md
+    ahe-clear/
+      SKILL.md
+  ahe-shared/
+    templates/
+      AGENTS.md
+      PRODUCT.md
+      PROGRESS.md
+      SESSION-HANDOFF.md
+      init.sh
+      feature-list.json
+    schemas/
+      process_status.schema.json
+      feature-list-schema.json
+```
+
+Only the eight `ahe-*` skill directories should appear as AHE skills in Codex. Shared templates and schemas must live outside `skills/`.
+
+## 4. Workspace Runtime State
+
+Workspace-specific state stays under `.ahe/`.
+
+```text
+.ahe/
+  process_status.json
+  backups/
+```
+
+The installed skills must not store workspace runtime state under `.codex/`.
+
+## 5. Skill Responsibilities
+
+### `$ahe-init`
+
+- Initialize the harness in the current workspace.
+- If `AGENTS.md` already exists, ask the user whether the current `AGENTS.md` is right.
+- If not, ask for the purpose of this project.
+- Update only the project-purpose portion of `AGENTS.md`.
+
+### `$ahe-agent`
+
+- Modify only the purpose in `AGENTS.md`.
+
+### `$ahe-product`
+
+- Modify `docs/PRODUCT.md`.
+- Ask recursively for product details until the specification is clear.
+
+### `$ahe-todo`
+
+- Append fast todo items into the last `## TODO` section of `docs/todo.md`.
+- Create the `## TODO` section at the end of `docs/todo.md` when it does not exist.
+- Update `feature-list.json` with the queued todo work.
+- Do not modify `docs/PRODUCT.md` directly.
+
+### `$ahe-constraints`
+
+- Modify `docs/constraints.md`.
+
+### `$ahe-architecture`
+
+- Modify `docs/achitecture.md`.
+
+### `$ahe-update`
+
+- Read `docs/todo.md` when it exists.
+- Apply queued todo content from `docs/todo.md` into `docs/PRODUCT.md`.
+- Remove the applied todo content from `docs/todo.md` because it is already reflected in `docs/PRODUCT.md`.
+- Update `feature-list.json`.
+- Update `PROGRESS.md`.
+- Update `SESSION-HANDOFF.md`.
+- Keep `.ahe/process_status.json` aligned with the active workflow.
+
+### `$ahe-clear`
+
+1. Create a timestamped backup under `.ahe/backups/`.
+2. Back up:
+   - `AGENTS.md`
+   - `docs/`
+   - `PROGRESS.md`
+   - `SESSION-HANDOFF.md`
+   - `feature-list.json`
+   - `init.sh`
+3. Remove:
+   - `docs/PRODUCT.md`
+   - `PROGRESS.md`
+   - `SESSION-HANDOFF.md`
+   - `feature-list.json`
+4. Ask the user for the new goal.
+5. Set up the new objective in `AGENTS.md`.
+6. Ask recursively for the new product specification.
+7. Finish when the new product specification is clear.
+
+## 6. Clarification Prompt
+
+If a user response needs clarification or more detail, AHE must ask with this exact format:
+
+```text
+Please choose one option:
+
+1. Yes
+
+2. No
+
+3. Custom input
+
+Enter 1, 2, or type your own answer:
+```
+
+## 7. Installation Behavior
+
+- Local development install after cloning the repo:
+  - `npx --yes --package=file:. ahe install`
+- Deployed install target:
+  - `npx ahe install`
+- Helper scripts:
+  - `scripts/install.sh` installs into `~/.codex`
+  - `scripts/uninstall.sh` removes the eight installed AHE skills and `.codex/ahe-shared`
+
+## 8. Success Criteria
+
+- Codex shows the eight split AHE skills instead of one monolithic `ahe` skill.
+- The installer copies all eight skill directories and the shared assets.
+- The uninstall script removes the installed AHE skills and shared assets cleanly.
+- Tests validate the split-skill structure and expected workflow contracts.
