@@ -2,13 +2,15 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-09 02:46 +0900
-**Session ID:** feat-017-agent-init-absence
+**Last Updated:** 2026-06-09 02:51 +0900
+**Session ID:** feat-018-init-multi-step
 **Active Feature:** None
 
 ## Completed
 
-- [x] Implemented `feat-017 AHE Agent Initialize Workflow on AGENTS.md Absence` by extending `$ahe-agent` to copy/rename the `agents.md` template, update the project purpose, and ask the user about their language choice.
+- [x] Implemented `feat-018 Init Workflow Multi-Step Execution` by modifying `ahe-init` to sequentially execute the six steps (ahe-agents, ahe-product, ahe-architecture, ahe-constraints, ahe-copy, ahe-update) and update the process status to track these steps. Also updated process_status.schema.json description and docs/PRODUCT.md.
+
+- [x] Implemented `feat-017 AHE Agent Initialize Workflow on AGENTS.md Absence` by extending `$ahe-agent` to copy/rename the `agents.md` template, ask the user for the project purpose, update the project purpose, and ask about their language choice.
 
 - [x] Implemented `feat-016 Copy Skill` by adding `ahe-copy` which copies template files (excluding `AGENTS.md` and `PRODUCT.md`) from `ahe-shared/templates/` to the workspace root, converting markdown names to uppercase.
 - [x] Updated the split-skill installer, uninstaller, and package file list to include `ahe-copy`.
@@ -107,6 +109,8 @@
 
 ## Change Log
 
+- `.codex/skills/ahe-agent/SKILL.md`, `docs/PRODUCT.md`, `tests/test_specialized_workflows.py` - Updated `$ahe-agent` workflow (when `AGENTS.md` is missing) to ask what the purpose of the project is to the user.
+- `.codex/skills/ahe-init/SKILL.md`, `.codex/ahe-shared/schemas/process_status.schema.json`, `docs/PRODUCT.md`, `tests/test_init_workflow.py` - Updated `ahe-init` to execute the six sequential steps and update progress status tracking.
 - `.codex/skills/ahe-copy/SKILL.md`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `tests/`, `feature-list.json` - Implemented the `ahe-copy` skill to copy workspace templates except AGENTS/PRODUCT, capitalizing markdown filenames, and validated it with tests.
 - `.codex/skills/` (agent, constraints, architecture, todo, clear), `tests/test_clarification_prompt.py` - Added Clarification Rule section and interactive conversation flows across all interactive AHE skills to enforce multi-turn dialogs and precise clarification prompts.
 - `.codex/skills/ahe-help/SKILL.md`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `package.json`, `tests/`, `feature-list.json` - Implemented the `ahe-help` skill, corrected post-install success output escaping, resolved npm packaging dotfolder omissions, and updated the test suite.

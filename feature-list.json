@@ -158,6 +158,7 @@
       "status": "done",
       "evidence": "Created .codex/skills/ahe-copy/SKILL.md to copy templates excluding agents/product to the workspace root while capitalizing markdown filenames, updated installer/uninstaller in bin/ahe and scripts/uninstall.sh, updated docs/PRODUCT.md, and validated all with 32/32 passing tests (pytest, ruff, mypy) and successful local global installation."
     },
+    {
       "id": "feat-017",
       "name": "AHE Agent Initialize Workflow on AGENTS.md Absence",
       "description": "Extend $ahe-agent to copy and capitalize agents.md from templates if AGENTS.md is missing, update the project purpose, and ask the user about their language choice.",
@@ -166,6 +167,16 @@
       ],
       "status": "done",
       "evidence": "Extended .codex/skills/ahe-agent/SKILL.md with a workflow for missing AGENTS.md that copies/renames templates/agents.md to AGENTS.md, updates the project purpose, and asks the language question sequence. Documented behavior in docs/PRODUCT.md, and added tests in tests/test_specialized_workflows.py which pass."
+    },
+    {
+      "id": "feat-018",
+      "name": "Init Workflow Multi-Step Execution",
+      "description": "Modify the ahe-init workflow to sequentially proceed through six steps (ahe-agents, ahe-product, ahe-architecture, ahe-constraints, ahe-copy, ahe-update) and update the process status to track these steps.",
+      "dependencies": [
+        "feat-017"
+      ],
+      "status": "done",
+      "evidence": "Updated .codex/skills/ahe-init/SKILL.md, .codex/ahe-shared/schemas/process_status.schema.json, docs/PRODUCT.md, and tests/test_init_workflow.py. Verified that all 33 tests passed using pytest tests/ -x."
     }
   ]
 }

@@ -83,6 +83,14 @@ The installed skills must not store workspace runtime state under `.codex/`.
 - If `AGENTS.md` already exists, ask the user whether the current `AGENTS.md` is right.
 - If not, ask for the purpose of this project.
 - Update only the project-purpose portion of `AGENTS.md`.
+- Execute the following six sequential steps and call each subprocess:
+  1. call "ahe-agents"
+  2. call "ahe-product"
+  3. call "ahe-architecture"
+  4. call "ahe-constraints"
+  5. call "ahe-copy"
+  6. call "ahe-update"
+- Ensure that the process status (e.g., `current_step` in `.ahe/process_status.json`) tracks each step and indicates the active status of the six steps sequence: `"ahe-agents"`, `"ahe-product"`, `"ahe-architecture"`, `"ahe-constraints"`, `"ahe-copy"`, and `"ahe-update"`.
 
 ### `$ahe-agent`
 
@@ -90,9 +98,10 @@ The installed skills must not store workspace runtime state under `.codex/`.
 - If `AGENTS.md` does not exist in the workspace:
   1. Copy `agents.md` from the template assets (e.g. `.codex/ahe-shared/templates/`).
   2. Rename it to `AGENTS.md` (uppercase).
-  3. Update the project purpose in the copied `AGENTS.md`.
-  4. Ask the user the exact prompt: "Is your language Python? 1. Yes 2. No 3. Custom input".
-  5. If the user answers "No", ask again: "Which language do you use?".
+  3. Ask what the purpose of this project is to user.
+  4. Update the project purpose in the copied `AGENTS.md`.
+  5. Ask the user the exact prompt: "Is your language Python? 1. Yes 2. No 3. Custom input".
+  6. If the user answers "No", ask again: "Which language do you use?".
 
 ### `$ahe-product`
 

@@ -31,8 +31,34 @@ def test_skill_md_contains_generated_files() -> None:
     for required_file in required_files:
         assert required_file in content, f"Missing required output file '{required_file}' in ahe-init workflow definition"
 
+def test_skill_md_contains_six_sequential_steps_and_status_tracking() -> None:
+    content = SKILL_MD_PATH.read_text(encoding="utf-8")
+    expected_steps = [
+        'call "ahe-agents"',
+        'call "ahe-product"',
+        'call "ahe-architecture"',
+        'call "ahe-constraints"',
+        'call "ahe-copy"',
+        'call "ahe-update"',
+    ]
+    for step in expected_steps:
+        assert step in content, f"Missing step '{step}' in ahe-init workflow definition"
+
+    expected_statuses = [
+        'ahe-agents',
+        'ahe-product',
+        'ahe-architecture',
+        'ahe-constraints',
+        'ahe-copy',
+        'ahe-update',
+    ]
+    for status in expected_statuses:
+        assert status in content, f"Missing progress status '{status}' in ahe-init workflow definition"
+
+
 if __name__ == "__main__":
     test_skill_md_contains_init_workflow_sections()
     test_skill_md_contains_all_required_inputs()
     test_skill_md_contains_generated_files()
+    test_skill_md_contains_six_sequential_steps_and_status_tracking()
     print("test_init_workflow.py passed!")

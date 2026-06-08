@@ -13,8 +13,9 @@ Use this skill when the user invokes `$ahe-agent`.
 - If `AGENTS.md` does not exist:
   1. Copy `agents.md` from the template directory `.codex/ahe-shared/templates/` (or `templates/` in the workspace).
   2. Rename it to `AGENTS.md` (uppercase).
-  3. Update the project purpose portion in the new `AGENTS.md`.
-  4. Ask the user the following exact prompt:
+  3. Ask what the purpose of this project is to user.
+  4. Update the project purpose portion in the new `AGENTS.md`.
+  5. Ask the user the following exact prompt:
      ```text
      Is your language Python?
 

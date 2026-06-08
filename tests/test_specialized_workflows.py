@@ -20,6 +20,7 @@ def test_skill_md_contains_agent_workflow() -> None:
     assert "If `AGENTS.md` does not exist" in content
     assert "Copy `agents.md` from the template" in content or "Copy agents.md from templates" in content or "copy agents.md from templates" in content.lower()
     assert "Rename it to `AGENTS.md` (uppercase)" in content or "rename AGENTS.md(uppercase)" in content.lower() or "rename it to `AGENTS.md`" in content
+    assert "Ask what the purpose of this project is to user." in content
     assert "Is your language Python?" in content
     assert "1. Yes" in content
     assert "2. No" in content
