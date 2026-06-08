@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -85,13 +86,18 @@ def test_installer_supports_local_npx_package_flow(tmp_path: Path) -> None:
 
     package_root = tmp_path / "package"
     workspace_root = tmp_path / "workspace"
+    npm_cache_root = tmp_path / "npm-cache"
 
     package_root.mkdir()
     workspace_root.mkdir()
+    npm_cache_root.mkdir()
 
     shutil.copy2(REPO_ROOT / "package.json", package_root / "package.json")
     shutil.copytree(REPO_ROOT / "bin", package_root / "bin")
     shutil.copytree(REPO_ROOT / ".codex", package_root / ".codex")
+
+    environment = os.environ.copy()
+    environment["npm_config_cache"] = str(npm_cache_root)
 
     completed_process = subprocess.run(
         (
@@ -104,6 +110,7 @@ def test_installer_supports_local_npx_package_flow(tmp_path: Path) -> None:
         cwd=workspace_root,
         check=False,
         capture_output=True,
+        env=environment,
         text=True,
     )
 

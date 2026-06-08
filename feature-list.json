@@ -35,8 +35,8 @@
       "dependencies": [
         "feat-003"
       ],
-      "status": "not-started",
-      "evidence": ""
+      "status": "done",
+      "evidence": "Expanded `.codex/skills/ahe/SKILL.md` with a dedicated `ahe product` workflow covering workspace inspection, one-question-at-a-time product inputs, required `docs/PRODUCT.md` sections, and synchronization of `AGENTS.md`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `.ahe/process_status.json`. Added `tests/test_product_workflow.py` and verified with `python3 tests/test_product_workflow.py` and `pytest tests/ -x`."
     },
     {
       "id": "feat-005",

@@ -2,8 +2,8 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-08 15:42 +0900
-**Session ID:** setup-chat-routing
+**Last Updated:** 2026-06-08 16:01 +0900
+**Session ID:** feat-004-product-workflow
 **Active Feature:** feat-004 - Product Workflow
 
 ## Completed
@@ -13,16 +13,18 @@
 - [x] Verified the setup artifacts with shell checks, JSON validation, installer doctor/version, installer smoke install, and direct execution of the Python test assertions.
 - [x] Implemented `feat-002 Chat Command Routing` by expanding `.codex/skills/ahe/SKILL.md` and adding `tests/test_chat_command_routing.py`.
 - [x] Implemented `feat-003 Init Workflow` by adding step-by-step instructions to `.codex/skills/ahe/SKILL.md` and creating `tests/test_init_workflow.py`.
+- [x] Implemented `feat-004 Product Workflow` by adding a dedicated `ahe product` workflow contract to `.codex/skills/ahe/SKILL.md` and creating `tests/test_product_workflow.py`.
+- [x] Fixed the `npx ahe install` smoke-test path resolution in `bin/ahe` so packaged installs work when the shell entrypoint is invoked through npm's `.bin` symlink.
 
 ## In Progress
 
-- [ ] Prepare `feat-004 Product Workflow`.
-  - Details: Implement the `ahe product` workflow that creates or updates docs/PRODUCT.md and synchronizes tracking artifacts.
+- [ ] No active implementation in progress.
+  - Details: `feat-004 Product Workflow` is complete and verified. The next queued feature is `feat-005 Check and Resume Workflows`.
   - Blockers: None.
 
 ## Blocked
 
-- [ ] No current product blocker. Local `pytest` is still unavailable, so the test module was executed directly with the Python standard library instead of the pytest runner.
+- [ ] No current blocker.
 
 ## Decisions
 
@@ -35,6 +37,9 @@
 - **Local development uses a file package spec**: cloned-repo testing should use `npx --yes --package=file:. ahe install`.
   - Context: The package is not deployed yet, but the user still wants the install UX to be exercised through `npx`.
   - Alternatives considered: Using only `bash bin/ahe install` does not match the intended installer entrypoint closely enough.
+- **The installer must resolve its real package path before copying skill files**: `npx` executes `bin/ahe` through npm's `.bin` symlink, so the installer has to follow symlinks before computing `PACKAGE_ROOT`.
+  - Context: The full pytest run exposed a failure where the installer looked for `.codex/skills/ahe` under `node_modules/.codex` instead of `node_modules/ahe/.codex`.
+  - Alternatives considered: Weakening the smoke test would hide a real packaging defect and would not verify the published install path.
 
 ## Change Log
 
@@ -46,3 +51,5 @@
 - `scripts/install.sh`, `scripts/uninstall.sh` - Added helper scripts for local installation and uninstallation of the AHE skill.
 - `.codex/skills/ahe/SKILL.md`, `tests/test_init_workflow.py` - Implemented Init Workflow instructions and test validation.
 - `tests/test_project_setup.py` - Fixed case-sensitivity issue for macOS compatibility.
+- `.codex/skills/ahe/SKILL.md`, `tests/test_product_workflow.py` - Added the Product Workflow contract and verification coverage.
+- `bin/ahe`, `tests/test_project_setup.py` - Made the installer smoke test hermetic and fixed symlink-aware package root resolution for `npx` installs.

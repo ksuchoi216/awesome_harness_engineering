@@ -2,7 +2,19 @@
 set -euo pipefail
 
 readonly VERSION="0.1.0"
-readonly SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+
+while [ -L "${SCRIPT_PATH}" ]; do
+  SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${SCRIPT_PATH}")" && pwd)"
+  SCRIPT_PATH="$(readlink "${SCRIPT_PATH}")"
+
+  case "${SCRIPT_PATH}" in
+    /*) ;;
+    *) SCRIPT_PATH="${SCRIPT_DIR}/${SCRIPT_PATH}" ;;
+  esac
+done
+
+readonly SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${SCRIPT_PATH}")" && pwd)"
 readonly PACKAGE_ROOT="$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)"
 readonly SOURCE_DIR="${PACKAGE_ROOT}/.codex/skills/ahe"
 

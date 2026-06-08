@@ -76,3 +76,38 @@ When executing the `ahe init` command, Codex must follow these instructions step
    - Update `.ahe/process_status.json`: set `current_command` to `null`, `current_step` to `null`, `workflow_complete` to `true`, and `updated_at` to the current ISO timestamp.
    - Run the validation check (equivalent to `ahe check`) and display the results to the user. Prompt them that harness initialization is complete and they should run `ahe product` next.
 
+## Command Workflow: ahe product
+
+When executing the `ahe product` command, Codex must follow these instructions step-by-step:
+
+1. **Product Inspection**:
+   - Inspect `docs/PRODUCT.md` if it already exists.
+   - Inspect `.ahe/process_status.json` before asking new questions.
+   - If `.ahe/process_status.json` exists and `current_command` is `ahe product` with `workflow_complete` set to `false`, resume the unfinished product workflow instead of restarting.
+   - If the global harness is not complete yet, direct the user to finish `ahe init` first.
+   - Update `.ahe/process_status.json` for the product workflow: set `current_command` to `ahe product`, set `workflow_complete` to `false`, preserve the existing `project` data, and set `current_step` to `ask_product_name`.
+
+2. **Sequential Product Conversation Flow**:
+   Ask exactly ONE focused question at a time and wait for the user's response. Save progress to `.ahe/process_status.json` after each answer:
+   - **Step 1: Product Name**: Ask what the product or feature is called.
+   - **Step 2: Product Objective**: Ask what outcome the product or feature should achieve.
+   - **Step 3: Background**: Ask for the context that explains why this work matters now.
+   - **Step 4: Current Goal**: Ask for the immediate goal of the current implementation cycle.
+   - **Step 5: Requirements**: Ask for the concrete required behaviors or constraints.
+   - **Step 6: Completion Criteria**: Ask how the user will decide the work is done.
+   - **Step 7: User Workflow**: Ask how the target user will move through the product or feature.
+   - **Step 8: Files to Create or Modify**: Ask which files or areas of the repo are expected to change.
+   - **Step 9: Verification Commands**: Ask which commands should verify the product work.
+   - **Step 10: Out of Scope**: Ask what must not be included in this product cycle.
+   - **Step 11: Open Questions**: Ask what uncertainties still need decisions.
+   - **Step 12: Notes**: Ask for any extra notes that future Codex sessions should keep in mind.
+
+3. **Product Spec Generation and Tracking Sync**:
+   Once all fields are collected, perform these file modifications:
+   - Create or update `docs/PRODUCT.md` as the canonical product specification.
+   - Ensure `docs/PRODUCT.md` contains these required sections in order: `# PRODUCT.md`, `## Product Name`, `## Product Objective`, `## Background`, `## Current Goal`, `## Requirements`, `## Completion Criteria`, `## User Workflow`, `## Files to Create or Modify`, `## Verification Commands`, `## Out of Scope`, `## Open Questions`, `## Notes`.
+   - Update `AGENTS.md` so its Product Specification section points to `docs/PRODUCT.md` as the current canonical spec.
+   - Update `PROGRESS.md` with the active product workflow status and the latest verification expectations.
+   - Update `SESSION-HANDOFF.md` with the current product context, open questions, and the recommended next action.
+   - Update `.ahe/process_status.json` so `product.spec_path` remains `docs/PRODUCT.md`, `product.exists` is `true`, `product.complete` reflects whether all required fields are filled, `current_command` is `null`, `current_step` is `null`, `workflow_complete` is `true`, and `updated_at` is refreshed to the current ISO timestamp.
+   - Run the validation check (equivalent to `ahe check`) and display the results to the user.
