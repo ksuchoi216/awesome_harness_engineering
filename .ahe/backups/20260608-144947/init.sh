@@ -3,18 +3,9 @@ set -e
 
 echo "=== Harness Initialization ==="
 
-conda_env_name=""
-if [ -f environment.yml ]; then
-  conda_env_name="$(sed -n 's/^name:[[:space:]]*//p' environment.yml | head -n 1)"
-elif [ -f conda.yaml ]; then
-  conda_env_name="$(sed -n 's/^name:[[:space:]]*//p' conda.yaml | head -n 1)"
-fi
-if [ -n "$conda_env_name" ]; then
-  echo "=== Conda environment: $conda_env_name ==="
-fi
-
-if [ ! -f pyproject.toml ] && [ ! -f requirements.txt ] && [ ! -f setup.py ] && [ ! -f environment.yml ] && [ ! -f conda.yaml ]; then
-  echo "Error: No Python manifest (pyproject.toml, requirements.txt, setup.py, environment.yml, or conda.yaml) found."
+# Check for Python manifest
+if [ ! -f pyproject.toml ] && [ ! -f requirements.txt ] && [ ! -f setup.py ]; then
+  echo "Error: No Python manifest (pyproject.toml, requirements.txt, or setup.py) found."
   exit 1
 fi
 

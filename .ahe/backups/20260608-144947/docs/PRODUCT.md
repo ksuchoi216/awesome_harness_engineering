@@ -434,31 +434,11 @@ AHE v0.1 should only act when the user explicitly types an AHE command.
 
 ### Include
 
-text Codex chat workflow AHE SKILL.md Command router ahe ahe init ahe product ahe check ahe resume AGENTS.md generation docs/PRODUCT.md generation PROGRESS.md generation SESSION-HANDOFF.md generation init.sh generation feature-list.json generation .ahe/process_status.json runtime state Python default environment npm installer with local development flow `npx --yes --package=file:. ahe install` and deployment target `npx ahe install` No hooks No automatic background behavior 
+text Codex chat workflow AHE SKILL.md Command router ahe ahe init ahe product ahe check ahe resume AGENTS.md generation docs/PRODUCT.md generation PROGRESS.md generation SESSION-HANDOFF.md generation init.sh generation feature-list.json generation .ahe/process_status.json runtime state Python default environment No hooks No automatic background behavior 
 
 ### Exclude
 
-text Hooks Subagents Automatic session-end behavior Automatic commits Remote registry GUI Multiple numbered work documents 
-
-## 23.1 Installer Distribution
-
-AHE also ships as an npm package so a workspace can install the Codex skill files with:
-
-text npx ahe install
-
-The installer is intentionally small.
-
-Before deployment, after cloning the repository, local development should use:
-
-text npx --yes --package=file:. ahe install
-
-If the install target is a different workspace than the cloned package directory, local development should use:
-
-text npx --yes --package=/path/to/awesome_harness_engineering ahe install
-
-Required behavior:
-
-text 1. Create `.codex/skills/ahe/` if missing. 2. Copy the packaged `SKILL.md`, templates, and schemas into `.codex/skills/ahe/`. 3. Do not create workspace runtime files under `.ahe/`. 4. Do not create `AGENTS.md` or other root harness files. 5. Fail instead of silently overwriting an existing install unless the user explicitly passes an overwrite option. 
+text Hooks Subagents Automatic session-end behavior Automatic commits Complex CLI Remote registry GUI Multiple numbered work documents 
 
 ## 24. Completion Definition
 

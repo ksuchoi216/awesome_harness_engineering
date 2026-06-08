@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly VERSION="0.1.0"
+readonly SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+readonly PACKAGE_ROOT="$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)"
+readonly SOURCE_DIR="${PACKAGE_ROOT}/.codex/skills/ahe"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ahe install [--force] [--backup]
+  ahe doctor
+  ahe version
+EOF
+}
+
+backup_existing_installation() {
+  local target_dir="$1"
+  local backup_root="$2"
+  local timestamp
+
+  timestamp="$(date '+%Y%m%d-%H%M%S')"
+  mkdir -p "${backup_root}"
+  mv "${target_dir}" "${backup_root}/ahe-${timestamp}"
+}
+
+install_skill() {
+  local force="false"
+  local backup="false"
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --force)
+        force="true"
+        ;;
+      --backup)
+        backup="true"
+        ;;
+      *)
+        printf 'Unknown install option: %s\n' "$1" >&2
+        usage >&2
+        exit 1
+        ;;
+    esac
+    shift
+  done
+
+  if [ ! -d "${SOURCE_DIR}" ]; then
+    printf 'Packaged skill files are missing: %s\n' "${SOURCE_DIR}" >&2
+    exit 1
+  fi
+
+  local target_dir="${PWD}/.codex/skills/ahe"
+  local backup_dir="${PWD}/.codex/skills/_backups"
+
+  if [ -e "${target_dir}" ]; then
+    if [ "${backup}" = "true" ]; then
+      backup_existing_installation "${target_dir}" "${backup_dir}"
+    elif [ "${force}" != "true" ]; then
+      cat <<EOF >&2
+AHE skill is already installed at:
+  ${target_dir}
+
+Re-run with --force to overwrite or --backup to move the existing install aside first.
+EOF
+      exit 1
+    else
+      rm -rf "${target_dir}"
+    fi
+  fi
+
+  mkdir -p "${PWD}/.codex/skills"
+  cp -R "${SOURCE_DIR}" "${target_dir}"
+
+  cat <<EOF
+AHE Codex skill installed.
+
+Next:
+1. Open Codex chat in this workspace.
+2. Type \`ahe init\`.
+EOF
+}
+
+doctor() {
+  local target_dir="${PWD}/.codex/skills/ahe"
+
+  if [ ! -f "${target_dir}/SKILL.md" ]; then
+    printf 'Missing: %s/SKILL.md\n' "${target_dir}" >&2
+    exit 1
+  fi
+
+  if [ ! -d "${target_dir}/templates" ]; then
+    printf 'Missing: %s/templates\n' "${target_dir}" >&2
+    exit 1
+  fi
+
+  if [ ! -d "${target_dir}/schemas" ]; then
+    printf 'Missing: %s/schemas\n' "${target_dir}" >&2
+    exit 1
+  fi
+
+  printf 'AHE skill installation looks healthy.\n'
+}
+
+main() {
+  if [ "$#" -eq 0 ]; then
+    usage
+    exit 1
+  fi
+
+  local command="$1"
+  shift
+
+  case "${command}" in
+    install)
+      install_skill "$@"
+      ;;
+    doctor)
+      doctor
+      ;;
+    version)
+      printf '%s\n' "${VERSION}"
+      ;;
+    *)
+      printf 'Unknown command: %s\n' "${command}" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

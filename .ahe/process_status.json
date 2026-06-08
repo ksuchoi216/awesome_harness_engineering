@@ -1,0 +1,51 @@
+{
+  "version": "0.1.0",
+  "mode": "codex-chat-workflow",
+  "current_command": null,
+  "current_step": null,
+  "workflow_complete": true,
+  "environment": {
+    "language": "python",
+    "detected_from_workspace": false
+  },
+  "project": {
+    "name": "Awesome Harness Engineering",
+    "objectives": [
+      "Automatically build harness by using the templates.",
+      "User will use codex to use this skill in codex's conversation(chat), not in terminal.",
+      "Finally, \"npx ahe install\" will install ahe to your computer."
+    ]
+  },
+  "product": {
+    "spec_path": "docs/PRODUCT.md",
+    "exists": true,
+    "complete": true
+  },
+  "files": {
+    "AGENTS.md": {
+      "exists": true,
+      "complete": true
+    },
+    "docs/PRODUCT.md": {
+      "exists": true,
+      "complete": true
+    },
+    "PROGRESS.md": {
+      "exists": true,
+      "complete": true
+    },
+    "SESSION-HANDOFF.md": {
+      "exists": true,
+      "complete": true
+    },
+    "init.sh": {
+      "exists": true,
+      "complete": true
+    },
+    "feature-list.json": {
+      "exists": true,
+      "complete": true
+    }
+  },
+  "updated_at": "2026-06-08T15:01:27+0900"
+}

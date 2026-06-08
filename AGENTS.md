@@ -1,11 +1,23 @@
 # Awesome Harness Engineering
+
+## Project Objectives
 Automatically build harness by using the templates.
 user will use codex to use this skill in codex's conversation(chat), not in terminal.
-finally, "npx ahe install" will install ahe to your computer.
-templates folder is for initilizing, and for agent, product, constraint, init.sh, feature_list.json, progress.md, session-handoff.md, schemas, examples
+for local development after cloning the repo, install with `npx --yes --package=file:. ahe install`.
+after deployment, the target user command is `npx ahe install`.
+templates folder is for initilizing, and for agent, product, constraint, init.sh, feature-list.json, PROGRESS.md, SESSION-HANDOFF.md, schemas, examples
+don't modify the template.
+
+## Global Rules
+- MUST NOT modify the AGENTS.md file except for PROJECT_PURPOSE.
+- MUST NOT modify the headers in PROGRESS.md and SESSION-HANDOFF.md like deletion of headers.
+- MUST FOLLOW THE FORMAT OF init.sh, feature-list.json, PROGRESS.md, SESSION-HANDOFF.md, AGENTS.md
+
+## Reference ONLY(DONT MODIFY)
+- learn-harness-engineering folder.
+- templates folder.
 
 ## Startup Workflow
-
 Before writing code:
 
 1. **Confirm working directory** with `pwd`

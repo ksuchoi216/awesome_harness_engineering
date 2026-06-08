@@ -2,13 +2,18 @@
 
 {{PROJECT_PURPOSE}}
 
+## Global Rules
+- MUST NOT modify the AGENTS.md file except for PROJECT_PURPOSE.
+- MUST NOT modify the headers in PROGRESS.md and SESSION-HANDOFF.md like deletion of headers.
+- MUST FOLLOW THE FORMAT OF init.sh, feature-list.json, PROGRESS.md, SESSION-HANDOFF.md, AGENTS.md
+
 ## Startup Workflow
 
 Before writing code:
 
 1. **Confirm working directory** with `pwd`
 2. **Read this file** completely
-3. **Read project docs if present** (`docs/ARCHITECTURE.md`, `docs/PRODUCT.md`, README, or equivalent)
+3. **Read project docs if present** (`docs/ARCHITECTURE.md`, `docs/PRODUCT.md`, `docs/CONSTRAINTS.md`, README, or equivalent)
 4. **Run `./init.sh`** to verify environment is healthy
 5. **Read `feature_list.json`** to see current feature state
 6. **Review recent commits** with `git log --oneline -5`
