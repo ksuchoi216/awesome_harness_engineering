@@ -2,24 +2,14 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-08 22:01 +0900
-**Session ID:** feat-012-reduced-ahe-skill-surface
-**Active Feature:** feat-012 - Reduced AHE Skill Surface
+**Last Updated:** 2026-06-08 21:56 +0900
+**Session ID:** ahe-clear-new-goal
+**Active Feature:** ahe clear - new goal reset
 
 ## Completed
 
-- [x] Implemented `feat-012 Reduced AHE Skill Surface` by reducing AHE to `$ahe-init`, `$ahe-agent`, `$ahe-product`, `$ahe-constraints`, `$ahe-architecture`, `$ahe-update`, and `$ahe-clear`.
-- [x] Rewrote the skill and product contracts around the reduced command surface.
-- [x] Replaced the old check/resume test expectations with the new reduced-command workflow tests.
-- [x] Implemented `feat-011 Alias Commands and Update Workflow` by adding `$ahe-init`, `$ahe-product`, and `$ahe-update` aliases plus the `ahe update` workflow contract.
-- [x] Updated `docs/PRODUCT.md` to include the alias commands and `ahe update`.
-- [x] Added `tests/test_update_workflow.py` and expanded `tests/test_chat_command_routing.py`.
-- [x] Implemented `feat-010 Global Codex Helper Scripts` by changing `scripts/install.sh` and `scripts/uninstall.sh` to target `${HOME}/.codex`.
-- [x] Added helper-script coverage to `tests/test_project_setup.py`.
-- [x] Implemented `feat-009 Clear Workflow Reset Semantics` by changing the `ahe clear` contract to back up the full harness context, reset `AGENTS.md` objective guidance, remove the old product spec after backup, and collect the new spec recursively.
-- [x] Updated `docs/PRODUCT.md` and `tests/test_clear_workflow.py` to match the new `ahe clear` semantics.
 - [x] Created `.ahe/backups/20260608-215651/` for the `ahe clear` workflow.
-- [x] Copied `AGENTS.md`, the `docs/` folder, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `init.sh` into the clear-workflow backup directory.
+- [x] Copied `AGENTS.md` and `docs/PRODUCT.md` into the clear-workflow backup directory.
 - [x] Backed up the current root AHE-managed files into `.ahe/backups/20260608-144947/`.
 - [x] Added the packaged installer scaffold and embedded skill assets under `.codex/skills/ahe/`.
 - [x] Verified the setup artifacts with shell checks, JSON validation, installer doctor/version, installer smoke install, and direct execution of the Python test assertions.
@@ -40,8 +30,8 @@
 
 ## In Progress
 
-- [ ] No active implementation in progress.
-  - Details: `feat-012 Reduced AHE Skill Surface` is complete. The previous `ahe clear` runtime is no longer aligned with the new command surface and should not be resumed as-is.
+- [ ] `ahe clear` is active and waiting for the new goal.
+  - Details: Backup location is `.ahe/backups/20260608-215651/`. `.ahe/process_status.json` is paused at `ask_new_goal`.
   - Blockers: None.
 
 ## Blocked
@@ -72,10 +62,6 @@
 ## Change Log
 
 - `.ahe/backups/20260608-215651/`, `.ahe/process_status.json`, `PROGRESS.md`, `SESSION-HANDOFF.md` - Started `ahe clear`, backed up `AGENTS.md` and `docs/PRODUCT.md`, and advanced the workflow to the new-goal question.
-- `.codex/skills/ahe/SKILL.md`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_clear_workflow.py` - Changed `ahe clear` to back up the full harness files, reset `AGENTS.md` objective guidance, remove the old product spec after backup, and rewrite `docs/PRODUCT.md` recursively.
-- `scripts/install.sh`, `scripts/uninstall.sh`, `tests/test_project_setup.py`, `docs/PRODUCT.md` - Changed the helper scripts to install/uninstall under `${HOME}/.codex` and added verification coverage.
-- `.codex/skills/ahe/SKILL.md`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_chat_command_routing.py`, `tests/test_update_workflow.py` - Added `$ahe-*` aliases and the `ahe update` workflow for feature-list, progress, and handoff maintenance.
-- `.codex/skills/ahe/SKILL.md`, `docs/PRODUCT.md`, `feature-list.json`, `tests/` - Reduced AHE to the seven `$ahe-*` commands and removed the old check/resume-centered contract surface.
 - `package.json`, `bin/ahe` - Added the minimal installer package and CLI entrypoint.
 - `.codex/skills/ahe/` - Added the embedded skill, templates, and schemas copied by the installer.
 - `init.sh`, `templates/` - Normalized the setup scripts and canonical template names to the conservative product spec.

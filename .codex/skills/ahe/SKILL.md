@@ -9,25 +9,27 @@ AHE is a Codex chat workflow skill for creating and maintaining project harness 
 
 ## Command Router Rule
 
-When the user message starts with `ahe`, Codex must treat it as an AHE workflow command instead of a shell command.
+When the user message starts with one of the commands below, Codex must treat it as an AHE workflow command instead of a shell command.
 
 General routing:
 
-- `ahe` -> smart entrypoint
-- `ahe init` -> initialize global project harness
-- `ahe product` -> create or update docs/PRODUCT.md
-- `ahe check` -> validate AHE-managed files
-- `ahe resume` -> resume unfinished AHE workflow
-- `ahe clear` -> back up current product/global instructions and start a new product goal
+- `$ahe-init` -> initialize harness engineering
+- `$ahe-agent` -> modify the project purpose in `AGENTS.md`
+- `$ahe-product` -> modify `docs/PRODUCT.md`
+- `$ahe-constraints` -> modify `docs/constraints.md`
+- `$ahe-architecture` -> modify `docs/achitecture.md`
+- `$ahe-update` -> update `feature-list.json`, `PROGRESS.md`, and `SESSION-HANDOFF.md`
+- `$ahe-clear` -> back up and remove the current product-tracking files
 
 ## Command Intent
 
-- `ahe`: inspect `.ahe/process_status.json`, resume unfinished work when present, otherwise show current status and the next recommended action.
-- `ahe init`: ask one focused question at a time, create or update `AGENTS.md`, and initialize the workspace harness files.
-- `ahe product`: create or update `docs/PRODUCT.md` and sync the tracking artifacts.
-- `ahe check`: validate required files, required sections, filename casing, and process status consistency.
-- `ahe resume`: continue the most recent unfinished AHE workflow from `.ahe/process_status.json`.
-- `ahe clear`: copy the current `docs/PRODUCT.md` and `AGENTS.md` into `.ahe/backups/`, then ask for a new goal and new product specification.
+- `$ahe-init`: initialize or refresh the harness. If `AGENTS.md` already exists, ask the user whether it is correct first.
+- `$ahe-agent`: modify only the project purpose in `AGENTS.md`.
+- `$ahe-product`: modify `docs/PRODUCT.md`.
+- `$ahe-constraints`: modify `docs/constraints.md`.
+- `$ahe-architecture`: modify `docs/achitecture.md`.
+- `$ahe-update`: update `feature-list.json`, `PROGRESS.md`, and `SESSION-HANDOFF.md`.
+- `$ahe-clear`: create backups and then remove the previous `docs/PRODUCT.md`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `feature-list.json`.
 
 ## Managed Files
 
@@ -35,6 +37,8 @@ AHE manages these workspace files:
 
 - `AGENTS.md`
 - `docs/PRODUCT.md`
+- `docs/constraints.md`
+- `docs/achitecture.md`
 - `PROGRESS.md`
 - `SESSION-HANDOFF.md`
 - `init.sh`
@@ -43,141 +47,166 @@ AHE manages these workspace files:
 
 Templates live under `templates/`. Schemas live under `schemas/`. Workspace runtime state must stay under `.ahe/`.
 
-## Command Workflow: ahe init
+## Clarification Prompt Rule
 
-When executing the `ahe init` command, Codex must follow these instructions step-by-step:
+When the user's response needs clarification or a more detailed description, Codex must ask for clarification using this exact format:
+
+```text
+Please choose one option:
+
+1. Yes
+
+2. No
+
+3. Custom input
+
+Enter 1, 2, or type your own answer:
+```
+
+If the user enters `1`, treat the answer as yes. If the user enters `2`, treat the answer as no. If the user enters `3` or any custom text, treat that text as the user's clarification input and continue the active AHE workflow.
+
+## Command Workflow: ahe-init
+
+When executing the `$ahe-init` command, Codex must follow these instructions step-by-step:
 
 1. **Workspace Inspection**:
-   - Inspect the current workspace to check if `.ahe/process_status.json` exists.
-   - If `.ahe/process_status.json` exists and `workflow_complete` is `false`, resume the unfinished workflow instead of restarting. Follow the **Resume Workflow** instructions.
-   - If not, inspect workspace files to infer the programming language (e.g., Python from `pyproject.toml`, `requirements.txt`, `setup.py`, `uv.lock`, `poetry.lock`, `conda.yaml`, `environment.yml`; JavaScript/TypeScript from `package.json`; Go from `go.mod`; Rust from `Cargo.toml`). If language is ambiguous, default to `python`.
-   - Create the initial `.ahe/process_status.json` conforming to `.codex/skills/ahe/schemas/process_status.schema.json`, set `current_command` to `ahe init`, `workflow_complete` to `false`, `environment.language` to the inferred/default language, and `current_step` to `ask_project_name`.
+   - Inspect `AGENTS.md` and `.ahe/process_status.json`.
+   - If `AGENTS.md` already exists, ask the user whether the current `AGENTS.md` is right.
+   - If the user says the current `AGENTS.md` is not right, ask for the purpose of this project.
+   - If `AGENTS.md` does not exist, ask for the purpose of this project immediately.
+   - Update `.ahe/process_status.json` for the init workflow: set `current_command` to `$ahe-init`, set `workflow_complete` to `false`, and set `current_step` to `ask_agents_confirmation` or `ask_project_purpose` as appropriate.
 
 2. **Sequential Conversation Flow**:
-   Ask the user for each piece of information needed to build `AGENTS.md`. Ask exactly ONE question at a time and wait for the user's response. Save progress to `.ahe/process_status.json` after the user answers each question:
-   - **Step 1: Project Name**: Ask the user for the name of the project. (Store in `project.name`)
-   - **Step 2: Project Objectives**: Ask the user for the project objectives/goals. (Store list in `project.objectives`)
-   - **Step 3: Global Constraints**: Ask the user for any global constraints or rules.
-   - **Step 4: Working Rules**: Ask the user for any specific working rules.
-   - **Step 5: Primary Verification Command**: Ask the user for the primary command to run tests/verify code.
-   - **Step 6: Additional Verification Commands**: Ask the user for other verification commands (linting, type checking).
-   - **Step 7: Do-not-do list**: Ask the user what actions or modifications must be avoided.
+   - Ask exactly ONE focused question at a time and wait for the user's response.
+   - If `AGENTS.md` exists, first ask whether it is right.
+   - If the user says no, ask for the purpose of this project.
+   - Save progress to `.ahe/process_status.json` after every answered question.
 
 3. **Harness Generation**:
-   Once all fields are collected, perform these file modifications:
-   - If any AHE-managed file (`AGENTS.md`, `PROGRESS.md`, `SESSION-HANDOFF.md`, `init.sh`, `feature-list.json`) already exists in the workspace, create a backup of it under `.ahe/backups/` before rewriting it.
-   - Create or update `AGENTS.md` in the root workspace using the `templates/agents.md` template.
-     - Replace `{{AGENT_FILE_NAME}}` with `AGENTS.md`.
-     - Replace `{{PROJECT_PURPOSE}}` with the collected project name, objectives, global constraints, working rules, verification commands, and do-not-do list.
-     - Include a Product Specification reference pointing to `docs/PRODUCT.md`. Write: "Product specification has not been defined yet. Run `ahe product` to create `docs/PRODUCT.md`."
-   - Create or update `init.sh` in the root workspace based on `templates/init.sh`, customized for the project's language environment. The script must be conservative and non-destructive.
-   - Create `PROGRESS.md` using `templates/progress.md`.
-   - Create `SESSION-HANDOFF.md` using `templates/session-handoff.md`.
-   - Create `feature-list.json` using `templates/feature-list.json`.
-   - Mark the file statuses inside `.ahe/process_status.json` under `files` as `exists: true` and `complete: true`.
-   - Update `.ahe/process_status.json`: set `current_command` to `null`, `current_step` to `null`, `workflow_complete` to `true`, and `updated_at` to the current ISO timestamp.
-   - Run the validation check (equivalent to `ahe check`) and display the results to the user. Prompt them that harness initialization is complete and they should run `ahe product` next.
+   - Create or update `AGENTS.md` only after the project purpose is clear.
+   - Replace only the `PROJECT_PURPOSE` portion of `AGENTS.md`.
+   - Keep the rest of the `AGENTS.md` file format unchanged.
+   - Create or update `.ahe/process_status.json` so `current_command`, `current_step`, and `workflow_complete` match whether the init workflow is complete.
 
-## Command Workflow: ahe product
+## Command Workflow: ahe-agent
 
-When executing the `ahe product` command, Codex must follow these instructions step-by-step:
+When executing the `$ahe-agent` command, Codex must follow these instructions step-by-step:
+
+1. **Agent Inspection**:
+   - Inspect `AGENTS.md` and `.ahe/process_status.json`.
+   - Update `.ahe/process_status.json` for the agent workflow: set `current_command` to `$ahe-agent`, set `workflow_complete` to `false`, and set `current_step` to `ask_project_purpose`.
+
+2. **Agent Conversation Flow**:
+   - Ask exactly ONE focused question at a time and wait for the user's response.
+   - Ask for the new or revised project purpose.
+   - Save progress after every answer.
+
+3. **Agent Completion**:
+   - Modify only the `PROJECT_PURPOSE` portion of `AGENTS.md`.
+   - Do not rewrite unrelated `AGENTS.md` sections.
+   - Update `.ahe/process_status.json` so `current_command`, `current_step`, and `workflow_complete` match whether the agent workflow is complete.
+
+## Command Workflow: ahe-product
+
+When executing the `$ahe-product` command, Codex must follow these instructions step-by-step:
 
 1. **Product Inspection**:
-   - Inspect `docs/PRODUCT.md` if it already exists.
-   - Inspect `.ahe/process_status.json` before asking new questions.
-   - If `.ahe/process_status.json` exists and `current_command` is `ahe product` with `workflow_complete` set to `false`, resume the unfinished product workflow instead of restarting.
-   - If the global harness is not complete yet, direct the user to finish `ahe init` first.
-   - Update `.ahe/process_status.json` for the product workflow: set `current_command` to `ahe product`, set `workflow_complete` to `false`, preserve the existing `project` data, and set `current_step` to `ask_product_name`.
+   - Inspect `docs/PRODUCT.md` and `.ahe/process_status.json`.
+   - Update `.ahe/process_status.json` for the product workflow: set `current_command` to `$ahe-product`, set `workflow_complete` to `false`, and set `current_step` to `ask_product_specification`.
 
 2. **Sequential Product Conversation Flow**:
-   Ask exactly ONE focused question at a time and wait for the user's response. Save progress to `.ahe/process_status.json` after each answer:
-   - **Step 1: Product Name**: Ask what the product or feature is called.
-   - **Step 2: Product Objective**: Ask what outcome the product or feature should achieve.
-   - **Step 3: Background**: Ask for the context that explains why this work matters now.
-   - **Step 4: Current Goal**: Ask for the immediate goal of the current implementation cycle.
-   - **Step 5: Requirements**: Ask for the concrete required behaviors or constraints.
-   - **Step 6: Completion Criteria**: Ask how the user will decide the work is done.
-   - **Step 7: User Workflow**: Ask how the target user will move through the product or feature.
-   - **Step 8: Files to Create or Modify**: Ask which files or areas of the repo are expected to change.
-   - **Step 9: Verification Commands**: Ask which commands should verify the product work.
-   - **Step 10: Out of Scope**: Ask what must not be included in this product cycle.
-   - **Step 11: Open Questions**: Ask what uncertainties still need decisions.
-   - **Step 12: Notes**: Ask for any extra notes that future Codex sessions should keep in mind.
+   - Ask exactly ONE focused question at a time and wait for the user's response.
+   - Ask for the product specification inputs needed to update `docs/PRODUCT.md`.
+   - Ask recursively for more detail whenever the product specification is incomplete or unclear.
+   - Save progress after every answer.
 
-3. **Product Spec Generation and Tracking Sync**:
-   Once all fields are collected, perform these file modifications:
-   - Create or update `docs/PRODUCT.md` as the canonical product specification.
-   - Ensure `docs/PRODUCT.md` contains these required sections in order: `# PRODUCT.md`, `## Product Name`, `## Product Objective`, `## Background`, `## Current Goal`, `## Requirements`, `## Completion Criteria`, `## User Workflow`, `## Files to Create or Modify`, `## Verification Commands`, `## Out of Scope`, `## Open Questions`, `## Notes`.
-   - Update `AGENTS.md` so its Product Specification section points to `docs/PRODUCT.md` as the current canonical spec.
-   - Update `PROGRESS.md` with the active product workflow status and the latest verification expectations.
-   - Update `SESSION-HANDOFF.md` with the current product context, open questions, and the recommended next action.
-   - Update `.ahe/process_status.json` so `product.spec_path` remains `docs/PRODUCT.md`, `product.exists` is `true`, `product.complete` reflects whether all required fields are filled, `current_command` is `null`, `current_step` is `null`, `workflow_complete` is `true`, and `updated_at` is refreshed to the current ISO timestamp.
-   - Run the validation check (equivalent to `ahe check`) and display the results to the user.
+3. **Product Completion**:
+   - Create or update `docs/PRODUCT.md`.
+   - If the product specification is clear, finish writing `docs/PRODUCT.md`.
+   - Update `.ahe/process_status.json` so `current_command`, `current_step`, and `workflow_complete` match whether the product workflow is complete.
 
-## Command Workflow: ahe check
+## Command Workflow: ahe-constraints
 
-When executing the `ahe check` command, Codex must follow these instructions step-by-step:
+When executing the `$ahe-constraints` command, Codex must follow these instructions step-by-step:
 
-1. **Validation Scope**:
-   - Inspect the current workspace state for all AHE-managed files.
-   - Validate that these required files exist where expected: `AGENTS.md`, `docs/PRODUCT.md`, `PROGRESS.md`, `SESSION-HANDOFF.md`, `init.sh`, `feature-list.json`, and `.ahe/process_status.json`.
-   - Validate these required rules: `Required files exist`, `Required sections exist`, `Required fields are filled`, `Filename casing is correct`, `AGENTS.md references docs/PRODUCT.md`, `.ahe/process_status.json matches the actual workspace state`, `init.sh exists and is executable or clearly marked as a script`, and `feature-list.json is valid JSON`.
-   - Validate product-specific completeness using the current contents of `docs/PRODUCT.md` when that file exists.
+1. **Constraints Inspection**:
+   - Inspect `docs/constraints.md` and `.ahe/process_status.json`.
+   - Update `.ahe/process_status.json` for the constraints workflow: set `current_command` to `$ahe-constraints`, set `workflow_complete` to `false`, and set `current_step` to `ask_constraints`.
 
-2. **Check Reporting**:
-   - Summarize the validation result in a compact checklist-style report that the user can read directly in chat.
-   - When all checks pass, report that the AHE harness is complete and ready for the next workflow step.
-   - When something is missing or inconsistent, identify the exact missing file, section, or field and report the issue explicitly.
-   - End the report with the recommended next action, such as `Run ahe product` when `docs/PRODUCT.md` is missing or `Run ahe resume` when unfinished workflow state exists.
+2. **Constraints Conversation Flow**:
+   - Ask exactly ONE focused question at a time and wait for the user's response.
+   - Ask for the constraints that must be written or updated in `docs/constraints.md`.
+   - Ask recursively for more detail whenever the constraints are incomplete or unclear.
+   - Save progress after every answer.
 
-## Command Workflow: ahe resume
+3. **Constraints Completion**:
+   - Create or update `docs/constraints.md`.
+   - If the constraints are clear, finish writing `docs/constraints.md`.
+   - Update `.ahe/process_status.json` so `current_command`, `current_step`, and `workflow_complete` match whether the constraints workflow is complete.
 
-When executing the `ahe resume` command, Codex must follow these instructions step-by-step:
+## Command Workflow: ahe-architecture
 
-1. **Resume State Inspection**:
-   - Read `.ahe/process_status.json`.
-   - Identify the previous `current_command`.
-   - Identify the previous `current_step`.
-   - Determine whether `workflow_complete` is `false` and whether enough collected data exists to resume the prior command.
+When executing the `$ahe-architecture` command, Codex must follow these instructions step-by-step:
 
-2. **Resume Decision and Next Prompt**:
-   - If unfinished workflow state exists, Summarize already collected fields, then Ask the next missing question for that workflow.
-   - Resume the prior command in its original mode: continue `ahe init` if the global harness workflow is unfinished, or continue `ahe product` if the product workflow is unfinished.
-   - Ask exactly one focused question at a time after the resume summary.
-   - If no unfinished workflow exists, Run a lightweight AHE status check and Recommend the next useful command.
-   - Use a fallback message shaped like: `No unfinished AHE workflow found.` followed by the current status summary and the recommended next action.
+1. **Architecture Inspection**:
+   - Inspect `docs/achitecture.md` and `.ahe/process_status.json`.
+   - Update `.ahe/process_status.json` for the architecture workflow: set `current_command` to `$ahe-architecture`, set `workflow_complete` to `false`, and set `current_step` to `ask_architecture`.
 
-## Command Workflow: ahe clear
+2. **Architecture Conversation Flow**:
+   - Ask exactly ONE focused question at a time and wait for the user's response.
+   - Ask for the architecture description that must be written or updated in `docs/achitecture.md`.
+   - Ask recursively for more detail whenever the architecture description is incomplete or unclear.
+   - Save progress after every answer.
 
-When executing the `ahe clear` command, Codex must follow these instructions step-by-step:
+3. **Architecture Completion**:
+   - Create or update `docs/achitecture.md`.
+   - If the architecture description is clear, finish writing `docs/achitecture.md`.
+   - Update `.ahe/process_status.json` so `current_command`, `current_step`, and `workflow_complete` match whether the architecture workflow is complete.
+
+## Command Workflow: ahe-update
+
+When executing the `$ahe-update` command, Codex must follow these instructions step-by-step:
+
+1. **Update Inspection**:
+   - Inspect `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `.ahe/process_status.json`.
+   - Update `.ahe/process_status.json` for the update workflow: set `current_command` to `$ahe-update`, set `workflow_complete` to `false`, and set `current_step` to `ask_update_summary`.
+
+2. **Sequential Update Conversation Flow**:
+   - Ask exactly ONE focused question at a time and wait for the user's response.
+   - First ask what changed and which feature entries need updating.
+   - Then ask what verification evidence, blockers, or status changes should be recorded.
+   - Then ask what next recommended action should be written into `SESSION-HANDOFF.md`.
+   - Save progress after every answer.
+
+3. **Update Completion**:
+   - Update `feature-list.json`.
+   - Update `PROGRESS.md`.
+   - Update `SESSION-HANDOFF.md`.
+   - Update `.ahe/process_status.json` so `current_command`, `current_step`, and `workflow_complete` match whether the update workflow is complete.
+
+## Command Workflow: ahe-clear
+
+When executing the `$ahe-clear` command, Codex must follow these instructions step-by-step:
 
 1. **Clear Preparation**:
-   - Inspect `docs/PRODUCT.md`, `AGENTS.md`, and `.ahe/process_status.json`.
+   - Inspect `docs/PRODUCT.md`, `PROGRESS.md`, `SESSION-HANDOFF.md`, `feature-list.json`, and `.ahe/process_status.json`.
    - If `.ahe/backups/` does not exist, create it.
    - Create a timestamped backup directory under `.ahe/backups/`.
    - Copy the current `docs/PRODUCT.md` into the backup directory, preserving the `docs/PRODUCT.md` relative path.
-   - Copy the current `AGENTS.md` into the backup directory, preserving the `AGENTS.md` relative path.
-   - Do not delete or overwrite `docs/PRODUCT.md` or `AGENTS.md` before the user provides the new goal and new product specification.
+   - Copy the current `PROGRESS.md` into the backup directory, preserving the `PROGRESS.md` relative path.
+   - Copy the current `SESSION-HANDOFF.md` into the backup directory, preserving the `SESSION-HANDOFF.md` relative path.
+   - Copy the current `feature-list.json` into the backup directory, preserving the `feature-list.json` relative path.
 
-2. **New Product Conversation Flow**:
-   - Update `.ahe/process_status.json` for the clear workflow: set `current_command` to `ahe clear`, set `workflow_complete` to `false`, and set `current_step` to `ask_new_goal`.
-   - Ask exactly ONE focused question at a time and wait for the user's response.
-   - First ask the user for the new goal.
-   - Save the new goal to `.ahe/process_status.json`, refresh `updated_at`, and advance `current_step` to `ask_new_product_spec`.
-   - Then ask the user for the new `docs/PRODUCT.md` content or product specification inputs.
-   - Save progress after every answer.
-
-3. **Clear Completion**:
-   - Create or update `docs/PRODUCT.md` only after the new goal and new product specification are collected.
-   - Keep `AGENTS.md` backed up; update it only if the new goal changes stable project-level guidance.
-   - Update `PROGRESS.md` with the clear workflow status and backup location.
-   - Update `SESSION-HANDOFF.md` with the new goal, current product context, backup location, and recommended next action.
-   - Update `.ahe/process_status.json` so `current_command`, `current_step`, and `workflow_complete` match whether the clear workflow is complete.
-   - Run the validation check (equivalent to `ahe check`) and display the results to the user.
+2. **Clear Removal**:
+   - Remove the previous `docs/PRODUCT.md`.
+   - Remove the previous `PROGRESS.md`.
+   - Remove the previous `SESSION-HANDOFF.md`.
+   - Remove the previous `feature-list.json`.
+   - Update `.ahe/process_status.json` so `current_command` is `$ahe-clear`, `current_step` is `null`, and `workflow_complete` is `true`.
 
 ## Session Tracking and Handoff Sync
 
-These rules apply across every AHE workflow, not only at the end of `ahe init` or `ahe product`.
+These rules apply across every AHE workflow.
 
 1. **Tracking Update Rules**:
    - Update `.ahe/process_status.json` at workflow start.
@@ -185,11 +214,9 @@ These rules apply across every AHE workflow, not only at the end of `ahe init` o
    - Refresh `updated_at` every time workflow state changes.
    - Keep `current_command`, `current_step`, and `workflow_complete` aligned with the active workflow state.
    - Keep the `files` status map aligned with the actual workspace files.
-   - Preserve already collected `project` and `product` data unless the active workflow intentionally replaces it.
 
 2. **Progress and Handoff Content Requirements**:
    - Update `PROGRESS.md` whenever the active feature, workflow status, blockers, or verification state changes.
    - Update `SESSION-HANDOFF.md` whenever the current objective, completed work, important files, verification evidence, or recommended next step changes.
    - PROGRESS.md must reflect the current active feature and latest completed work.
    - SESSION-HANDOFF.md must leave the next Codex session with a concrete startup path.
-   - When a workflow pauses mid-conversation, both documents should make the unfinished command and next missing question easy to recover.

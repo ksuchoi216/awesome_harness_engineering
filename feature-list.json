@@ -67,6 +67,56 @@
       ],
       "status": "done",
       "evidence": "Updated `.codex/skills/ahe/SKILL.md` and `docs/PRODUCT.md` with the `ahe clear` routing and workflow contract. Added `tests/test_clear_workflow.py` and verified with direct Python test-module execution because pytest is not installed in this workspace."
+    },
+    {
+      "id": "feat-008",
+      "name": "Clarification Prompt Format",
+      "description": "Require AHE to use a three-option clarification prompt when a user response needs clarification or more detail.",
+      "dependencies": [
+        "feat-007"
+      ],
+      "status": "done",
+      "evidence": "Added the Clarification Prompt Rule to `.codex/skills/ahe/SKILL.md`, documented it in `docs/PRODUCT.md`, and covered the exact prompt format in `tests/test_clarification_prompt.py`."
+    },
+    {
+      "id": "feat-009",
+      "name": "Clear Workflow Reset Semantics",
+      "description": "Change `ahe clear` so it backs up the full harness context, asks for a new goal, resets the AGENTS objective, removes the old product spec, and rewrites `docs/PRODUCT.md` recursively until clear.",
+      "dependencies": [
+        "feat-008"
+      ],
+      "status": "done",
+      "evidence": "Updated `.codex/skills/ahe/SKILL.md`, `docs/PRODUCT.md`, and `tests/test_clear_workflow.py` to match the new `ahe clear` semantics. The active clear-workflow backup directory was also expanded to include the full requested backup set."
+    },
+    {
+      "id": "feat-010",
+      "name": "Global Codex Helper Scripts",
+      "description": "Make `scripts/install.sh` and `scripts/uninstall.sh` operate on the global Codex home under `~/.codex`.",
+      "dependencies": [
+        "feat-009"
+      ],
+      "status": "done",
+      "evidence": "Updated `scripts/install.sh` to install into `${HOME}/.codex` via the packaged installer and `scripts/uninstall.sh` to remove `${HOME}/.codex/skills/ahe`. Added coverage in `tests/test_project_setup.py`."
+    },
+    {
+      "id": "feat-011",
+      "name": "Alias Commands and Update Workflow",
+      "description": "Add Codex-facing aliases like `$ahe-init`, `$ahe-product`, and `$ahe-update`, and define `ahe update` for feature-list, progress, and handoff maintenance.",
+      "dependencies": [
+        "feat-010"
+      ],
+      "status": "done",
+      "evidence": "Updated `.codex/skills/ahe/SKILL.md` and `docs/PRODUCT.md` with `$ahe-*` aliases plus the `ahe update` workflow. Added `tests/test_update_workflow.py` and expanded `tests/test_chat_command_routing.py`."
+    },
+    {
+      "id": "feat-012",
+      "name": "Reduced AHE Skill Surface",
+      "description": "Reduce AHE to the seven `$ahe-*` commands for init, agent, product, constraints, architecture, update, and clear.",
+      "dependencies": [
+        "feat-011"
+      ],
+      "status": "done",
+      "evidence": "Rewrote `.codex/skills/ahe/SKILL.md`, updated `docs/PRODUCT.md`, replaced the old check/resume expectations, and added command/workflow contract tests for the reduced `$ahe-*` surface."
     }
   ]
 }

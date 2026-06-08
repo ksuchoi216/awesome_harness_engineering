@@ -2,21 +2,14 @@
 
 ## Current Product Context
 
-- Goal: Keep AHE limited to the seven `$ahe-*` commands for init, agent, product, constraints, architecture, update, and clear.
-- Current status: `feat-012 Reduced AHE Skill Surface` is complete.
+- Goal: Start a new product direction through `ahe clear` after backing up the current `AGENTS.md` and `docs/PRODUCT.md`.
+- Current status: `ahe clear` is active and paused at `ask_new_goal`.
 - Branch / commit: Current working tree changes only. No commit created in this session.
 
 ## Last Completed Work
 
 - [x] Created `.ahe/backups/20260608-215651/`.
-- [x] Expanded the clear-workflow backup to include `AGENTS.md`, the `docs/` folder, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `init.sh`.
-- [x] Updated the `ahe clear` contract so it resets the `AGENTS.md` objective and rewrites `docs/PRODUCT.md` recursively after backup.
-- [x] Updated `scripts/install.sh` to install into `${HOME}/.codex`.
-- [x] Updated `scripts/uninstall.sh` to remove `${HOME}/.codex/skills/ahe`.
-- [x] Added helper-script coverage to `tests/test_project_setup.py`.
-- [x] Rewrote the AHE command router around the seven `$ahe-*` commands only.
-- [x] Added workflow coverage for `$ahe-agent`, `$ahe-constraints`, `$ahe-architecture`, and the reduced `$ahe-clear`.
-- [x] Removed the old check/resume-focused contract surface.
+- [x] Copied `AGENTS.md` and `docs/PRODUCT.md` into the backup directory.
 - [x] Added a cross-workflow `Session Tracking and Handoff Sync` section to `.codex/skills/ahe/SKILL.md`.
 - [x] Added `tests/test_session_tracking_handoff.py` and verified it in isolation and in the full pytest suite.
 - [x] Confirmed the overall workflow contract remains green with `pytest tests/ -x` and `./init.sh`.
@@ -28,19 +21,13 @@
 
 ## Current Open Questions
 
-- Whether the previous in-progress `.ahe/process_status.json` clear state should be discarded or translated into the new `$ahe-clear` semantics.
+- What is the new goal for the next product direction?
 
 ## Important Files
 
 - `docs/PRODUCT.md` - Canonical product specification and scope reference.
 - `.ahe/backups/20260608-215651/AGENTS.md` - Clear-workflow backup of the current global instructions.
-- `.ahe/backups/20260608-215651/docs/` - Clear-workflow backup of the current docs folder.
-- `.ahe/backups/20260608-215651/PROGRESS.md` - Clear-workflow backup of the current progress log.
-- `.ahe/backups/20260608-215651/SESSION-HANDOFF.md` - Clear-workflow backup of the current handoff file.
-- `.ahe/backups/20260608-215651/init.sh` - Clear-workflow backup of the current startup script.
-- `scripts/install.sh`, `scripts/uninstall.sh` - Helper scripts for global Codex install and uninstall under `${HOME}/.codex`.
-- `tests/test_specialized_workflows.py` - Contract coverage for `$ahe-agent`, `$ahe-constraints`, `$ahe-architecture`, and `$ahe-update`.
-- `tests/test_command_set.py` - Contract coverage for the reduced `$ahe-*` command surface.
+- `.ahe/backups/20260608-215651/docs/PRODUCT.md` - Clear-workflow backup of the current product specification.
 - `.codex/skills/ahe/SKILL.md` - Installed skill entrypoint containing routing plus explicit workflow and cross-workflow tracking contracts.
 - `.ahe/process_status.json` - Runtime state used by future `ahe` and `ahe resume` flows.
 - `tests/test_clarification_prompt.py` - Contract coverage for the clarification prompt format.
@@ -54,7 +41,7 @@
 2. Read `feature-list.json` and `PROGRESS.md`.
 3. Review this handoff.
 4. Run `./init.sh` or the documented verification command before editing.
-5. Decide whether to reset `.ahe/process_status.json` to match the reduced command surface.
+5. Resume `ahe clear` and answer the new-goal question.
 
 ## Verification Status
 

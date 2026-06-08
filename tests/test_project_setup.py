@@ -119,6 +119,46 @@ def test_installer_supports_local_npx_package_flow(tmp_path: Path) -> None:
     assert (workspace_root / ".codex/skills/ahe/SKILL.md").exists()
 
 
+def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
+    npx_binary = shutil.which("npx")
+
+    if npx_binary is None:
+        return
+
+    fake_home = tmp_path / "home"
+    npm_cache_root = tmp_path / "npm-cache"
+    fake_home.mkdir()
+    npm_cache_root.mkdir()
+
+    environment = os.environ.copy()
+    environment["HOME"] = str(fake_home)
+    environment["npm_config_cache"] = str(npm_cache_root)
+
+    install_process = subprocess.run(
+        (str(REPO_ROOT / "scripts" / "install.sh"),),
+        cwd=REPO_ROOT,
+        check=False,
+        capture_output=True,
+        env=environment,
+        text=True,
+    )
+
+    assert install_process.returncode == 0, install_process.stderr
+    assert (fake_home / ".codex/skills/ahe/SKILL.md").exists()
+
+    uninstall_process = subprocess.run(
+        (str(REPO_ROOT / "scripts" / "uninstall.sh"),),
+        cwd=REPO_ROOT,
+        check=False,
+        capture_output=True,
+        env=environment,
+        text=True,
+    )
+
+    assert uninstall_process.returncode == 0, uninstall_process.stderr
+    assert not (fake_home / ".codex/skills/ahe").exists()
+
+
 def test_template_directory_does_not_use_forbidden_lowercase_markdown_names() -> None:
     template_dir = REPO_ROOT / ".codex/skills/ahe/templates"
     if not template_dir.exists():

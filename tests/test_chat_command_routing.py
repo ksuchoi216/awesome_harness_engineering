@@ -26,12 +26,13 @@ def test_skill_md_has_yaml_frontmatter() -> None:
 def test_skill_md_contains_command_routing_instructions() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
     assert "## Command Router Rule" in content, "Missing '## Command Router Rule' section"
-    assert "ahe          ->" in content or "ahe` ->" in content or "- `ahe`" in content, "Missing ahe routing"
-    assert "ahe init" in content
-    assert "ahe product" in content
-    assert "ahe check" in content
-    assert "ahe resume" in content
-    assert "ahe clear" in content
+    assert "$ahe-init" in content
+    assert "$ahe-agent" in content
+    assert "$ahe-product" in content
+    assert "$ahe-constraints" in content
+    assert "$ahe-architecture" in content
+    assert "$ahe-update" in content
+    assert "$ahe-clear" in content
 
 if __name__ == "__main__":
     test_skill_md_has_yaml_frontmatter()

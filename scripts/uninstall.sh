@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TARGET_DIR=".codex/skills/ahe"
+TARGET_DIR="${HOME}/.codex/skills/ahe"
 
 if [ -d "${TARGET_DIR}" ]; then
   echo "Uninstalling AHE skill..."
