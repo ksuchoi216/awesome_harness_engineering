@@ -31,6 +31,7 @@ def test_skill_md_contains_command_routing_instructions() -> None:
     assert "ahe product" in content
     assert "ahe check" in content
     assert "ahe resume" in content
+    assert "ahe clear" in content
 
 if __name__ == "__main__":
     test_skill_md_has_yaml_frontmatter()

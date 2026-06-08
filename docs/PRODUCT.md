@@ -14,7 +14,7 @@ AHE is a Codex chat workflow skill.
 
 AHE lets the user type command-like messages inside Codex chat, such as:
 
-text ahe ahe init ahe product ahe check ahe resume 
+text ahe ahe init ahe product ahe check ahe resume ahe clear 
 
 Codex must interpret these messages as AHE workflow commands through the installed AHE skill.
 
@@ -215,7 +215,7 @@ They are typed inside Codex chat.
 
 Supported v0.1 commands:
 
-text ahe ahe init ahe product ahe check ahe resume 
+text ahe ahe init ahe product ahe check ahe resume ahe clear 
 
 These commands should not be executed as shell commands unless the user explicitly asks to run them in the terminal.
 
@@ -225,7 +225,7 @@ When the user message starts with ahe, Codex must treat it as an AHE workflow co
 
 General routing:
 
-text ahe          -> smart entrypoint ahe init     -> initialize global project harness ahe product  -> create or update docs/PRODUCT.md ahe check    -> validate AHE-managed files ahe resume   -> resume unfinished AHE workflow 
+text ahe          -> smart entrypoint ahe init     -> initialize global project harness ahe product  -> create or update docs/PRODUCT.md ahe check    -> validate AHE-managed files ahe resume   -> resume unfinished AHE workflow ahe clear    -> back up AGENTS.md and docs/PRODUCT.md, then ask for a new goal and product spec 
 
 ## 12. Smart Entrypoint: ahe
 
@@ -361,6 +361,26 @@ Example:
 
 text No unfinished AHE workflow found.  Current status: [x] AGENTS.md [ ] docs/PRODUCT.md  Recommended next action: Run `ahe product`. 
 
+## 16.1 Command: ahe clear
+
+### Purpose
+
+ahe clear starts a new product direction while preserving the current global instructions and product specification.
+
+### Behavior
+
+When the user types:
+
+text ahe clear 
+
+Codex should:
+
+text 1. Create a timestamped backup directory under `.ahe/backups/`. 2. Copy `docs/PRODUCT.md` to the backup directory, preserving the relative path. 3. Copy `AGENTS.md` to the backup directory, preserving the relative path. 4. Update `.ahe/process_status.json` with `current_command` set to `ahe clear`, `workflow_complete` set to `false`, and `current_step` set to `ask_new_goal`. 5. Ask one focused question: what is the new goal? 6. After the user answers, save the new goal and ask for the new `docs/PRODUCT.md` content or product specification inputs. 7. Do not overwrite `docs/PRODUCT.md` or `AGENTS.md` until the new goal and new product specification are collected. 8. Update `PROGRESS.md` and `SESSION-HANDOFF.md` with the backup location and clear workflow state. 9. Run `ahe check` after the new product specification is written. 
+
+### Required Backup Files
+
+text AGENTS.md docs/PRODUCT.md 
+
 ## 17. Default Environment
 
 The default environment is Python.
@@ -434,7 +454,7 @@ AHE v0.1 should only act when the user explicitly types an AHE command.
 
 ### Include
 
-text Codex chat workflow AHE SKILL.md Command router ahe ahe init ahe product ahe check ahe resume AGENTS.md generation docs/PRODUCT.md generation PROGRESS.md generation SESSION-HANDOFF.md generation init.sh generation feature-list.json generation .ahe/process_status.json runtime state Python default environment npm installer with local development flow `npx --yes --package=file:. ahe install` and deployment target `npx ahe install` No hooks No automatic background behavior 
+text Codex chat workflow AHE SKILL.md Command router ahe ahe init ahe product ahe check ahe resume ahe clear AGENTS.md generation docs/PRODUCT.md generation PROGRESS.md generation SESSION-HANDOFF.md generation init.sh generation feature-list.json generation .ahe/process_status.json runtime state Python default environment npm installer with local development flow `npx --yes --package=file:. ahe install` and deployment target `npx ahe install` No hooks No automatic background behavior 
 
 ### Exclude
 

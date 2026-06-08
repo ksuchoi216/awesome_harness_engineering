@@ -18,6 +18,7 @@ General routing:
 - `ahe product` -> create or update docs/PRODUCT.md
 - `ahe check` -> validate AHE-managed files
 - `ahe resume` -> resume unfinished AHE workflow
+- `ahe clear` -> back up current product/global instructions and start a new product goal
 
 ## Command Intent
 
@@ -26,6 +27,7 @@ General routing:
 - `ahe product`: create or update `docs/PRODUCT.md` and sync the tracking artifacts.
 - `ahe check`: validate required files, required sections, filename casing, and process status consistency.
 - `ahe resume`: continue the most recent unfinished AHE workflow from `.ahe/process_status.json`.
+- `ahe clear`: copy the current `docs/PRODUCT.md` and `AGENTS.md` into `.ahe/backups/`, then ask for a new goal and new product specification.
 
 ## Managed Files
 
@@ -144,6 +146,34 @@ When executing the `ahe resume` command, Codex must follow these instructions st
    - Ask exactly one focused question at a time after the resume summary.
    - If no unfinished workflow exists, Run a lightweight AHE status check and Recommend the next useful command.
    - Use a fallback message shaped like: `No unfinished AHE workflow found.` followed by the current status summary and the recommended next action.
+
+## Command Workflow: ahe clear
+
+When executing the `ahe clear` command, Codex must follow these instructions step-by-step:
+
+1. **Clear Preparation**:
+   - Inspect `docs/PRODUCT.md`, `AGENTS.md`, and `.ahe/process_status.json`.
+   - If `.ahe/backups/` does not exist, create it.
+   - Create a timestamped backup directory under `.ahe/backups/`.
+   - Copy the current `docs/PRODUCT.md` into the backup directory, preserving the `docs/PRODUCT.md` relative path.
+   - Copy the current `AGENTS.md` into the backup directory, preserving the `AGENTS.md` relative path.
+   - Do not delete or overwrite `docs/PRODUCT.md` or `AGENTS.md` before the user provides the new goal and new product specification.
+
+2. **New Product Conversation Flow**:
+   - Update `.ahe/process_status.json` for the clear workflow: set `current_command` to `ahe clear`, set `workflow_complete` to `false`, and set `current_step` to `ask_new_goal`.
+   - Ask exactly ONE focused question at a time and wait for the user's response.
+   - First ask the user for the new goal.
+   - Save the new goal to `.ahe/process_status.json`, refresh `updated_at`, and advance `current_step` to `ask_new_product_spec`.
+   - Then ask the user for the new `docs/PRODUCT.md` content or product specification inputs.
+   - Save progress after every answer.
+
+3. **Clear Completion**:
+   - Create or update `docs/PRODUCT.md` only after the new goal and new product specification are collected.
+   - Keep `AGENTS.md` backed up; update it only if the new goal changes stable project-level guidance.
+   - Update `PROGRESS.md` with the clear workflow status and backup location.
+   - Update `SESSION-HANDOFF.md` with the new goal, current product context, backup location, and recommended next action.
+   - Update `.ahe/process_status.json` so `current_command`, `current_step`, and `workflow_complete` match whether the clear workflow is complete.
+   - Run the validation check (equivalent to `ahe check`) and display the results to the user.
 
 ## Session Tracking and Handoff Sync
 

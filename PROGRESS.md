@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-08 16:18 +0900
-**Session ID:** feat-006-session-tracking-handoff
-**Active Feature:** feat-006 - Session Tracking and Handoff
+**Last Updated:** 2026-06-08 21:47 +0900
+**Session ID:** feat-007-clear-workflow
+**Active Feature:** feat-007 - Clear Workflow
 
 ## Completed
 
@@ -19,11 +19,14 @@
 - [x] Added `tests/test_check_resume_workflows.py` to verify validation scope, report behavior, resume-state inspection, and next-question handling.
 - [x] Implemented `feat-006 Session Tracking and Handoff` by adding a cross-workflow tracking sync contract to `.codex/skills/ahe/SKILL.md`.
 - [x] Added `tests/test_session_tracking_handoff.py` to verify process-status synchronization and progress/handoff update rules.
+- [x] Implemented `feat-007 Clear Workflow` by adding the `ahe clear` command contract to `.codex/skills/ahe/SKILL.md`.
+- [x] Updated `docs/PRODUCT.md` so the product specification includes `ahe clear`.
+- [x] Added `tests/test_clear_workflow.py` to verify backup and new-goal conversation requirements.
 
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-006 Session Tracking and Handoff` is complete and verified. The current planned feature sequence is fully implemented.
+  - Details: `feat-007 Clear Workflow` is complete and verified.
   - Blockers: None.
 
 ## Blocked
@@ -65,3 +68,4 @@
 - `bin/ahe`, `tests/test_project_setup.py` - Made the installer smoke test hermetic and fixed symlink-aware package root resolution for `npx` installs.
 - `.codex/skills/ahe/SKILL.md`, `tests/test_check_resume_workflows.py` - Added explicit Check and Resume workflow contracts and verification coverage.
 - `.codex/skills/ahe/SKILL.md`, `tests/test_session_tracking_handoff.py` - Added explicit cross-workflow tracking and handoff synchronization rules and verification coverage.
+- `.codex/skills/ahe/SKILL.md`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_clear_workflow.py` - Added `ahe clear` workflow routing, behavior, tracking, and tests.

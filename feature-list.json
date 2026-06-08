@@ -57,6 +57,16 @@
       ],
       "status": "done",
       "evidence": "Expanded `.codex/skills/ahe/SKILL.md` with a cross-workflow `Session Tracking and Handoff Sync` section covering when `.ahe/process_status.json`, `PROGRESS.md`, and `SESSION-HANDOFF.md` must be updated together. Added `tests/test_session_tracking_handoff.py` and verified with `python3 tests/test_session_tracking_handoff.py` and `pytest tests/ -x`."
+    },
+    {
+      "id": "feat-007",
+      "name": "Clear Workflow",
+      "description": "Add `ahe clear` so AHE backs up `docs/PRODUCT.md` and `AGENTS.md`, then asks for a new goal and new product specification.",
+      "dependencies": [
+        "feat-006"
+      ],
+      "status": "done",
+      "evidence": "Updated `.codex/skills/ahe/SKILL.md` and `docs/PRODUCT.md` with the `ahe clear` routing and workflow contract. Added `tests/test_clear_workflow.py` and verified with direct Python test-module execution because pytest is not installed in this workspace."
     }
   ]
 }
