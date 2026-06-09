@@ -2,11 +2,13 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-09 03:12 +0900
-**Session ID:** feat-020-codex-ui-clarification
+**Last Updated:** 2026-06-09 10:50 +0900
+**Session ID:** feat-021-internal-ask-user
 **Active Feature:** None
 
 ## Completed
+
+- [x] Implemented `feat-021 Internal Ask User Protocol Skill` by adding the internal `ahe-ask-user` protocol skill, wiring the 8 interactive AHE skills to follow it, keeping `ahe-help` user-facing only, updating installer/uninstaller coverage, and refreshing the product/tracking artifacts.
 
 - [x] Implemented `feat-020 Codex UI-Compatible Clarification Requests` by replacing the fixed plain-text clarification prompt in all 8 interactive AHE skill files with Codex-supported structured response request guidance, adding skill-specific clarification criteria, updating `docs/PRODUCT.md`, and updating the clarification tests to match the new contract.
 
@@ -65,7 +67,7 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-020 Codex UI-Compatible Clarification Requests` is complete. Interactive skill clarification guidance now targets Codex structured response UI instead of a fixed plain-text prompt.
+  - Details: `feat-021 Internal Ask User Protocol Skill` is complete. Interactive AHE skills now share the internal `ahe-ask-user` clarification and state-persistence protocol while `$ahe-help` remains user-facing.
   - Blockers: None.
 
 ## Blocked
@@ -74,6 +76,9 @@
 
 ## Decisions
 
+- **ahe-ask-user is internal, not a command**: The new skill is installed with AHE so inner skills can reference it, but `$ahe-help` must not list it or route through it.
+  - Context: The user clarified that this skill is for inner skills, not for the user.
+  - Alternatives considered: Exposing it as another `$ahe-*` command would make the help surface confusing and invite direct use of a protocol-only skill.
 - **Clarification UI guidance should target Codex structured response requests, not a hardcoded text block**: Interactive AHE skills now instruct Codex to ask short structured questions with meaningful options and custom input, then re-ask until each skill's clarification criteria are satisfied.
   - Context: The user wants the Codex response picker UI behavior rather than literal prompt text rendered in chat.
   - Alternatives considered: Keeping the exact `Question: {question}` text block would preserve the old test contract but would not match the desired Codex UI behavior.
@@ -116,6 +121,7 @@
 
 ## Change Log
 
+- `.codex/skills/ahe-ask-user/SKILL.md`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-agent/SKILL.md`, `.codex/skills/ahe-product/SKILL.md`, `.codex/skills/ahe-todo/SKILL.md`, `.codex/skills/ahe-constraints/SKILL.md`, `.codex/skills/ahe-architecture/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `.codex/skills/ahe-copy/SKILL.md`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_clarification_prompt.py`, `tests/test_command_set.py`, `tests/test_project_setup.py` - Added the internal ask-user protocol skill and installer/test/docs coverage while keeping help user-facing.
 - `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-agent/SKILL.md`, `.codex/skills/ahe-product/SKILL.md`, `.codex/skills/ahe-todo/SKILL.md`, `.codex/skills/ahe-constraints/SKILL.md`, `.codex/skills/ahe-architecture/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `.codex/skills/ahe-copy/SKILL.md`, `docs/PRODUCT.md`, `tests/test_clarification_prompt.py`, `tests/test_specialized_workflows.py`, `feature-list.json` - Replaced the fixed clarification prompt format with Codex UI-compatible structured response request guidance and added skill-specific clarification criteria.
 - `.codex/skills/ahe-agent/SKILL.md`, `docs/PRODUCT.md`, `tests/test_specialized_workflows.py` - Updated `$ahe-agent` workflow (when `AGENTS.md` is missing) to ask what the purpose of the project is to the user.
 - `.codex/skills/ahe-init/SKILL.md`, `.codex/ahe-shared/schemas/process_status.schema.json`, `docs/PRODUCT.md`, `tests/test_init_workflow.py` - Updated `ahe-init` to execute the six sequential steps and update progress status tracking.

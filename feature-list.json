@@ -146,7 +146,7 @@
         "feat-014"
       ],
       "status": "done",
-      "evidence": "Created .codex/skills/ahe-help/SKILL.md listing all 9 AHE commands, updated installer/uninstaller in bin/ahe and scripts/uninstall.sh, updated package.json files array to correctly pack .codex dotfolder, updated docs/PRODUCT.md, and validated all with 31/31 passing tests (pytest, ruff, mypy) and successful local dry-run packaging and installation smoke tests."
+      "evidence": "Created .codex/skills/ahe-help/SKILL.md listing the user-facing AHE commands, updated installer/uninstaller in bin/ahe and scripts/uninstall.sh, updated package.json files array to correctly pack .codex dotfolder, updated docs/PRODUCT.md, and validated all with 31/31 passing tests (pytest, ruff, mypy) and successful local dry-run packaging and installation smoke tests."
     },
     {
       "id": "feat-016",
@@ -197,6 +197,16 @@
       ],
       "status": "done",
       "evidence": "Updated all 8 interactive skill markdown files to require Codex-supported structured response requests with custom input and skill-specific clarification criteria, updated docs/PRODUCT.md, adjusted tests/test_clarification_prompt.py and tests/test_specialized_workflows.py, and verified with ./init.sh plus pytest tests/ -x."
+    },
+    {
+      "id": "feat-021",
+      "name": "Internal Ask User Protocol Skill",
+      "description": "Add an internal `ahe-ask-user` skill that centralizes clarification and state-persistence behavior for interactive AHE workflow skills without exposing it as a user command.",
+      "dependencies": [
+        "feat-020"
+      ],
+      "status": "done",
+      "evidence": "Added `.codex/skills/ahe-ask-user/SKILL.md`, wired interactive skills to follow the shared protocol, kept `ahe-help` user-facing only, updated installer/uninstaller coverage, updated docs and tracking, and verified with `./init.sh` plus `pytest tests/ -x`."
     }
   ]
 }
