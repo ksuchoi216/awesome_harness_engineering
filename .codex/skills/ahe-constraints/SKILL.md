@@ -19,16 +19,24 @@ Use this skill when the user invokes `$ahe-constraints`.
 
 ## Clarification Rule
 
-If a user answer needs clarification or a more detailed description, ask question recursively to clarify the response, and use this exact prompt:
+When required information is missing, follow the `ahe-ask-user` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
 
-Question: {question}
-Please choose one option:
+### User Response Target
 
-1. Yes
+- Collect clear project constraints for `docs/constraints.md`.
 
-2. No
+### Questions to Ask
 
-3. Custom input
+- Ask what rule, limit, or required practice should be documented.
+- Ask why the constraint exists when that is not obvious.
+- Ask whether the constraint is mandatory or a preference when needed.
 
-Enter 1, 2, or type your own answer:
+### Clarification Criteria
 
+- The answer must describe the rule and its practical meaning.
+- The answer must be specific enough that another engineer can follow the constraint without guessing.
+
+### Re-ask When
+
+- Ask again when the answer is vague, contradictory, or only names a topic without the actual rule.
+- Ask again when the operational meaning of the constraint is still unclear.

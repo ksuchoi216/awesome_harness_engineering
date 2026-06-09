@@ -21,6 +21,8 @@ The user works in Codex chat, not primarily in the terminal. The package install
 - `$ahe-help`
 - `$ahe-copy`
 
+The package also installs `ahe-ask-user` as an internal protocol skill for the other AHE workflow skills. It is not a user-facing command and must not be listed by `$ahe-help`.
+
 ## 3. Installed Layout
 
 The packaged install must create the following structure inside Codex home or the current workspace:
@@ -31,6 +33,8 @@ The packaged install must create the following structure inside Codex home or th
     ahe-init/
       SKILL.md
     ahe-agent/
+      SKILL.md
+    ahe-ask-user/
       SKILL.md
     ahe-product/
       SKILL.md
@@ -61,7 +65,7 @@ The packaged install must create the following structure inside Codex home or th
       feature-list-schema.json
 ```
 
-Only the ten `ahe-*` skill directories should appear as AHE skills in Codex. Shared templates and schemas must live outside `skills/`.
+Only the ten user-facing `$ahe-*` commands should be shown to users. The installed `ahe-ask-user` skill is internal support for other AHE skills. Shared templates and schemas must live outside `skills/`.
 
 ## 4. Workspace Runtime State
 
@@ -100,7 +104,7 @@ The installed skills must not store workspace runtime state under `.codex/`.
   2. Rename it to `AGENTS.md` (uppercase).
   3. Ask what the purpose of this project is to user.
   4. Update the project purpose in the copied `AGENTS.md`.
-  5. Ask the user the exact prompt: "Is your language Python? 1. Yes 2. No 3. Custom input".
+  5. Ask whether the project language is Python using a Codex-supported structured response request with meaningful options and custom input.
   6. If the user answers "No", ask again: "Which language do you use?".
 
 ### `$ahe-product`
@@ -165,20 +169,14 @@ The installed skills must not store workspace runtime state under `.codex/`.
 
 ## 6. Clarification Prompt
 
-If a user response needs clarification or more detail, AHE must ask recursively to clarify the response, using this exact format:
+If a user response needs clarification or more detail, each interactive AHE skill must follow the internal `ahe-ask-user` protocol and ask again recursively using a Codex-supported structured response request.
 
-```text
-Question: {question}
-Please choose one option:
-
-1. Yes
-
-2. No
-
-3. Custom input
-
-Enter 1, 2, or type your own answer:
-```
+- Ask a short question matched to the active skill.
+- Provide 2-3 meaningful mutually exclusive options when possible.
+- Allow custom input when predefined options are not enough.
+- Keep asking until the answer satisfies the skill's clarification criteria.
+- Treat vague, off-topic, contradictory, or incomplete answers as not clarified yet.
+- Do not expose `$ahe-ask-user` as a command; it is only shared guidance for inner skills.
 
 ## 7. Installation Behavior
 
@@ -188,11 +186,11 @@ Enter 1, 2, or type your own answer:
   - `npx ahe install`
 - Helper scripts:
   - `scripts/install.sh` installs into `~/.codex`
-  - `scripts/uninstall.sh` removes the ten installed AHE skills and `.codex/ahe-shared`
+  - `scripts/uninstall.sh` removes the installed AHE skills and `.codex/ahe-shared`
 
 ## 8. Success Criteria
 
-- Codex shows the ten split AHE skills instead of one monolithic `ahe` skill.
-- The installer copies all ten skill directories and the shared assets.
+- Codex shows the ten user-facing split AHE commands instead of one monolithic `ahe` skill.
+- The installer copies all user-facing skill directories, the internal `ahe-ask-user` protocol skill, and the shared assets.
 - The uninstall script removes the installed AHE skills and shared assets cleanly.
 - Tests validate the split-skill structure and expected workflow contracts.

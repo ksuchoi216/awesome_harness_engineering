@@ -37,15 +37,25 @@ Use this skill when the user invokes `$ahe-init`.
 
 ## Clarification Rule
 
-If a user answer needs clarification or a more detailed description, ask question recursively to clarify the response, and use this exact prompt:
+When required information is missing, follow the `ahe-ask-user` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
 
-Question: {question}
-Please choose one option:
+### User Response Target
 
-1. Yes
+- Collect the project purpose and any setup confirmation needed to continue the six-step initialization workflow.
 
-2. No
+### Questions to Ask
 
-3. Custom input
+- Ask whether the existing `AGENTS.md` is correct.
+- Ask what the purpose of this project is when `AGENTS.md` is missing or incorrect.
+- Ask follow-up questions when the purpose or setup choice is still unclear.
 
-Enter 1, 2, or type your own answer:
+### Clarification Criteria
+
+- The answer must be specific enough to update `PROJECT_PURPOSE`.
+- The answer must make it clear whether initialization should continue with the current `AGENTS.md` or with a new purpose.
+- The answer must resolve any setup choice that blocks the next workflow step.
+
+### Re-ask When
+
+- Ask again when the answer is vague, off-topic, contradictory, or incomplete.
+- Ask again when the answer does not identify the project goal, target user, or intended outcome clearly enough to continue initialization.

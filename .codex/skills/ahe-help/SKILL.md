@@ -20,3 +20,4 @@ When the user requests help or a list of commands, print a summary of the availa
 - `$ahe-update`: Apply queued todo content from `docs/todo.md` into `docs/PRODUCT.md` and update tracking files.
 - `$ahe-clear`: Back up the current harness, reset the project goal and specification, and rebuild them.
 - `$ahe-help`: Show this command summary and description of all AHE skills.
+- `$ahe-copy`: Copy template files, excluding `AGENTS.md` and `PRODUCT.md`, from `ahe-shared/templates` to the workspace root.

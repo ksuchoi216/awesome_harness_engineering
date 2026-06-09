@@ -22,15 +22,24 @@ Engage in an interactive conversation with the user to verify the copy operation
 
 ## Clarification Rule
 
-If a user answer needs clarification or a more detailed description, ask question recursively to clarify the response, and use this exact prompt:
+When required information is missing, follow the `ahe-ask-user` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
 
-Question: {question}
-Please choose one option:
+### User Response Target
 
-1. Yes
+- Collect explicit user confirmation for the copy operation, especially when existing files may be overwritten.
 
-2. No
+### Questions to Ask
 
-3. Custom input
+- Ask whether the copy should continue when target files already exist.
+- Ask which files should be skipped when the user does not want a full overwrite.
+- Ask follow-up questions when overwrite intent is still unclear.
 
-Enter 1, 2, or type your own answer:
+### Clarification Criteria
+
+- The answer must make overwrite intent explicit for existing files.
+- The answer must be clear enough to decide whether to copy, skip, or partially overwrite files.
+
+### Re-ask When
+
+- Ask again when the answer is ambiguous, contradictory, or does not explicitly confirm overwrite behavior.
+- Ask again when the user answer does not make the copy decision explicit.

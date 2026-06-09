@@ -15,16 +15,7 @@ Use this skill when the user invokes `$ahe-agent`.
   2. Rename it to `AGENTS.md` (uppercase).
   3. Ask what the purpose of this project is to user.
   4. Update the project purpose portion in the new `AGENTS.md`.
-  5. Ask the user the following exact prompt:
-     ```text
-     Is your language Python?
-
-     1. Yes
-
-     2. No
-
-     3. Custom input
-     ```
+  5. Ask whether the project language is Python using a Codex-supported structured response request with meaningful options and custom input.
   - If the user chooses "No" (option 2), ask again: "Which language do you use?" and capture their custom answer.
 - If `AGENTS.md` exists in the workspace:
   - Read `AGENTS.md`.
@@ -37,16 +28,26 @@ Use this skill when the user invokes `$ahe-agent`.
 
 ## Clarification Rule
 
-If a user answer needs clarification or a more detailed description, ask question recursively to clarify the response, and use this exact prompt:
+When required information is missing, follow the `ahe-ask-user` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
 
-Question: {question}
-Please choose one option:
+### User Response Target
 
-1. Yes
+- Collect a concrete project purpose and, when needed, the project language.
 
-2. No
+### Questions to Ask
 
-3. Custom input
+- Ask what the purpose of this project is.
+- Ask follow-up questions about the goal, target audience, or core capability when the purpose is still unclear.
+- Ask whether the project language is Python and ask which language is used when the answer is no or custom.
 
-Enter 1, 2, or type your own answer:
+### Clarification Criteria
 
+- The answer must be specific enough to write the `PROJECT_PURPOSE` section in `AGENTS.md`.
+- The answer must state what the project is for and what problem or outcome it targets.
+- The language answer must clearly identify whether Python guidance applies.
+
+### Re-ask When
+
+- Ask again when the answer is vague, off-topic, or too abstract, such as `code`.
+- Ask again when the answer does not identify the user, problem, or intended outcome clearly enough to update `PROJECT_PURPOSE`.
+- Ask again when the language answer is ambiguous or does not clearly name the language in use.

@@ -13,6 +13,7 @@ def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
         [
             "ahe-agent",
             "ahe-architecture",
+            "ahe-ask-user",
             "ahe-clear",
             "ahe-constraints",
             "ahe-help",
@@ -24,6 +25,29 @@ def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
         ]
     )
     assert actual_skill_names == expected_skill_names
+
+
+def test_help_skill_does_not_expose_internal_protocols() -> None:
+    help_content = (SKILL_DIR / "ahe-help/SKILL.md").read_text(encoding="utf-8")
+
+    user_facing_commands = (
+        "$ahe-init",
+        "$ahe-agent",
+        "$ahe-product",
+        "$ahe-todo",
+        "$ahe-constraints",
+        "$ahe-architecture",
+        "$ahe-update",
+        "$ahe-clear",
+        "$ahe-help",
+        "$ahe-copy",
+    )
+
+    for command in user_facing_commands:
+        assert command in help_content
+
+    assert "$ahe-ask-user" not in help_content
+    assert "ahe-ask-user" not in help_content
 
 
 def test_split_skill_set_covers_required_context_docs() -> None:

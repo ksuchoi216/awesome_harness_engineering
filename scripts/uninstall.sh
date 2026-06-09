@@ -6,6 +6,7 @@ readonly SHARED_DIR="${CODEX_HOME}/ahe-shared"
 readonly MANAGED_SKILLS=(
   "ahe-init"
   "ahe-agent"
+  "ahe-ask-user"
   "ahe-product"
   "ahe-todo"
   "ahe-constraints"
