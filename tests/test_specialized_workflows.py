@@ -6,8 +6,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 AGENT_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-agent/SKILL.md"
 TODO_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-todo/SKILL.md"
-CONSTRAINTS_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-constraints/SKILL.md"
-ARCHITECTURE_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-architecture/SKILL.md"
+SPEC_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-spec/SKILL.md"
 UPDATE_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-update/SKILL.md"
 HELP_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-help/SKILL.md"
 COPY_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-copy/SKILL.md"
@@ -27,10 +26,12 @@ def test_skill_md_contains_agent_workflow() -> None:
     assert "Which language do you use?" in content or "Which language do you use" in content
 
 
-def test_skill_md_contains_constraints_workflow() -> None:
-    content = CONSTRAINTS_SKILL_MD_PATH.read_text(encoding="utf-8")
-    assert "## Command Workflow: ahe-constraints" in content
+def test_skill_md_contains_spec_workflow() -> None:
+    content = SPEC_SKILL_MD_PATH.read_text(encoding="utf-8")
+    assert "## Command Workflow: ahe-spec" in content
+    assert "docs/PRODUCT.md" in content
     assert "docs/constraints.md" in content
+    assert "docs/achitecture.md" in content
 
 
 def test_skill_md_contains_todo_workflow() -> None:
@@ -38,12 +39,6 @@ def test_skill_md_contains_todo_workflow() -> None:
     assert "## Command Workflow: ahe-todo" in content
     assert "docs/todo.md" in content
     assert "feature-list.json" in content
-
-
-def test_skill_md_contains_architecture_workflow() -> None:
-    content = ARCHITECTURE_SKILL_MD_PATH.read_text(encoding="utf-8")
-    assert "## Command Workflow: ahe-architecture" in content
-    assert "docs/achitecture.md" in content
 
 
 def test_skill_md_contains_update_workflow() -> None:
@@ -73,9 +68,8 @@ def test_skill_md_contains_copy_workflow() -> None:
 
 if __name__ == "__main__":
     test_skill_md_contains_agent_workflow()
+    test_skill_md_contains_spec_workflow()
     test_skill_md_contains_todo_workflow()
-    test_skill_md_contains_constraints_workflow()
-    test_skill_md_contains_architecture_workflow()
     test_skill_md_contains_update_workflow()
     test_skill_md_contains_help_workflow()
     test_skill_md_contains_copy_workflow()

@@ -7,10 +7,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILL_MD_PATHS = (
     REPO_ROOT / ".codex/skills/ahe-init/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-agent/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-product/SKILL.md",
+    REPO_ROOT / ".codex/skills/ahe-spec/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-todo/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-constraints/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-architecture/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-clear/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-copy/SKILL.md",
 )
@@ -49,11 +47,13 @@ def test_skill_md_contains_representative_skill_specific_rules() -> None:
     assert "`code`" in agent_content
     assert "PROJECT_PURPOSE" in agent_content
 
-    product_content = (
-        REPO_ROOT / ".codex/skills/ahe-product/SKILL.md"
+    spec_content = (
+        REPO_ROOT / ".codex/skills/ahe-spec/SKILL.md"
     ).read_text(encoding="utf-8")
-    assert "docs/PRODUCT.md" in product_content
-    assert "success" in product_content.lower()
+    assert "docs/PRODUCT.md" in spec_content
+    assert "docs/constraints.md" in spec_content
+    assert "docs/achitecture.md" in spec_content
+    assert "success" in spec_content.lower()
 
     copy_content = (
         REPO_ROOT / ".codex/skills/ahe-copy/SKILL.md"

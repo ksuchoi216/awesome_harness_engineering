@@ -12,14 +12,12 @@ def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
     expected_skill_names = sorted(
         [
             "ahe-agent",
-            "ahe-architecture",
             "ahe-ask-user",
             "ahe-clear",
-            "ahe-constraints",
             "ahe-help",
             "ahe-copy",
             "ahe-init",
-            "ahe-product",
+            "ahe-spec",
             "ahe-todo",
             "ahe-update",
         ]
@@ -33,10 +31,8 @@ def test_help_skill_does_not_expose_internal_protocols() -> None:
     user_facing_commands = (
         "$ahe-init",
         "$ahe-agent",
-        "$ahe-product",
+        "$ahe-spec",
         "$ahe-todo",
-        "$ahe-constraints",
-        "$ahe-architecture",
         "$ahe-update",
         "$ahe-clear",
         "$ahe-help",
@@ -56,6 +52,7 @@ def test_split_skill_set_covers_required_context_docs() -> None:
         for skill_path in sorted(SKILL_DIR.glob("*/SKILL.md"))
     )
     for required_file in (
+        "docs/PRODUCT.md",
         "docs/constraints.md",
         "docs/achitecture.md",
         "docs/todo.md",

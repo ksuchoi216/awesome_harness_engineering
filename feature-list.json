@@ -217,6 +217,26 @@
       ],
       "status": "done",
       "evidence": "Created `.codex/hooks/hooks.json` and `.codex/hooks/ahe-hook.js`, updated installer `bin/ahe` and uninstaller to handle `.codex/hooks/`, added tests to `tests/test_project_setup.py`, and verified with `pytest tests/ -x`."
+    },
+    {
+      "id": "feat-023",
+      "name": "AHE Exact Command Auto Operation",
+      "description": "Change the AHE hook so exact `ahe` prompts activate automatic harness inspection, CodeGraph review guidance, unfinished-feature continuation, ambiguity clarification, and next-task routing.",
+      "dependencies": [
+        "feat-022"
+      ],
+      "status": "done",
+      "evidence": "Updated `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, and `tests/test_ahe_hook.py` so exact `ahe` prompts inject the automatic operation directive while ordinary AHE mentions do not trigger it. Verified with `./init.sh`, `pytest tests/ -x`, `python3 -m json.tool feature-list.json`, `codegraph sync`, and `codegraph status`."
+    },
+    {
+      "id": "feat-024",
+      "name": "Consolidated AHE Spec Skill",
+      "description": "Replace `$ahe-product`, `$ahe-constraints`, and `$ahe-architecture` with one `$ahe-spec` workflow that updates product, constraints, and architecture docs.",
+      "dependencies": [
+        "feat-023"
+      ],
+      "status": "done",
+      "evidence": "Created `.codex/skills/ahe-spec/SKILL.md`, removed the old product/constraints/architecture skill files, updated init sequencing, installer/uninstaller lists, help, process-status schema, hook guidance, docs, and tests for the reduced skill surface. Verified with `./init.sh`, `pytest tests/ -x`, `python3 -m json.tool feature-list.json`, and `python3 -m json.tool .codex/ahe-shared/schemas/process_status.schema.json`."
     }
   ]
 }

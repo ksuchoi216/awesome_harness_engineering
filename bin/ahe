@@ -23,10 +23,8 @@ readonly MANAGED_SKILLS=(
   "ahe-init"
   "ahe-agent"
   "ahe-ask-user"
-  "ahe-product"
+  "ahe-spec"
   "ahe-todo"
-  "ahe-constraints"
-  "ahe-architecture"
   "ahe-update"
   "ahe-clear"
   "ahe-help"
@@ -155,7 +153,7 @@ AHE Codex skill installed.
 
 Next:
 1. Open Codex chat in this workspace.
-2. Use one of: \`\$ahe-init\`, \`\$ahe-product\`, \`\$ahe-update\`, \`\$ahe-clear\`, \`\$ahe-help\`, or \`\$ahe-copy\`.
+2. Use one of: \`\$ahe-init\`, \`\$ahe-spec\`, \`\$ahe-update\`, \`\$ahe-clear\`, \`\$ahe-help\`, or \`\$ahe-copy\`.
 EOF
 }
 

@@ -2,11 +2,15 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-13 12:51 +0900
-**Session ID:** feat-022-ahe-keyword-trigger
+**Last Updated:** 2026-06-13 22:40 +0900
+**Session ID:** feat-024-consolidated-ahe-spec-skill
 **Active Feature:** None
 
 ## Completed
+
+- [x] Implemented `feat-024 Consolidated AHE Spec Skill` by replacing `$ahe-product`, `$ahe-constraints`, and `$ahe-architecture` with one `$ahe-spec` workflow that updates `docs/PRODUCT.md`, `docs/constraints.md`, and `docs/achitecture.md`. Updated init sequencing, installer/uninstaller lists, help text, process-status schema, hook guidance, product docs, and tests for the reduced command surface.
+
+- [x] Implemented `feat-023 AHE Exact Command Auto Operation` by changing `.codex/hooks/ahe-hook.js` so exact `ahe` prompts inject an automatic AHE operation directive while ordinary AHE mentions do not trigger it. Added `tests/test_ahe_hook.py`, updated `docs/PRODUCT.md`, refreshed `feature-list.json`, and verified with `./init.sh`, `pytest tests/ -x`, `python3 -m json.tool feature-list.json`, `codegraph sync`, and `codegraph status`.
 
 - [x] Implemented `feat-022 AHE Keyword Trigger` by adding a UserPromptSubmit hook to `.codex/hooks/ahe-hook.js` that detects the "ahe" keyword in user prompts and dynamically injects an AHE routing directive. Updated the installer, uninstaller, tracking artifacts, and test suite to verify `.codex/hooks/` deployments.
 
@@ -69,7 +73,7 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-022 AHE Keyword Trigger` is complete. The system now supports a native `UserPromptSubmit` hook that detects "ahe" and responds with an AHE guidance directive.
+  - Details: `feat-024 Consolidated AHE Spec Skill` is complete. The system now exposes `$ahe-spec` for product, constraints, and architecture specification work instead of three separate public skills.
   - Blockers: None.
 
 ## Blocked
@@ -81,6 +85,18 @@
 - **AHE keyword detection acts via a hook, not a skill trigger**: Added `ahe-hook.js` and `hooks.json` to leverage Codex's `UserPromptSubmit` hook instead of just adding a `triggers` block to `ahe-help`.
   - Context: The user requested "detecting the 'ahe' in user's query like ultrawork in codex", and ultrawork works by injecting a transparent directive via hooks.
   - Alternatives considered: Using `triggers: ["ahe"]` in `SKILL.md` would immediately launch a specific skill (e.g. `ahe-help`), which is more intrusive than a background directive injection.
+- **Exact `ahe` starts automatic operation, normal mentions do not**: The hook now requires the prompt to trim and case-fold to exactly `ahe`.
+  - Context: The user wanted a simple command users can remember, but did not want ordinary AHE discussion to trigger automatic routing.
+  - Alternatives considered: Keeping broad `\bahe\b` matching would interrupt prompts like "explain ahe" and make the hook too aggressive.
+- **Automatic operation prefers CodeGraph but remains usable without it**: The directive tells Codex to check `.codegraph/` and prefer CodeGraph exploration when available, then fall back to normal repo inspection if CodeGraph is missing.
+  - Context: The user specifically requested review through CodeGraph and pointed to the local `.codegraph/` flow.
+  - Alternatives considered: Installing or initializing CodeGraph from AHE would add an external dependency side effect outside this package's current installer contract.
+- **Ambiguous next steps must ask the user**: When feature state, active process state, dependencies, or CodeGraph review do not identify one safe next workflow, AHE asks a short clarification question with meaningful options.
+  - Context: The user explicitly asked AHE not to guess when the next step is hard to decide.
+  - Alternatives considered: Choosing the first plausible action would be faster but risks working on the wrong harness task.
+- **Product, constraints, and architecture share one public spec workflow**: `$ahe-spec` now owns `docs/PRODUCT.md`, `docs/constraints.md`, and `docs/achitecture.md` instead of exposing three separate public skills.
+  - Context: The user said AHE had too many skills and specifically asked to put `ahe-constraints`, `ahe-product`, and `ahe-architecture` together.
+  - Alternatives considered: Keeping alias skills would preserve compatibility but would not reduce the visible skill count.
 - **ahe-ask-user is internal, not a command**: The new skill is installed with AHE so inner skills can reference it, but `$ahe-help` must not list it or route through it.
   - Context: The user clarified that this skill is for inner skills, not for the user.
   - Alternatives considered: Exposing it as another `$ahe-*` command would make the help surface confusing and invite direct use of a protocol-only skill.
@@ -127,6 +143,8 @@
 ## Change Log
 
 - `.codex/hooks/hooks.json`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `scripts/uninstall.sh`, `tests/test_project_setup.py`, `feature-list.json` - Added native keyword detection via a Node.js `UserPromptSubmit` hook script.
+- `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, `tests/test_ahe_hook.py`, `feature-list.json`, `PROGRESS.md` - Upgraded exact `ahe` prompts into automatic AHE operation routing with harness inspection, CodeGraph review guidance, unfinished-feature continuation, ambiguity clarification, and next-task handling.
+- `.codex/skills/ahe-spec/SKILL.md`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-help/SKILL.md`, `.codex/ahe-shared/schemas/process_status.schema.json`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, `tests/` - Consolidated the product, constraints, and architecture skills into `$ahe-spec` and updated the reduced public command surface.
 - `.codex/skills/ahe-ask-user/SKILL.md`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-agent/SKILL.md`, `.codex/skills/ahe-product/SKILL.md`, `.codex/skills/ahe-todo/SKILL.md`, `.codex/skills/ahe-constraints/SKILL.md`, `.codex/skills/ahe-architecture/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `.codex/skills/ahe-copy/SKILL.md`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_clarification_prompt.py`, `tests/test_command_set.py`, `tests/test_project_setup.py` - Added the internal ask-user protocol skill and installer/test/docs coverage while keeping help user-facing.
 - `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-agent/SKILL.md`, `.codex/skills/ahe-product/SKILL.md`, `.codex/skills/ahe-todo/SKILL.md`, `.codex/skills/ahe-constraints/SKILL.md`, `.codex/skills/ahe-architecture/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `.codex/skills/ahe-copy/SKILL.md`, `docs/PRODUCT.md`, `tests/test_clarification_prompt.py`, `tests/test_specialized_workflows.py`, `feature-list.json` - Replaced the fixed clarification prompt format with Codex UI-compatible structured response request guidance and added skill-specific clarification criteria.
 - `.codex/skills/ahe-agent/SKILL.md`, `docs/PRODUCT.md`, `tests/test_specialized_workflows.py` - Updated `$ahe-agent` workflow (when `AGENTS.md` is missing) to ask what the purpose of the project is to the user.

@@ -12,10 +12,8 @@ REQUIRED_SKILL_FILES = (
     Path(".codex/skills/ahe-init/SKILL.md"),
     Path(".codex/skills/ahe-agent/SKILL.md"),
     Path(".codex/skills/ahe-ask-user/SKILL.md"),
-    Path(".codex/skills/ahe-product/SKILL.md"),
+    Path(".codex/skills/ahe-spec/SKILL.md"),
     Path(".codex/skills/ahe-todo/SKILL.md"),
-    Path(".codex/skills/ahe-constraints/SKILL.md"),
-    Path(".codex/skills/ahe-architecture/SKILL.md"),
     Path(".codex/skills/ahe-update/SKILL.md"),
     Path(".codex/skills/ahe-clear/SKILL.md"),
     Path(".codex/skills/ahe-help/SKILL.md"),
@@ -161,7 +159,7 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
     )
 
     assert install_process.returncode == 0, install_process.stderr
-    assert (fake_home / ".codex/skills/ahe-product/SKILL.md").exists()
+    assert (fake_home / ".codex/skills/ahe-spec/SKILL.md").exists()
     assert (fake_home / ".codex/skills/ahe-ask-user/SKILL.md").exists()
     assert (fake_home / ".codex/ahe-shared/templates/PRODUCT.md").exists()
     assert (fake_home / ".codex/hooks/ahe-hook.js").exists()
