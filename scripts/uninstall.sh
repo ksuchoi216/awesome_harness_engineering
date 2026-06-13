@@ -3,6 +3,7 @@ set -euo pipefail
 
 readonly CODEX_HOME="${HOME}/.codex"
 readonly SHARED_DIR="${CODEX_HOME}/ahe-shared"
+readonly HOOKS_DIR="${CODEX_HOME}/hooks"
 readonly MANAGED_SKILLS=(
   "ahe-init"
   "ahe-agent"
@@ -24,5 +25,6 @@ for skill_name in "${MANAGED_SKILLS[@]}"; do
 done
 
 rm -rf "${SHARED_DIR}"
+rm -rf "${HOOKS_DIR}"
 
 echo "AHE skills uninstalled successfully."

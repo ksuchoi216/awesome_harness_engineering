@@ -2,11 +2,13 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-09 10:50 +0900
-**Session ID:** feat-021-internal-ask-user
+**Last Updated:** 2026-06-13 12:51 +0900
+**Session ID:** feat-022-ahe-keyword-trigger
 **Active Feature:** None
 
 ## Completed
+
+- [x] Implemented `feat-022 AHE Keyword Trigger` by adding a UserPromptSubmit hook to `.codex/hooks/ahe-hook.js` that detects the "ahe" keyword in user prompts and dynamically injects an AHE routing directive. Updated the installer, uninstaller, tracking artifacts, and test suite to verify `.codex/hooks/` deployments.
 
 - [x] Implemented `feat-021 Internal Ask User Protocol Skill` by adding the internal `ahe-ask-user` protocol skill, wiring the 8 interactive AHE skills to follow it, keeping `ahe-help` user-facing only, updating installer/uninstaller coverage, and refreshing the product/tracking artifacts.
 
@@ -67,7 +69,7 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-021 Internal Ask User Protocol Skill` is complete. Interactive AHE skills now share the internal `ahe-ask-user` clarification and state-persistence protocol while `$ahe-help` remains user-facing.
+  - Details: `feat-022 AHE Keyword Trigger` is complete. The system now supports a native `UserPromptSubmit` hook that detects "ahe" and responds with an AHE guidance directive.
   - Blockers: None.
 
 ## Blocked
@@ -76,6 +78,9 @@
 
 ## Decisions
 
+- **AHE keyword detection acts via a hook, not a skill trigger**: Added `ahe-hook.js` and `hooks.json` to leverage Codex's `UserPromptSubmit` hook instead of just adding a `triggers` block to `ahe-help`.
+  - Context: The user requested "detecting the 'ahe' in user's query like ultrawork in codex", and ultrawork works by injecting a transparent directive via hooks.
+  - Alternatives considered: Using `triggers: ["ahe"]` in `SKILL.md` would immediately launch a specific skill (e.g. `ahe-help`), which is more intrusive than a background directive injection.
 - **ahe-ask-user is internal, not a command**: The new skill is installed with AHE so inner skills can reference it, but `$ahe-help` must not list it or route through it.
   - Context: The user clarified that this skill is for inner skills, not for the user.
   - Alternatives considered: Exposing it as another `$ahe-*` command would make the help surface confusing and invite direct use of a protocol-only skill.
@@ -121,6 +126,7 @@
 
 ## Change Log
 
+- `.codex/hooks/hooks.json`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `scripts/uninstall.sh`, `tests/test_project_setup.py`, `feature-list.json` - Added native keyword detection via a Node.js `UserPromptSubmit` hook script.
 - `.codex/skills/ahe-ask-user/SKILL.md`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-agent/SKILL.md`, `.codex/skills/ahe-product/SKILL.md`, `.codex/skills/ahe-todo/SKILL.md`, `.codex/skills/ahe-constraints/SKILL.md`, `.codex/skills/ahe-architecture/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `.codex/skills/ahe-copy/SKILL.md`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_clarification_prompt.py`, `tests/test_command_set.py`, `tests/test_project_setup.py` - Added the internal ask-user protocol skill and installer/test/docs coverage while keeping help user-facing.
 - `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-agent/SKILL.md`, `.codex/skills/ahe-product/SKILL.md`, `.codex/skills/ahe-todo/SKILL.md`, `.codex/skills/ahe-constraints/SKILL.md`, `.codex/skills/ahe-architecture/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `.codex/skills/ahe-copy/SKILL.md`, `docs/PRODUCT.md`, `tests/test_clarification_prompt.py`, `tests/test_specialized_workflows.py`, `feature-list.json` - Replaced the fixed clarification prompt format with Codex UI-compatible structured response request guidance and added skill-specific clarification criteria.
 - `.codex/skills/ahe-agent/SKILL.md`, `docs/PRODUCT.md`, `tests/test_specialized_workflows.py` - Updated `$ahe-agent` workflow (when `AGENTS.md` is missing) to ask what the purpose of the project is to the user.

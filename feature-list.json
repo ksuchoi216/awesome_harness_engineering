@@ -207,6 +207,16 @@
       ],
       "status": "done",
       "evidence": "Added `.codex/skills/ahe-ask-user/SKILL.md`, wired interactive skills to follow the shared protocol, kept `ahe-help` user-facing only, updated installer/uninstaller coverage, updated docs and tracking, and verified with `./init.sh` plus `pytest tests/ -x`."
+    },
+    {
+      "id": "feat-022",
+      "name": "AHE Keyword Trigger",
+      "description": "Add a UserPromptSubmit hook to detect the 'ahe' keyword in user prompts and dynamically inject an AHE routing directive.",
+      "dependencies": [
+        "feat-021"
+      ],
+      "status": "done",
+      "evidence": "Created `.codex/hooks/hooks.json` and `.codex/hooks/ahe-hook.js`, updated installer `bin/ahe` and uninstaller to handle `.codex/hooks/`, added tests to `tests/test_project_setup.py`, and verified with `pytest tests/ -x`."
     }
   ]
 }
