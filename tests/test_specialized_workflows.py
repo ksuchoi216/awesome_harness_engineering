@@ -7,7 +7,6 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 INIT_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-init/SKILL.md"
 SPEC_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-spec/SKILL.md"
 UPDATE_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-update/SKILL.md"
-HELP_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-help/SKILL.md"
 
 
 def test_skill_md_contains_init_workflow_details_absorbed_from_agent_and_copy() -> None:
@@ -43,23 +42,18 @@ def test_skill_md_contains_update_workflow() -> None:
     assert "Update `SESSION-HANDOFF.md`." in content
 
 
-def test_skill_md_contains_help_workflow() -> None:
-    content = HELP_SKILL_MD_PATH.read_text(encoding="utf-8")
-    assert "## Command Workflow: ahe-help" in content
-    assert "$ahe-help" in content
-    assert "Show a list of commands" in content or "Show this command summary" in content
-    assert "$ahe-init" in content
-    assert "$ahe-spec" in content
-    assert "$ahe-update" in content
-    assert "$ahe-clear" in content
-    assert "$ahe-agent" not in content
-    assert "$ahe-todo" not in content
-    assert "$ahe-copy" not in content
+def test_internal_skills_are_no_longer_user_facing_commands() -> None:
+    for skill_path in (
+        REPO_ROOT / ".codex/skills/ahe-spec/SKILL.md",
+        REPO_ROOT / ".codex/skills/ahe-update/SKILL.md",
+    ):
+        content = skill_path.read_text(encoding="utf-8")
+        assert "not a user-facing command" in content.lower()
 
 
 if __name__ == "__main__":
     test_skill_md_contains_init_workflow_details_absorbed_from_agent_and_copy()
     test_skill_md_contains_spec_workflow()
     test_skill_md_contains_update_workflow()
-    test_skill_md_contains_help_workflow()
+    test_internal_skills_are_no_longer_user_facing_commands()
     print("test_specialized_workflows.py passed!")

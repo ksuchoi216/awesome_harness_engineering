@@ -288,6 +288,27 @@
       ],
       "status": "done",
       "evidence": "Updated `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, and `tests/test_ahe_hook.py` so exact `ahe` prompts show a shorter status table, exclude the next step from the table, and ask the user to confirm one direct next-step choice before proceeding. Verified with `pytest tests/test_ahe_hook.py -x`."
+    },
+    {
+      "id": "feat-030",
+      "name": "Internal AHE Thinking Orchestrator",
+      "description": "Add `ahe-thinking` as an internal decision protocol so exact `ahe` prompts and interactive workflows classify harness state, ask only the needed Why/What/How questions, and continue automatically.",
+      "dependencies": [
+        "feat-026",
+        "feat-029"
+      ],
+      "status": "done",
+      "evidence": "Added `.codex/skills/ahe-thinking/SKILL.md`, updated `.codex/skills/ahe-conversation/SKILL.md`, the interactive workflow skill contracts, installer/uninstaller managed skill lists, `docs/PRODUCT.md`, and exact `ahe` hook guidance so routing now uses `thinking -> conversation if needed -> execution -> thinking` and classifies exactly one of `harness engineering not enough`, `in the middle of building features`, or `completed all`. Verified with `./init.sh`, `pytest tests/ -x`, and `python3 -m json.tool feature-list.json`."
+    },
+    {
+      "id": "feat-031",
+      "name": "Two-Entrypoint AHE Surface",
+      "description": "Reduce AHE usage to exact `ahe init` for new starts and exact `ahe` for progress, remove `ahe-help`, and fold clear/reset behavior into `ahe-init`.",
+      "dependencies": [
+        "feat-030"
+      ],
+      "status": "done",
+      "evidence": "Removed `.codex/skills/ahe-help/SKILL.md` and `.codex/skills/ahe-clear/SKILL.md`, updated `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `ahe-init` contract text, and hook coverage so users now rely on exact `ahe init` for a new start and exact `ahe` for progress while reset/backup behavior lives inside `ahe-init`. Verified with `./init.sh`, `pytest tests/ -x`, and `python3 -m json.tool feature-list.json`."
     }
   ]
 }

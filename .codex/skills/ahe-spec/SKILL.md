@@ -1,11 +1,14 @@
 ---
 name: ahe-spec
-description: Update product, constraints, and architecture docs through one recursive specification conversation.
+description: Internal AHE specification workflow for updating product, constraints, and architecture docs.
 ---
 
 # AHE Spec
 
-Use this skill when the user invokes `$ahe-spec`.
+This is an internal AHE workflow skill, not a user-facing command.
+
+Do not treat `$ahe-spec` as a user command.
+Use it after `ahe-thinking` decides that specification work must continue.
 
 ## Command Workflow: ahe-spec
 
@@ -32,7 +35,7 @@ Use this skill when the user invokes `$ahe-spec`.
 
 ## Clarification Rule
 
-When required information is missing, follow the `ahe-conversation` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
+When the next specification step is not clear, follow the `ahe-thinking` protocol first. If `ahe-thinking` finds missing information, follow the `ahe-conversation` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
 
 ### User Response Target
 

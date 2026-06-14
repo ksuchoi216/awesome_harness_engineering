@@ -1,11 +1,14 @@
 ---
 name: ahe-update
-description: Synchronize feature-list.json, PROGRESS.md, and SESSION-HANDOFF.md with current work.
+description: Internal AHE workflow for synchronizing tracked work and handoff artifacts.
 ---
 
 # AHE Update
 
-Use this skill when the user invokes `$ahe-update`.
+This is an internal AHE workflow skill, not a user-facing command.
+
+Do not treat `$ahe-update` as a user command.
+Use it after `ahe-thinking` decides that tracked harness work should be synchronized.
 
 ## Command Workflow: ahe-update
 
@@ -23,7 +26,7 @@ Use this skill when the user invokes `$ahe-update`.
 
 ## Clarification Rule
 
-When required information is missing, follow the `ahe-conversation` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
+When the next update step is not clear, follow the `ahe-thinking` protocol first. If `ahe-thinking` finds missing information, follow the `ahe-conversation` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
 
 ### User Response Target
 

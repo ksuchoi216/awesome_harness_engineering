@@ -8,8 +8,6 @@ SKILL_PATHS = (
     REPO_ROOT / ".codex/skills/ahe-init/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-spec/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-update/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-clear/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-help/SKILL.md",
 )
 
 
@@ -34,16 +32,12 @@ def test_each_skill_md_has_yaml_frontmatter() -> None:
 
 
 def test_skill_files_match_expected_command_names() -> None:
-    expected_pairs = {
-        "ahe-init": "$ahe-init",
-        "ahe-spec": "$ahe-spec",
-        "ahe-update": "$ahe-update",
-        "ahe-clear": "$ahe-clear",
-        "ahe-help": "$ahe-help",
-    }
-    for skill_name, command_name in expected_pairs.items():
+    init_content = (REPO_ROOT / ".codex/skills/ahe-init/SKILL.md").read_text(encoding="utf-8")
+    assert "$ahe-init" in init_content
+
+    for skill_name in ("ahe-spec", "ahe-update"):
         content = (REPO_ROOT / f".codex/skills/{skill_name}/SKILL.md").read_text(encoding="utf-8")
-        assert command_name in content
+        assert "not a user-facing command" in content.lower()
 
 
 if __name__ == "__main__":

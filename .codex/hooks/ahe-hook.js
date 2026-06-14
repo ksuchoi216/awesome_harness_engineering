@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const AHE_DIRECTIVE_MARKER = "<ahe-mode>";
-const AHE_DIRECTIVE = [
+const AHE_PROGRESS_DIRECTIVE = [
     AHE_DIRECTIVE_MARKER,
     "AHE automatic operation activated.",
     "",
@@ -17,6 +17,7 @@ const AHE_DIRECTIVE = [
     "   - Check `docs/PRODUCT.md`.",
     "   - Check `feature-list.json`.",
     "   - Check `PROGRESS.md`.",
+    "   - Use `ahe-thinking` as the internal decision layer before choosing the next action.",
     "",
     "3. Review code through CodeGraph when available:",
     "   - Prefer CodeGraph MCP or CodeGraph exploration for code review and impact context after the preflight command succeeds.",
@@ -34,26 +35,49 @@ const AHE_DIRECTIVE = [
     "   - Keep the table short and readable.",
     "   - Do not include the next step inside the table.",
     "",
-    "5. Decide the next AHE workflow:",
+    "5. Decide the next AHE workflow with `ahe-thinking`:",
     "   - If no harness files exist, route to `$ahe-init`.",
-    "   - If harness files exist but core harness engineering is incomplete, continue harness engineering work.",
+    "   - If harness files exist but core harness engineering is incomplete, classify the state as `harness engineering not enough` and continue harness engineering work.",
     "   - If `feature-list.json` is missing or invalid, repair the harness state or route to initialization behavior.",
-    "   - If any feature in `feature-list.json` has a status other than `done`, continue the first unfinished feature whose dependencies are satisfied.",
+    "   - If any feature in `feature-list.json` has a status other than `done`, classify the state as `in the middle of building features` and continue the first unfinished feature whose dependencies are satisfied.",
     "   - Respect dependencies listed in `feature-list.json`; do not start a dependent feature before prerequisites are done.",
-    "   - If all features are `done`, ask the user for the next task.",
+    "   - If all features are `done` and no obvious harness gap remains, classify the state as `completed all` and ask the user for the next task.",
+    "   - Judge the active `project`, `feature`, or `sub-feature` before moving forward.",
+    "   - For a `project`, require `Why`, `What`, and `How` by default.",
+    "   - For a `feature` or `sub-feature`, require only the minimum of `Why`, `What`, and `How` needed to proceed safely.",
     "",
     "6. Ask for clarification instead of guessing:",
-    "   - If multiple plausible next steps exist, feature data conflicts, dependencies are unclear, or CodeGraph review points to several valid directions, ask the user a short clarification question with meaningful options.",
+    "   - If multiple plausible next steps exist, feature data conflicts, dependencies are unclear, or CodeGraph review points to several valid directions, use `ahe-thinking` to judge the missing detail.",
+    "   - If clarity is missing, call `ahe-conversation` for the exact missing `Why`, `What`, or `How`.",
     "   - Continue only after one safe next step is clear.",
     "",
-    "7. After the table, ask the user to confirm the next step directly.",
-    "   - Use exactly one simple next-step choice: `harness engineering`, `start a new task`, or `resume existing harness work`.",
+    "7. After the table, classify the harness into exactly one state.",
+    "   - Use exactly one state: `harness engineering not enough`, `in the middle of building features`, or `completed all`.",
     "   - Do not include the next step inside the table.",
-    "   - Wait for the user's confirmation such as `go ahead` before proceeding with that next step.",
+    "   - Continue automatically after classification.",
+    "   - Follow this loop: `thinking -> conversation if needed -> execution -> thinking`.",
+].join("\\n");
+
+const AHE_INIT_DIRECTIVE = [
+    AHE_DIRECTIVE_MARKER,
+    "AHE automatic operation activated.",
+    "",
+    "The user sent the exact AHE init command. Treat this as a new start request:",
+    "",
+    "1. Route to `$ahe-init` first.",
+    "2. Treat this flow as a new start, not a progress continuation.",
+    "3. Read existing harness files only to determine whether initialization must refresh or overwrite them safely.",
+    "4. Use `ahe-thinking` before clarification when the next setup step is uncertain.",
+    "5. If clarification is needed, call `ahe-conversation` for the exact missing detail.",
+    "6. Continue through initialization work until the new start path is clear.",
 ].join("\\n");
 
 function isExactAheCommand(prompt) {
     return prompt.trim().toLowerCase() === "ahe";
+}
+
+function isExactAheInitCommand(prompt) {
+    return prompt.trim().toLowerCase() === "ahe init";
 }
 
 async function main() {
@@ -81,7 +105,15 @@ async function main() {
             const output = {
                 hookSpecificOutput: {
                     hookEventName: "UserPromptSubmit",
-                    additionalContext: AHE_DIRECTIVE
+                    additionalContext: AHE_PROGRESS_DIRECTIVE
+                }
+            };
+            process.stdout.write(JSON.stringify(output) + "\n");
+        } else if (isExactAheInitCommand(parsed.prompt)) {
+            const output = {
+                hookSpecificOutput: {
+                    hookEventName: "UserPromptSubmit",
+                    additionalContext: AHE_INIT_DIRECTIVE
                 }
             };
             process.stdout.write(JSON.stringify(output) + "\n");

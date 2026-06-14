@@ -2,11 +2,15 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-14 13:02 +0900
-**Session ID:** feat-029-simplified-ahe-status-report-confirmation
+**Last Updated:** 2026-06-15 00:10 +0900
+**Session ID:** feat-031-two-entrypoint-ahe-surface
 **Active Feature:** None
 
 ## Completed
+
+- [x] Implemented `feat-031 Two-Entrypoint AHE Surface` by removing `.codex/skills/ahe-help/SKILL.md`, folding the internal `ahe-clear` reset path into `.codex/skills/ahe-init/SKILL.md`, deleting `.codex/skills/ahe-clear/SKILL.md` and `tests/test_clear_workflow.py`, updating install/uninstall skill lists, shrinking the installed public surface to `ahe init` and exact `ahe`, and extending the hook contract so exact `ahe init` acts as the new-start path. Updated `docs/PRODUCT.md`, `feature-list.json`, `SESSION-HANDOFF.md`, and contract tests, then verified with `./init.sh`, `pytest tests/ -x`, and `python3 -m json.tool feature-list.json`.
+
+- [x] Implemented `feat-030 Internal AHE Thinking Orchestrator` by adding `.codex/skills/ahe-thinking/SKILL.md` as a hidden internal protocol, updating `.codex/skills/ahe-conversation/SKILL.md` to act only after `ahe-thinking` identifies the missing detail, wiring `ahe-init`, `ahe-spec`, `ahe-update`, and `ahe-clear` to follow `ahe-thinking` before clarification, and updating the exact `ahe` hook so it classifies exactly one harness state and continues automatically with `thinking -> conversation if needed -> execution -> thinking`. Updated installer/uninstaller skill lists, `docs/PRODUCT.md`, `feature-list.json`, `SESSION-HANDOFF.md`, and contract tests, then verified with `./init.sh`, `pytest tests/ -x`, and `python3 -m json.tool feature-list.json`.
 
 - [x] Implemented `feat-029 Simplified AHE Status Report Confirmation` by reducing the exact `ahe` first-response table to `AGENTS.md`, `PRODUCT.md`, `feature-list.json`, and `PROGRESS.md`, then requiring a direct next-step confirmation after the table using one of `harness engineering`, `start a new task`, or `resume existing harness work`. Updated `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, `feature-list.json`, and `tests/test_ahe_hook.py`, then verified with `pytest tests/test_ahe_hook.py -x`.
 
@@ -83,7 +87,7 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-029 Simplified AHE Status Report Confirmation` is complete. Exact `ahe` automatic operation now reports a shorter harness table first and asks for direct next-step confirmation after the table.
+  - Details: `feat-031 Two-Entrypoint AHE Surface` is complete. Users now start with exact `ahe init` and continue with exact `ahe`; reset behavior lives inside `ahe-init`.
   - Blockers: None.
 
 ## Blocked
@@ -104,6 +108,15 @@
 - **The exact `ahe` report should stay minimal and ask for the next step outside the table**: The table now covers only `AGENTS.md`, `PRODUCT.md`, `feature-list.json`, and `PROGRESS.md`, and AHE must ask the user to confirm one simple next-step choice after the table.
   - Context: The user said broader rows and embedding the next step in the table made the report harder to read and made the next action easy to miss.
   - Alternatives considered: Keeping optional docs, git state, or a next-step row would preserve more detail but would work against the requested simpler first response.
+- **`ahe-thinking` decides and `ahe-conversation` clarifies**: AHE now uses a separate internal decision layer to judge the current `project`, `feature`, or `sub-feature`, decide which of `Why`, `What`, and `How` are required, and hand only the missing detail to `ahe-conversation`.
+  - Context: The user wanted critical thinking to run freely between actions and wanted clarification to recurse from project level down into features and sub-features only as needed.
+  - Alternatives considered: Keeping `ahe-conversation` as both judge and questioner would preserve fewer moving parts, but it would blur the difference between deciding what is missing and asking for it.
+- **Exact `ahe` should continue automatically after classification**: The hook now classifies exactly one state from `harness engineering not enough`, `in the middle of building features`, or `completed all`, then continues without a separate confirmation step.
+  - Context: The user explicitly wanted `대화 -> 실행 -> 대화 -> 실행` continuity rather than a recommendation that stops.
+  - Alternatives considered: Keeping a post-table confirmation prompt would be safer in some ambiguous cases but would not match the requested continuous flow.
+- **New starts and resets belong to `ahe-init`**: AHE no longer keeps a separate internal clear workflow; exact `ahe init` and `$ahe-init` cover both first-time initialization and fresh-start reset behavior through backup plus replacement.
+  - Context: The user said actual usage should be only `ahe init` for a new start and `ahe` for progress.
+  - Alternatives considered: Keeping `ahe-clear` internally would preserve a narrower reset workflow, but it duplicates the new-start responsibility now owned by `ahe-init`.
 - **CodeGraph preflight is adaptive**: Exact `ahe` now checks `command -v codegraph`; missing CLI reports `NOT INSTALLATION of codegraph` and skips init/sync, missing `.codegraph/` runs `codegraph init`, and existing `.codegraph/` runs `codegraph sync`.
   - Context: The user wants AHE to initialize or sync CodeGraph automatically when possible while adapting cleanly when CodeGraph is not installed.
   - Alternatives considered: Always attempting `codegraph init` or `codegraph sync` would create noisy failures on machines without the CLI.
@@ -165,6 +178,8 @@
 ## Change Log
 
 - `.codex/hooks/hooks.json`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `scripts/uninstall.sh`, `tests/test_project_setup.py`, `feature-list.json` - Added native keyword detection via a Node.js `UserPromptSubmit` hook script.
+- `.codex/skills/ahe-thinking/SKILL.md`, `.codex/skills/ahe-conversation/SKILL.md`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-spec/SKILL.md`, `.codex/skills/ahe-update/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `feature-list.json`, `SESSION-HANDOFF.md`, `tests/test_ahe_hook.py`, `tests/test_clarification_prompt.py`, `tests/test_command_set.py`, `tests/test_project_setup.py` - Added the internal `ahe-thinking` orchestrator, split decision-making from recursive clarification, and changed exact `ahe` routing from post-table confirmation into automatic state classification and continuation.
+- `.codex/skills/ahe-init/SKILL.md`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `feature-list.json`, `SESSION-HANDOFF.md`, `tests/test_ahe_hook.py`, `tests/test_chat_command_routing.py`, `tests/test_command_set.py`, `tests/test_init_workflow.py`, `tests/test_project_setup.py`, `tests/test_specialized_workflows.py` - Reduced AHE usage to exact `ahe init` and exact `ahe`, removed `ahe-help`, and merged the old clear/reset path into `ahe-init`.
 - `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, `tests/test_ahe_hook.py`, `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md` - Added adaptive CodeGraph preflight for exact `ahe`: check command installation, run init or sync based on `.codegraph/`, and skip both commands when the CLI is unavailable.
 - `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, `tests/test_ahe_hook.py`, `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md` - Required exact `ahe` automatic operation to first report harness engineering status in a consistent Markdown table before proceeding.
 - `.codex/skills/ahe-conversation/SKILL.md`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-spec/SKILL.md`, `.codex/skills/ahe-update/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, `tests/test_clarification_prompt.py`, `tests/test_command_set.py`, `tests/test_project_setup.py` - Replaced the previous internal clarification protocol with `ahe-conversation`.

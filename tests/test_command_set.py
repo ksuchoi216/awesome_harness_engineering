@@ -12,32 +12,29 @@ def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
     expected_skill_names = sorted(
         [
             "ahe-conversation",
-            "ahe-clear",
-            "ahe-help",
             "ahe-init",
             "ahe-spec",
+            "ahe-thinking",
             "ahe-update",
         ]
     )
     assert actual_skill_names == expected_skill_names
 
 
-def test_help_skill_does_not_expose_internal_protocols() -> None:
-    help_content = (SKILL_DIR / "ahe-help/SKILL.md").read_text(encoding="utf-8")
+def test_only_init_is_user_facing_command() -> None:
+    init_content = (SKILL_DIR / "ahe-init/SKILL.md").read_text(encoding="utf-8")
+    assert "$ahe-init" in init_content
 
-    user_facing_commands = (
-        "$ahe-init",
-        "$ahe-spec",
-        "$ahe-update",
-        "$ahe-clear",
-        "$ahe-help",
+    internal_skill_names = (
+        "ahe-conversation",
+        "ahe-thinking",
+        "ahe-spec",
+        "ahe-update",
     )
 
-    for command in user_facing_commands:
-        assert command in help_content
-
-    assert "$ahe-conversation" not in help_content
-    assert "ahe-conversation" not in help_content
+    for skill_name in internal_skill_names:
+        content = (SKILL_DIR / f"{skill_name}/SKILL.md").read_text(encoding="utf-8")
+        assert "not a user-facing command" in content.lower()
 
 
 def test_split_skill_set_covers_required_context_docs() -> None:

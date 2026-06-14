@@ -51,9 +51,26 @@ def test_skill_md_contains_three_sequential_steps_and_status_tracking() -> None:
         assert status in content, f"Missing progress status '{status}' in ahe-init workflow definition"
 
 
+def test_skill_md_absorbs_reset_and_backup_behavior_for_new_start() -> None:
+    content = SKILL_MD_PATH.read_text(encoding="utf-8")
+    required_behaviors = [
+        ".ahe/backups/",
+        "Copy `AGENTS.md` into the backup directory",
+        "Copy the current `docs/PRODUCT.md` into the backup directory",
+        "Remove the previous `docs/PRODUCT.md`",
+        "Remove the previous `feature-list.json`",
+        "new start",
+    ]
+    for required_behavior in required_behaviors:
+        assert required_behavior in content, (
+            f"Missing absorbed reset behavior '{required_behavior}' in ahe-init"
+        )
+
+
 if __name__ == "__main__":
     test_skill_md_contains_init_workflow_sections()
     test_skill_md_contains_all_required_inputs()
     test_skill_md_contains_generated_files()
     test_skill_md_contains_three_sequential_steps_and_status_tracking()
+    test_skill_md_absorbs_reset_and_backup_behavior_for_new_start()
     print("test_init_workflow.py passed!")

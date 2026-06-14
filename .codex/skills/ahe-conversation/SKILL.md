@@ -7,9 +7,11 @@ description: Internal AHE protocol for recursive clarification, conversation sta
 
 This is an internal AHE protocol skill, not a user-facing command.
 
-Do not treat `$ahe-conversation` as a user command. Do not list it in `$ahe-help`.
+Do not treat `$ahe-conversation` as a user command.
 Use it only when another AHE workflow skill needs more conversation before it can
 continue safely.
+Use it after `ahe-thinking` identifies a missing decision or missing `Why`,
+`What`, or `How`.
 
 ## When to Converse
 
@@ -22,6 +24,8 @@ one of these:
 - Harness file ownership, overwrite behavior, or reset behavior.
 - `.ahe/process_status.json`, `PROGRESS.md`, or `SESSION-HANDOFF.md` state.
 - The next workflow step when several valid paths are possible.
+- The missing `Why`, `What`, or `How` for the current `project`, `feature`, or
+  `sub-feature`.
 
 If the missing detail can be inferred safely from existing files, infer
 conservatively and record the assumption in the active workflow artifact.
@@ -29,6 +33,7 @@ conservatively and record the assumption in the active workflow artifact.
 ## Conversation Protocol
 
 - Inspect relevant existing files before asking.
+- Let `ahe-thinking` judge what is missing before you ask.
 - Explain the decision point briefly when context helps the user answer.
 - Ask exactly one question at a time.
 - Use a Codex-supported structured response request when meaningful options exist.
@@ -39,6 +44,8 @@ conservatively and record the assumption in the active workflow artifact.
 - Ask again when the answer is vague, off-topic, contradictory, or incomplete
   according to the calling skill's clarification criteria.
 - Continue until the calling workflow has enough information to act.
+- Do not expand the scope of questioning beyond the missing detail that
+  `ahe-thinking` identified.
 
 ## State Persistence
 

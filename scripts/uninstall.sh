@@ -7,10 +7,9 @@ readonly HOOKS_DIR="${CODEX_HOME}/hooks"
 readonly MANAGED_SKILLS=(
   "ahe-init"
   "ahe-conversation"
+  "ahe-thinking"
   "ahe-spec"
   "ahe-update"
-  "ahe-clear"
-  "ahe-help"
 )
 
 echo "Uninstalling AHE skills from ${CODEX_HOME}..."

@@ -22,10 +22,9 @@ readonly SOURCE_HOOKS_DIR="${PACKAGE_ROOT}/.codex/hooks"
 readonly MANAGED_SKILLS=(
   "ahe-init"
   "ahe-conversation"
+  "ahe-thinking"
   "ahe-spec"
   "ahe-update"
-  "ahe-clear"
-  "ahe-help"
 )
 
 usage() {
@@ -150,7 +149,8 @@ AHE Codex skill installed.
 
 Next:
 1. Open Codex chat in this workspace.
-2. Use one of: \`\$ahe-init\`, \`\$ahe-spec\`, \`\$ahe-update\`, \`\$ahe-clear\`, or \`\$ahe-help\`.
+2. Use \`ahe init\` for a new start.
+3. Use exact \`ahe\` to continue existing harness work.
 EOF
 }
 

@@ -63,6 +63,7 @@ def test_exact_ahe_prompt_emits_auto_operation_context() -> None:
     assert "unfinished feature" in additional_context
     assert "ask the user" in additional_context
     assert "$ahe-init" in additional_context
+    assert "ahe-thinking" in additional_context
 
 
 def test_auto_operation_requires_first_response_status_table() -> None:
@@ -90,11 +91,16 @@ def test_auto_operation_requires_first_response_status_table() -> None:
 def test_auto_operation_requires_direct_next_step_confirmation() -> None:
     additional_context = additional_context_for_prompt("ahe")
 
-    assert "After the table, ask the user to confirm the next step directly." in additional_context
-    assert "`harness engineering`" in additional_context
-    assert "`start a new task`" in additional_context
-    assert "`resume existing harness work`" in additional_context
+    assert "After the table, classify the harness into exactly one state." in additional_context
+    assert "`harness engineering not enough`" in additional_context
+    assert "`in the middle of building features`" in additional_context
+    assert "`completed all`" in additional_context
     assert "Do not include the next step inside the table." in additional_context
+    assert "Continue automatically after classification." in additional_context
+    assert "thinking -> conversation if needed -> execution -> thinking" in additional_context
+    assert "confirm the next step directly" not in additional_context
+    assert "`start a new task`" not in additional_context
+    assert "`resume existing harness work`" not in additional_context
 
 
 def test_auto_operation_requires_codegraph_preflight_before_status_checks() -> None:
@@ -115,6 +121,14 @@ def test_uppercase_ahe_prompt_emits_auto_operation_context() -> None:
     additional_context = additional_context_for_prompt("AHE")
 
     assert "AHE automatic operation activated." in additional_context
+
+
+def test_exact_ahe_init_prompt_emits_new_start_context() -> None:
+    additional_context = additional_context_for_prompt("ahe init")
+
+    assert "AHE automatic operation activated." in additional_context
+    assert "$ahe-init" in additional_context
+    assert "new start" in additional_context.lower() or "initialize" in additional_context.lower()
 
 
 def test_ahe_mention_inside_normal_prompt_does_not_trigger() -> None:
