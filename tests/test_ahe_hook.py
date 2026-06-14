@@ -58,12 +58,57 @@ def test_exact_ahe_prompt_emits_auto_operation_context() -> None:
     assert "AHE automatic operation activated." in additional_context
     assert "AGENTS.md" in additional_context
     assert "feature-list.json" in additional_context
-    assert ".ahe/process_status.json" in additional_context
     assert "CodeGraph" in additional_context
     assert ".codegraph/" in additional_context
     assert "unfinished feature" in additional_context
     assert "ask the user" in additional_context
     assert "$ahe-init" in additional_context
+
+
+def test_auto_operation_requires_first_response_status_table() -> None:
+    additional_context = additional_context_for_prompt("ahe")
+
+    assert "first response" in additional_context.lower()
+    assert "| Item | Content |" in additional_context
+    assert "|---|---|" in additional_context
+    assert "AGENTS.md" in additional_context
+    assert "PRODUCT.md" in additional_context
+    assert "feature-list.json" in additional_context
+    assert "PROGRESS.md" in additional_context
+    assert "| Next step |" not in additional_context
+    assert "docs/constraints.md" not in additional_context
+    assert "docs/achitecture.md" not in additional_context
+    assert "docs/todo.md" not in additional_context
+    assert "SESSION-HANDOFF.md" not in additional_context
+    assert ".ahe/process_status.json" not in additional_context
+    assert "| CodeGraph |" not in additional_context
+    assert additional_context.index("status report table") < additional_context.index(
+        "Decide the next AHE workflow"
+    )
+
+
+def test_auto_operation_requires_direct_next_step_confirmation() -> None:
+    additional_context = additional_context_for_prompt("ahe")
+
+    assert "After the table, ask the user to confirm the next step directly." in additional_context
+    assert "`harness engineering`" in additional_context
+    assert "`start a new task`" in additional_context
+    assert "`resume existing harness work`" in additional_context
+    assert "Do not include the next step inside the table." in additional_context
+
+
+def test_auto_operation_requires_codegraph_preflight_before_status_checks() -> None:
+    additional_context = additional_context_for_prompt("ahe")
+
+    assert "CodeGraph preflight" in additional_context
+    assert "command -v codegraph" in additional_context
+    assert "NOT INSTALLATION of codegraph" in additional_context
+    assert "skip `codegraph init` and `codegraph sync`" in additional_context
+    assert "If `.codegraph/` does not exist, run `codegraph init`" in additional_context
+    assert "If `.codegraph/` exists, run `codegraph sync`" in additional_context
+    assert additional_context.index("CodeGraph preflight") < additional_context.index(
+        "Inspect current harness state"
+    )
 
 
 def test_uppercase_ahe_prompt_emits_auto_operation_context() -> None:

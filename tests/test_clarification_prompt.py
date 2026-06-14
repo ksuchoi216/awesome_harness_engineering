@@ -6,20 +6,17 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILL_MD_PATHS = (
     REPO_ROOT / ".codex/skills/ahe-init/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-agent/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-spec/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-todo/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-clear/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-copy/SKILL.md",
 )
-ASK_USER_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-ask-user/SKILL.md"
+CONVERSATION_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-conversation/SKILL.md"
 
 
 def test_skill_md_contains_clarification_prompt_rule() -> None:
     for skill_path in SKILL_MD_PATHS:
         content = skill_path.read_text(encoding="utf-8")
         assert "## Clarification Rule" in content
-        assert "follow the `ahe-ask-user` protocol" in content
+        assert "follow the `ahe-conversation` protocol" in content
         assert "Codex-supported structured response request" in content
         assert "custom input" in content.lower()
         assert "ask again" in content.lower()
@@ -41,11 +38,11 @@ def test_skill_md_contains_clarification_judgment_sections() -> None:
 
 
 def test_skill_md_contains_representative_skill_specific_rules() -> None:
-    agent_content = (
-        REPO_ROOT / ".codex/skills/ahe-agent/SKILL.md"
+    init_content = (
+        REPO_ROOT / ".codex/skills/ahe-init/SKILL.md"
     ).read_text(encoding="utf-8")
-    assert "`code`" in agent_content
-    assert "PROJECT_PURPOSE" in agent_content
+    assert "PROJECT_PURPOSE" in init_content
+    assert "Which language do you use?" in init_content
 
     spec_content = (
         REPO_ROOT / ".codex/skills/ahe-spec/SKILL.md"
@@ -55,24 +52,21 @@ def test_skill_md_contains_representative_skill_specific_rules() -> None:
     assert "docs/achitecture.md" in spec_content
     assert "success" in spec_content.lower()
 
-    copy_content = (
-        REPO_ROOT / ".codex/skills/ahe-copy/SKILL.md"
-    ).read_text(encoding="utf-8")
-    assert "overwrite" in copy_content.lower()
-    assert "explicit" in copy_content.lower()
+    assert "overwrite" in init_content.lower()
 
 
-def test_ahe_ask_user_defines_internal_protocol() -> None:
-    content = ASK_USER_SKILL_MD_PATH.read_text(encoding="utf-8")
+def test_ahe_conversation_defines_internal_protocol() -> None:
+    content = CONVERSATION_SKILL_MD_PATH.read_text(encoding="utf-8")
 
-    assert "name: ahe-ask-user" in content
+    assert "name: ahe-conversation" in content
     assert "internal" in content.lower()
     assert "not a user-facing command" in content.lower()
-    assert "Do not treat `$ahe-ask-user` as a user command." in content
+    assert "Do not treat `$ahe-conversation` as a user command." in content
     assert ".ahe/process_status.json" in content
     assert "PROGRESS.md" in content
     assert "SESSION-HANDOFF.md" in content
     assert "one question at a time" in content.lower()
+    assert "conversation state" in content.lower()
     assert "Codex-supported structured response request" in content
     assert "Resume" in content
 
@@ -81,5 +75,5 @@ if __name__ == "__main__":
     test_skill_md_contains_clarification_prompt_rule()
     test_skill_md_contains_clarification_judgment_sections()
     test_skill_md_contains_representative_skill_specific_rules()
-    test_ahe_ask_user_defines_internal_protocol()
+    test_ahe_conversation_defines_internal_protocol()
     print("test_clarification_prompt.py passed!")

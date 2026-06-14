@@ -21,14 +21,11 @@ readonly SOURCE_SHARED_DIR="${PACKAGE_ROOT}/.codex/ahe-shared"
 readonly SOURCE_HOOKS_DIR="${PACKAGE_ROOT}/.codex/hooks"
 readonly MANAGED_SKILLS=(
   "ahe-init"
-  "ahe-agent"
-  "ahe-ask-user"
+  "ahe-conversation"
   "ahe-spec"
-  "ahe-todo"
   "ahe-update"
   "ahe-clear"
   "ahe-help"
-  "ahe-copy"
 )
 
 usage() {
@@ -148,12 +145,12 @@ EOF
   cp -R "${SOURCE_SHARED_DIR}" "${target_shared_dir}"
   cp -R "${SOURCE_HOOKS_DIR}" "${target_hooks_dir}"
 
-  cat <<EOF
+ cat <<EOF
 AHE Codex skill installed.
 
 Next:
 1. Open Codex chat in this workspace.
-2. Use one of: \`\$ahe-init\`, \`\$ahe-spec\`, \`\$ahe-update\`, \`\$ahe-clear\`, \`\$ahe-help\`, or \`\$ahe-copy\`.
+2. Use one of: \`\$ahe-init\`, \`\$ahe-spec\`, \`\$ahe-update\`, \`\$ahe-clear\`, or \`\$ahe-help\`.
 EOF
 }
 

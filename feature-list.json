@@ -200,13 +200,13 @@
     },
     {
       "id": "feat-021",
-      "name": "Internal Ask User Protocol Skill",
-      "description": "Add an internal `ahe-ask-user` skill that centralizes clarification and state-persistence behavior for interactive AHE workflow skills without exposing it as a user command.",
+      "name": "Internal Clarification Protocol Skill",
+      "description": "Add an internal protocol skill that centralizes clarification and state-persistence behavior for interactive AHE workflow skills without exposing it as a user command.",
       "dependencies": [
         "feat-020"
       ],
       "status": "done",
-      "evidence": "Added `.codex/skills/ahe-ask-user/SKILL.md`, wired interactive skills to follow the shared protocol, kept `ahe-help` user-facing only, updated installer/uninstaller coverage, updated docs and tracking, and verified with `./init.sh` plus `pytest tests/ -x`."
+      "evidence": "Added an internal protocol skill, wired interactive skills to follow the shared protocol, kept `ahe-help` user-facing only, updated installer/uninstaller coverage, updated docs and tracking, and verified with `./init.sh` plus `pytest tests/ -x`."
     },
     {
       "id": "feat-022",
@@ -237,6 +237,57 @@
       ],
       "status": "done",
       "evidence": "Created `.codex/skills/ahe-spec/SKILL.md`, removed the old product/constraints/architecture skill files, updated init sequencing, installer/uninstaller lists, help, process-status schema, hook guidance, docs, and tests for the reduced skill surface. Verified with `./init.sh`, `pytest tests/ -x`, `python3 -m json.tool feature-list.json`, and `python3 -m json.tool .codex/ahe-shared/schemas/process_status.schema.json`."
+    },
+    {
+      "id": "feat-025",
+      "name": "Reduced AHE Public Command Surface",
+      "description": "Remove public `ahe-agent`, `ahe-copy`, and `ahe-todo` by folding setup into `ahe-init` and queued-work capture into `ahe-update`.",
+      "dependencies": [
+        "feat-024"
+      ],
+      "status": "done",
+      "evidence": "Removed `.codex/skills/ahe-agent`, `.codex/skills/ahe-copy`, and `.codex/skills/ahe-todo`; updated `ahe-init` to absorb AGENTS/template-copy behavior; updated `ahe-update` to absorb todo capture; refreshed help, installer/uninstaller lists, hook guidance, schema, product docs, progress/handoff, and tests. Verified with `./init.sh`, `pytest tests/ -x`, `python3 -m json.tool feature-list.json`, `python3 -m json.tool .codex/ahe-shared/schemas/process_status.schema.json`, `bash -n bin/ahe`, and `bash -n scripts/uninstall.sh`."
+    },
+    {
+      "id": "feat-026",
+      "name": "Internal AHE Conversation Protocol",
+      "description": "Replace the previous internal protocol with `ahe-conversation` so clarification covers recursive, stateful AHE workflow conversations instead of a simple question helper.",
+      "dependencies": [
+        "feat-025"
+      ],
+      "status": "done",
+      "evidence": "Added `.codex/skills/ahe-conversation/SKILL.md`, removed the previous internal protocol skill directory, updated interactive skills to follow the `ahe-conversation` protocol, refreshed installer/uninstaller lists, product docs, and tests. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/`, `python3 -m json.tool feature-list.json`, `bash -n bin/ahe`, and `bash -n scripts/uninstall.sh`. `mypy src/ --strict` was run and exited with code 2 because `src/` contains no Python files."
+    },
+    {
+      "id": "feat-027",
+      "name": "AHE First Response Status Report",
+      "description": "Require exact `ahe` automatic operation to first report current harness engineering status in a consistent Markdown table before proceeding to the recommended next step.",
+      "dependencies": [
+        "feat-023"
+      ],
+      "status": "done",
+      "evidence": "Updated `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, and `tests/test_ahe_hook.py` so exact `ahe` prompts require a first-response status report table with `Item` and `Content` columns before workflow execution. Verified with `./init.sh`, `pytest tests/ -x`, `python3 -m json.tool feature-list.json`, and `codegraph sync`."
+    },
+    {
+      "id": "feat-028",
+      "name": "Adaptive CodeGraph Preflight",
+      "description": "Require exact `ahe` automatic operation to check CodeGraph installation first, run `codegraph init` when `.codegraph/` is missing, run `codegraph sync` when it exists, and skip both commands with a `NOT INSTALLATION of codegraph` report when the CLI is unavailable.",
+      "dependencies": [
+        "feat-023"
+      ],
+      "status": "done",
+      "evidence": "Updated `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, and `tests/test_ahe_hook.py` so exact `ahe` prompts perform an adaptive CodeGraph preflight before harness status reporting. Verified with `./init.sh`, `pytest tests/ -x`, `python3 -m json.tool feature-list.json`, and `codegraph sync`."
+    },
+    {
+      "id": "feat-029",
+      "name": "Simplified AHE Status Report Confirmation",
+      "description": "Keep the exact `ahe` first-response report minimal, limit the table to AGENTS, PRODUCT, feature-list, and PROGRESS, and ask the user to confirm one direct next-step choice after the table.",
+      "dependencies": [
+        "feat-027",
+        "feat-028"
+      ],
+      "status": "done",
+      "evidence": "Updated `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, and `tests/test_ahe_hook.py` so exact `ahe` prompts show a shorter status table, exclude the next step from the table, and ask the user to confirm one direct next-step choice before proceeding. Verified with `pytest tests/test_ahe_hook.py -x`."
     }
   ]
 }

@@ -6,14 +6,11 @@ readonly SHARED_DIR="${CODEX_HOME}/ahe-shared"
 readonly HOOKS_DIR="${CODEX_HOME}/hooks"
 readonly MANAGED_SKILLS=(
   "ahe-init"
-  "ahe-agent"
-  "ahe-ask-user"
+  "ahe-conversation"
   "ahe-spec"
-  "ahe-todo"
   "ahe-update"
   "ahe-clear"
   "ahe-help"
-  "ahe-copy"
 )
 
 echo "Uninstalling AHE skills from ${CODEX_HOME}..."

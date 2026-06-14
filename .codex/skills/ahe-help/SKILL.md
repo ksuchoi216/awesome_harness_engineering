@@ -12,10 +12,7 @@ Use this skill when the user invokes `$ahe-help`.
 When the user requests help or a list of commands, print a summary of the available AHE skills and how to invoke them:
 
 - `$ahe-init`: Initialize the harness in the current workspace.
-- `$ahe-agent`: Modify only the purpose in `AGENTS.md`.
 - `$ahe-spec`: Modify `docs/PRODUCT.md`, `docs/constraints.md`, and `docs/achitecture.md` through one sequential specification conversation.
-- `$ahe-todo`: Append fast todo items into the last `## TODO` section of `docs/todo.md` and update `feature-list.json`.
-- `$ahe-update`: Apply queued todo content from `docs/todo.md` into `docs/PRODUCT.md` and update tracking files.
+- `$ahe-update`: Queue todo work in `docs/todo.md`, apply queued todo content into `docs/PRODUCT.md`, and update tracking files.
 - `$ahe-clear`: Back up the current harness, reset the project goal and specification, and rebuild them.
 - `$ahe-help`: Show this command summary and description of all AHE skills.
-- `$ahe-copy`: Copy template files, excluding `AGENTS.md` and `PRODUCT.md`, from `ahe-shared/templates` to the workspace root.

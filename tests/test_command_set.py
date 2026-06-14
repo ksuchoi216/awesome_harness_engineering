@@ -11,14 +11,11 @@ def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
     actual_skill_names = sorted(path.name for path in SKILL_DIR.iterdir() if path.is_dir())
     expected_skill_names = sorted(
         [
-            "ahe-agent",
-            "ahe-ask-user",
+            "ahe-conversation",
             "ahe-clear",
             "ahe-help",
-            "ahe-copy",
             "ahe-init",
             "ahe-spec",
-            "ahe-todo",
             "ahe-update",
         ]
     )
@@ -30,20 +27,17 @@ def test_help_skill_does_not_expose_internal_protocols() -> None:
 
     user_facing_commands = (
         "$ahe-init",
-        "$ahe-agent",
         "$ahe-spec",
-        "$ahe-todo",
         "$ahe-update",
         "$ahe-clear",
         "$ahe-help",
-        "$ahe-copy",
     )
 
     for command in user_facing_commands:
         assert command in help_content
 
-    assert "$ahe-ask-user" not in help_content
-    assert "ahe-ask-user" not in help_content
+    assert "$ahe-conversation" not in help_content
+    assert "ahe-conversation" not in help_content
 
 
 def test_split_skill_set_covers_required_context_docs() -> None:

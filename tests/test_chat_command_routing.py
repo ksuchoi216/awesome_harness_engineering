@@ -6,13 +6,10 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILL_PATHS = (
     REPO_ROOT / ".codex/skills/ahe-init/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-agent/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-spec/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-todo/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-update/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-clear/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-help/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-copy/SKILL.md",
 )
 
 
@@ -39,13 +36,10 @@ def test_each_skill_md_has_yaml_frontmatter() -> None:
 def test_skill_files_match_expected_command_names() -> None:
     expected_pairs = {
         "ahe-init": "$ahe-init",
-        "ahe-agent": "$ahe-agent",
         "ahe-spec": "$ahe-spec",
-        "ahe-todo": "$ahe-todo",
         "ahe-update": "$ahe-update",
         "ahe-clear": "$ahe-clear",
         "ahe-help": "$ahe-help",
-        "ahe-copy": "$ahe-copy",
     }
     for skill_name, command_name in expected_pairs.items():
         content = (REPO_ROOT / f".codex/skills/{skill_name}/SKILL.md").read_text(encoding="utf-8")

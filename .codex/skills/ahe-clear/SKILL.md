@@ -42,7 +42,7 @@ Use this skill when the user invokes `$ahe-clear`.
 
 ## Clarification Rule
 
-When required information is missing, follow the `ahe-ask-user` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
+When required information is missing, follow the `ahe-conversation` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
 
 ### User Response Target
 

@@ -2,11 +2,21 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-13 22:40 +0900
-**Session ID:** feat-024-consolidated-ahe-spec-skill
+**Last Updated:** 2026-06-14 13:02 +0900
+**Session ID:** feat-029-simplified-ahe-status-report-confirmation
 **Active Feature:** None
 
 ## Completed
+
+- [x] Implemented `feat-029 Simplified AHE Status Report Confirmation` by reducing the exact `ahe` first-response table to `AGENTS.md`, `PRODUCT.md`, `feature-list.json`, and `PROGRESS.md`, then requiring a direct next-step confirmation after the table using one of `harness engineering`, `start a new task`, or `resume existing harness work`. Updated `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, `feature-list.json`, and `tests/test_ahe_hook.py`, then verified with `pytest tests/test_ahe_hook.py -x`.
+
+- [x] Implemented `feat-028 Adaptive CodeGraph Preflight` by updating the exact `ahe` hook directive so AHE first checks `command -v codegraph`, reports `NOT INSTALLATION of codegraph` and skips init/sync when the CLI is missing, runs `codegraph init` when `.codegraph/` is missing, and runs `codegraph sync` when `.codegraph/` exists. Updated `docs/PRODUCT.md`, `feature-list.json`, and `tests/test_ahe_hook.py`, then verified with `./init.sh`, `pytest tests/ -x`, `python3 -m json.tool feature-list.json`, and `codegraph sync`.
+
+- [x] Implemented `feat-027 AHE First Response Status Report` by updating the exact `ahe` hook directive so automatic operation first reports harness engineering status in a consistent Markdown table before edits or workflow execution. Updated `docs/PRODUCT.md`, `feature-list.json`, and `tests/test_ahe_hook.py`, then verified with `./init.sh`, `pytest tests/ -x`, `python3 -m json.tool feature-list.json`, and `codegraph sync`.
+
+- [x] Implemented `feat-026 Internal AHE Conversation Protocol` by replacing the previous internal clarification protocol with `ahe-conversation`, expanding the protocol language for recursive clarification, conversation state, decision points, and resume-aware workflow guidance. Updated interactive skills, installer/uninstaller lists, product docs, and tests for the new internal protocol name.
+
+- [x] Implemented `feat-025 Reduced AHE Public Command Surface` by removing public `$ahe-agent`, `$ahe-copy`, and `$ahe-todo`, folding AGENTS/template copy behavior into `$ahe-init`, and folding queued todo capture into `$ahe-update`. Updated help, installer/uninstaller lists, hook guidance, process-status schema, product docs, tracking artifacts, and tests for the five-command public surface.
 
 - [x] Implemented `feat-024 Consolidated AHE Spec Skill` by replacing `$ahe-product`, `$ahe-constraints`, and `$ahe-architecture` with one `$ahe-spec` workflow that updates `docs/PRODUCT.md`, `docs/constraints.md`, and `docs/achitecture.md`. Updated init sequencing, installer/uninstaller lists, help text, process-status schema, hook guidance, product docs, and tests for the reduced command surface.
 
@@ -14,7 +24,7 @@
 
 - [x] Implemented `feat-022 AHE Keyword Trigger` by adding a UserPromptSubmit hook to `.codex/hooks/ahe-hook.js` that detects the "ahe" keyword in user prompts and dynamically injects an AHE routing directive. Updated the installer, uninstaller, tracking artifacts, and test suite to verify `.codex/hooks/` deployments.
 
-- [x] Implemented `feat-021 Internal Ask User Protocol Skill` by adding the internal `ahe-ask-user` protocol skill, wiring the 8 interactive AHE skills to follow it, keeping `ahe-help` user-facing only, updating installer/uninstaller coverage, and refreshing the product/tracking artifacts.
+- [x] Implemented `feat-021 Internal Clarification Protocol Skill` by adding an internal clarification protocol skill, wiring the interactive AHE skills to follow it, keeping `ahe-help` user-facing only, updating installer/uninstaller coverage, and refreshing the product/tracking artifacts.
 
 - [x] Implemented `feat-020 Codex UI-Compatible Clarification Requests` by replacing the fixed plain-text clarification prompt in all 8 interactive AHE skill files with Codex-supported structured response request guidance, adding skill-specific clarification criteria, updating `docs/PRODUCT.md`, and updating the clarification tests to match the new contract.
 
@@ -73,7 +83,7 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-024 Consolidated AHE Spec Skill` is complete. The system now exposes `$ahe-spec` for product, constraints, and architecture specification work instead of three separate public skills.
+  - Details: `feat-029 Simplified AHE Status Report Confirmation` is complete. Exact `ahe` automatic operation now reports a shorter harness table first and asks for direct next-step confirmation after the table.
   - Blockers: None.
 
 ## Blocked
@@ -88,6 +98,15 @@
 - **Exact `ahe` starts automatic operation, normal mentions do not**: The hook now requires the prompt to trim and case-fold to exactly `ahe`.
   - Context: The user wanted a simple command users can remember, but did not want ordinary AHE discussion to trigger automatic routing.
   - Alternatives considered: Keeping broad `\bahe\b` matching would interrupt prompts like "explain ahe" and make the hook too aggressive.
+- **Exact `ahe` first reports harness status as a table**: Automatic operation must start its first response with a stable Markdown table using `Item` and `Content` columns before recommending or executing a next step.
+  - Context: The user wants to see the current harness engineering state first after AHE checks files, CodeGraph, and next-step routing.
+  - Alternatives considered: Jumping straight into the next workflow would hide the status information the user needs to understand why AHE chose that path.
+- **The exact `ahe` report should stay minimal and ask for the next step outside the table**: The table now covers only `AGENTS.md`, `PRODUCT.md`, `feature-list.json`, and `PROGRESS.md`, and AHE must ask the user to confirm one simple next-step choice after the table.
+  - Context: The user said broader rows and embedding the next step in the table made the report harder to read and made the next action easy to miss.
+  - Alternatives considered: Keeping optional docs, git state, or a next-step row would preserve more detail but would work against the requested simpler first response.
+- **CodeGraph preflight is adaptive**: Exact `ahe` now checks `command -v codegraph`; missing CLI reports `NOT INSTALLATION of codegraph` and skips init/sync, missing `.codegraph/` runs `codegraph init`, and existing `.codegraph/` runs `codegraph sync`.
+  - Context: The user wants AHE to initialize or sync CodeGraph automatically when possible while adapting cleanly when CodeGraph is not installed.
+  - Alternatives considered: Always attempting `codegraph init` or `codegraph sync` would create noisy failures on machines without the CLI.
 - **Automatic operation prefers CodeGraph but remains usable without it**: The directive tells Codex to check `.codegraph/` and prefer CodeGraph exploration when available, then fall back to normal repo inspection if CodeGraph is missing.
   - Context: The user specifically requested review through CodeGraph and pointed to the local `.codegraph/` flow.
   - Alternatives considered: Installing or initializing CodeGraph from AHE would add an external dependency side effect outside this package's current installer contract.
@@ -97,9 +116,12 @@
 - **Product, constraints, and architecture share one public spec workflow**: `$ahe-spec` now owns `docs/PRODUCT.md`, `docs/constraints.md`, and `docs/achitecture.md` instead of exposing three separate public skills.
   - Context: The user said AHE had too many skills and specifically asked to put `ahe-constraints`, `ahe-product`, and `ahe-architecture` together.
   - Alternatives considered: Keeping alias skills would preserve compatibility but would not reduce the visible skill count.
-- **ahe-ask-user is internal, not a command**: The new skill is installed with AHE so inner skills can reference it, but `$ahe-help` must not list it or route through it.
-  - Context: The user clarified that this skill is for inner skills, not for the user.
-  - Alternatives considered: Exposing it as another `$ahe-*` command would make the help surface confusing and invite direct use of a protocol-only skill.
+- **Init owns setup plumbing and update owns queued work**: `ahe-init` now absorbs the old `ahe-agent` and `ahe-copy` responsibilities, and `ahe-update` now absorbs the old `ahe-todo` capture path.
+  - Context: The user said the remaining skill list was still too complicated after the `ahe-spec` consolidation.
+  - Alternatives considered: Keeping the subcommands as aliases would preserve compatibility but would not reduce the visible skill count or cognitive load.
+- **ahe-conversation is the internal protocol**: The internal skill now describes recursive clarification, stateful decision points, resume context, and workflow continuation instead of a narrow question helper.
+  - Context: The user said the previous internal name was too simple and clarification requires many questions and answers with thinking about what to check and how to approach the work.
+  - Alternatives considered: Keeping the old internal protocol as a compatibility alias would reduce churn but preserve a misleading internal name.
 - **Clarification UI guidance should target Codex structured response requests, not a hardcoded text block**: Interactive AHE skills now instruct Codex to ask short structured questions with meaningful options and custom input, then re-ask until each skill's clarification criteria are satisfied.
   - Context: The user wants the Codex response picker UI behavior rather than literal prompt text rendered in chat.
   - Alternatives considered: Keeping the exact `Question: {question}` text block would preserve the old test contract but would not match the desired Codex UI behavior.
@@ -143,9 +165,13 @@
 ## Change Log
 
 - `.codex/hooks/hooks.json`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `scripts/uninstall.sh`, `tests/test_project_setup.py`, `feature-list.json` - Added native keyword detection via a Node.js `UserPromptSubmit` hook script.
+- `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, `tests/test_ahe_hook.py`, `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md` - Added adaptive CodeGraph preflight for exact `ahe`: check command installation, run init or sync based on `.codegraph/`, and skip both commands when the CLI is unavailable.
+- `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, `tests/test_ahe_hook.py`, `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md` - Required exact `ahe` automatic operation to first report harness engineering status in a consistent Markdown table before proceeding.
+- `.codex/skills/ahe-conversation/SKILL.md`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-spec/SKILL.md`, `.codex/skills/ahe-update/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, `tests/test_clarification_prompt.py`, `tests/test_command_set.py`, `tests/test_project_setup.py` - Replaced the previous internal clarification protocol with `ahe-conversation`.
 - `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, `tests/test_ahe_hook.py`, `feature-list.json`, `PROGRESS.md` - Upgraded exact `ahe` prompts into automatic AHE operation routing with harness inspection, CodeGraph review guidance, unfinished-feature continuation, ambiguity clarification, and next-task handling.
+- `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-update/SKILL.md`, `.codex/skills/ahe-help/SKILL.md`, `.codex/ahe-shared/schemas/process_status.schema.json`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, `tests/` - Reduced the public AHE command surface to `init`, `spec`, `update`, `clear`, and `help`.
 - `.codex/skills/ahe-spec/SKILL.md`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-help/SKILL.md`, `.codex/ahe-shared/schemas/process_status.schema.json`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, `tests/` - Consolidated the product, constraints, and architecture skills into `$ahe-spec` and updated the reduced public command surface.
-- `.codex/skills/ahe-ask-user/SKILL.md`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-agent/SKILL.md`, `.codex/skills/ahe-product/SKILL.md`, `.codex/skills/ahe-todo/SKILL.md`, `.codex/skills/ahe-constraints/SKILL.md`, `.codex/skills/ahe-architecture/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `.codex/skills/ahe-copy/SKILL.md`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_clarification_prompt.py`, `tests/test_command_set.py`, `tests/test_project_setup.py` - Added the internal ask-user protocol skill and installer/test/docs coverage while keeping help user-facing.
+- `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-agent/SKILL.md`, `.codex/skills/ahe-product/SKILL.md`, `.codex/skills/ahe-todo/SKILL.md`, `.codex/skills/ahe-constraints/SKILL.md`, `.codex/skills/ahe-architecture/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `.codex/skills/ahe-copy/SKILL.md`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_clarification_prompt.py`, `tests/test_command_set.py`, `tests/test_project_setup.py` - Added internal clarification protocol coverage while keeping help user-facing.
 - `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-agent/SKILL.md`, `.codex/skills/ahe-product/SKILL.md`, `.codex/skills/ahe-todo/SKILL.md`, `.codex/skills/ahe-constraints/SKILL.md`, `.codex/skills/ahe-architecture/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `.codex/skills/ahe-copy/SKILL.md`, `docs/PRODUCT.md`, `tests/test_clarification_prompt.py`, `tests/test_specialized_workflows.py`, `feature-list.json` - Replaced the fixed clarification prompt format with Codex UI-compatible structured response request guidance and added skill-specific clarification criteria.
 - `.codex/skills/ahe-agent/SKILL.md`, `docs/PRODUCT.md`, `tests/test_specialized_workflows.py` - Updated `$ahe-agent` workflow (when `AGENTS.md` is missing) to ask what the purpose of the project is to the user.
 - `.codex/skills/ahe-init/SKILL.md`, `.codex/ahe-shared/schemas/process_status.schema.json`, `docs/PRODUCT.md`, `tests/test_init_workflow.py` - Updated `ahe-init` to execute the six sequential steps and update progress status tracking.

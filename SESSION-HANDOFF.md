@@ -3,17 +3,29 @@
 ## Current Product Context
 
 - Goal: Keep AHE's Codex skill surface small and focused while preserving the harness specification docs.
-- Current status: `feat-024 Consolidated AHE Spec Skill` is complete.
-- Branch / commit: `develop`; consolidated `$ahe-spec` changes prepared in this session.
+- Current status: `feat-029 Simplified AHE Status Report Confirmation` is complete.
+- Branch / commit: `develop`; exact `ahe` now reports a shorter status table and asks for direct next-step confirmation.
 
 ## Last Completed Work
 
-- [x] Added `.codex/skills/ahe-spec/SKILL.md` as the single public workflow for product, constraints, and architecture specification updates.
-- [x] Removed the old `$ahe-product`, `$ahe-constraints`, and `$ahe-architecture` skill files from the managed AHE skill set.
-- [x] Updated `$ahe-init` to call `ahe-agent`, `ahe-spec`, `ahe-copy`, and `ahe-update` as the four initialization subprocesses.
+- [x] Reduced the exact `ahe` first-response status table to `AGENTS.md`, `PRODUCT.md`, `feature-list.json`, and `PROGRESS.md`.
+- [x] Removed the next-step choice from the report table so the first response stays short and readable.
+- [x] Updated the exact `ahe` hook directive so AHE asks for one direct next-step confirmation after the table using `harness engineering`, `start a new task`, or `resume existing harness work`.
+- [x] Updated `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, and `tests/test_ahe_hook.py` for the simplified report and confirmation flow.
+- [x] Updated the exact `ahe` hook directive so AHE checks `command -v codegraph` before harness status reporting.
+- [x] Added adaptive CodeGraph behavior: run `codegraph init` when `.codegraph/` is missing, run `codegraph sync` when it exists, and skip both commands with `NOT INSTALLATION of codegraph` when the CLI is unavailable.
+- [x] Updated the exact `ahe` hook directive so automatic operation first reports harness engineering status in a consistent Markdown table before edits or workflow execution.
+- [x] Updated `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, and `tests/test_ahe_hook.py` for the first-response status table behavior.
+- [x] Replaced the previous internal clarification protocol with `.codex/skills/ahe-conversation/SKILL.md`.
+- [x] Expanded the internal protocol wording to cover recursive clarification, conversation state, decision points, and resume-aware workflow continuation.
+- [x] Updated interactive skills, installer/uninstaller lists, `docs/PRODUCT.md`, and tests so AHE now installs and references `ahe-conversation`.
+- [x] Reduced the public AHE command set to `$ahe-init`, `$ahe-spec`, `$ahe-update`, `$ahe-clear`, and `$ahe-help`.
+- [x] Removed the public `ahe-agent`, `ahe-copy`, and `ahe-todo` skill files from the managed AHE skill set.
+- [x] Updated `$ahe-init` to absorb AGENTS/template setup behavior and to coordinate only `ahe-spec` and `ahe-update`.
+- [x] Updated `$ahe-update` to absorb queued todo capture as well as queued todo application.
 - [x] Updated installer, uninstaller, `$ahe-help`, process-status schema, hook guidance, `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, and tests for the reduced command surface.
-- [x] Added `.codex/skills/ahe-ask-user/SKILL.md` as an internal protocol skill, not a user-facing command.
-- [x] Updated all 8 interactive skill markdown files to follow the `ahe-ask-user` protocol while keeping skill-specific clarification criteria.
+- [x] Added an internal clarification protocol skill, not a user-facing command.
+- [x] Updated interactive skill markdown files to follow the internal clarification protocol while keeping skill-specific clarification criteria.
 - [x] Updated `bin/ahe` and `scripts/uninstall.sh` so packaged install/uninstall include the internal skill.
 - [x] Updated `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, and this handoff for `feat-021`.
 - [x] Updated `tests/test_command_set.py`, `tests/test_clarification_prompt.py`, and `tests/test_project_setup.py` to cover the internal skill and ensure `$ahe-help` does not expose it.
@@ -51,19 +63,20 @@
 ## Important Files
 
 - `docs/PRODUCT.md` - Canonical product specification and scope reference.
-- `.codex/skills/ahe-ask-user/SKILL.md` - Internal clarification and state-persistence protocol used by interactive AHE skills.
+- `.codex/skills/ahe-conversation/SKILL.md` - Internal recursive clarification, conversation state, and resume-aware workflow protocol used by interactive AHE skills.
 - `.codex/skills/ahe-spec/SKILL.md` - Combined product, constraints, and architecture specification workflow.
+- `.codex/hooks/ahe-hook.js` - Exact `ahe` command hook; the directive now runs adaptive CodeGraph preflight, emits a shorter first-response harness status table, and asks for direct next-step confirmation after the table.
 - `.ahe/backups/20260608-215651/AGENTS.md` - Clear-workflow backup of the current global instructions.
 - `.ahe/backups/20260608-215651/docs/` - Clear-workflow backup of the current docs folder.
 - `.ahe/backups/20260608-215651/PROGRESS.md` - Clear-workflow backup of the current progress log.
 - `.ahe/backups/20260608-215651/SESSION-HANDOFF.md` - Clear-workflow backup of the current handoff file.
 - `.ahe/backups/20260608-215651/init.sh` - Clear-workflow backup of the current startup script.
-- `.codex/skills/ahe-init/SKILL.md` through `.codex/skills/ahe-clear/SKILL.md`, plus `.codex/skills/ahe-spec/SKILL.md`, `.codex/skills/ahe-todo/SKILL.md`, `.codex/skills/ahe-help/SKILL.md`, and `.codex/skills/ahe-copy/SKILL.md` - The visible AHE skills now exposed in Codex.
-- `tests/test_clarification_prompt.py` - Contract coverage for Codex UI-compatible clarification guidance, skill-specific clarification sections, and the internal `ahe-ask-user` protocol.
+- `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-spec/SKILL.md`, `.codex/skills/ahe-update/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, and `.codex/skills/ahe-help/SKILL.md` - The visible AHE skills now exposed in Codex.
+- `tests/test_clarification_prompt.py` - Contract coverage for Codex UI-compatible clarification guidance, skill-specific clarification sections, and the internal `ahe-conversation` protocol.
 - `.codex/skills/ahe-update/SKILL.md` - Update workflow that now consumes `docs/todo.md` into `docs/PRODUCT.md`.
 - `.codex/ahe-shared/` - Shared templates and schemas used by the split skills and installer.
 - `scripts/install.sh`, `scripts/uninstall.sh` - Helper scripts for global Codex install and uninstall under `${HOME}/.codex`.
-- `tests/test_specialized_workflows.py` - Contract coverage for `$ahe-agent`, `$ahe-spec`, `$ahe-todo`, `$ahe-update`, `$ahe-help`, and `$ahe-copy`.
+- `tests/test_specialized_workflows.py` - Contract coverage for the merged `$ahe-init`, `$ahe-spec`, `$ahe-update`, and `$ahe-help` workflows.
 - `tests/test_command_set.py` - Contract coverage for the reduced `$ahe-*` command surface.
 - `.ahe/process_status.json` - Runtime state used by future `ahe` and `ahe resume` flows.
 - `tests/test_clarification_prompt.py` - Contract coverage for the clarification prompt format.
@@ -77,17 +90,19 @@
 2. Read `feature-list.json` and `PROGRESS.md`.
 3. Review this handoff.
 4. Run `./init.sh` or the documented verification command before editing.
-5. If the spec workflow changes again, update `ahe-spec`, `ahe-init`, `ahe-help`, installer lists, product docs, and the markdown contract tests together.
+5. If the public skill surface changes again, update `ahe-init`, `ahe-spec`, `ahe-update`, `ahe-help`, installer lists, product docs, and the markdown contract tests together.
 
 ## Verification Status
 
 | Check | Command | Result | Notes |
 |---|---|---|---|
 | Init sanity | `./init.sh` | Pass | Startup check still reports the expected Python-default environment guidance. |
-| Full tests | `pytest tests/ -x` | Pass | Full contract suite passed after consolidating the spec workflow. |
-| Focused lint | `ruff check tests/test_command_set.py tests/test_clarification_prompt.py tests/test_project_setup.py` | Pass | Edited Python tests pass ruff. |
-| Shell syntax | `bash -n init.sh`, `bash -n bin/ahe`, and `bash -n scripts/uninstall.sh` | Pass | Startup, installer, and uninstaller scripts parse cleanly. |
+| Full tests | `pytest tests/ -x` | Pass | Full contract suite passed after adding first-response status table guidance to the exact `ahe` hook. |
+| Lint | `ruff check src/` | Pass | Ruff reported no Python files under `src/` and exited successfully. |
+| Type check | `mypy src/ --strict` | Not applicable | Command exited with code 2 because `src/` contains no Python files. |
+| Shell syntax | `bash -n bin/ahe` and `bash -n scripts/uninstall.sh` | Pass | Installer and uninstaller scripts parse cleanly. |
 | JSON validation | `python3 -m json.tool feature-list.json` | Pass | `feature-list.json` is valid JSON. |
+| CodeGraph sync | `codegraph sync` | Pass | Local CodeGraph index synced after adaptive CodeGraph preflight hook edits. |
 | Runtime state JSON | `python3 -m json.tool .ahe/process_status.json` | Pass | Process status file is valid JSON. |
 | Installer checks | `bash bin/ahe doctor`, `bash bin/ahe version`, and `pytest tests/test_project_setup.py -x` | Pass | Split-skill install metadata, copy behavior, `npx` flow, internal protocol installation, and global helper scripts passed. |
 | Direct module tests | `python3 tests/test_*.py` modules | Not run this session | Full pytest coverage passed, so direct module execution was not repeated. |
