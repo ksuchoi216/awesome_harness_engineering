@@ -1,0 +1,124 @@
+#!/usr/bin/env node
+const AHE_DIRECTIVE_MARKER = "<ahe-mode>";
+const AHE_PROGRESS_DIRECTIVE = [
+    AHE_DIRECTIVE_MARKER,
+    "AHE automatic operation activated.",
+    "",
+    "The user sent the exact AHE command. Operate as the Awesome Harness Engineering router:",
+    "",
+    "1. Run CodeGraph preflight before inspecting harness status:",
+    "   - Check whether the CodeGraph CLI is installed with `command -v codegraph`.",
+    "   - If the `codegraph` command is not installed, report `NOT INSTALLATION of codegraph`, skip `codegraph init` and `codegraph sync`, and continue with normal repo inspection.",
+    "   - If `.codegraph/` does not exist, run `codegraph init` before reviewing code.",
+    "   - If `.codegraph/` exists, run `codegraph sync` before reviewing code.",
+    "",
+    "2. Inspect current harness state before choosing a workflow:",
+    "   - Check `AGENTS.md`.",
+    "   - Check `docs/PRODUCT.md`.",
+    "   - Check `feature-list.json`.",
+    "   - Check `PROGRESS.md`.",
+    "   - Use `ahe-thinking` as the internal decision layer before choosing the next action.",
+    "",
+    "3. Review code through CodeGraph when available:",
+    "   - Prefer CodeGraph MCP or CodeGraph exploration for code review and impact context after the preflight command succeeds.",
+    "   - If CodeGraph is not installed, skip CodeGraph review and rely on normal repo inspection.",
+    "",
+    "4. Make the first response a simple harness engineering status report table before proceeding:",
+    "   - Start the response with a concise status report table.",
+    "   - Use this consistent Markdown table format:",
+    "     | Item | Content |",
+    "     |---|---|",
+    "     | AGENTS.md | Exists/missing, purpose status, and any obvious issue. |",
+    "     | PRODUCT.md | Exists/missing, completion state, and whether product scope needs work. |",
+    "     | feature-list.json | Valid/missing/invalid, unfinished feature summary, and all-done status. |",
+    "     | PROGRESS.md | Exists/missing and current session state. |",
+    "   - Keep the table short and readable.",
+    "   - Do not include the next step inside the table.",
+    "",
+    "5. Decide the next AHE workflow with `ahe-thinking`:",
+    "   - If no harness files exist, route to `$ahe-init`.",
+    "   - If harness files exist but core harness engineering is incomplete, classify the state as `harness engineering not enough` and continue harness engineering work.",
+    "   - If `feature-list.json` is missing or invalid, repair the harness state or route to initialization behavior.",
+    "   - If any feature in `feature-list.json` has a status other than `done`, classify the state as `in the middle of building features` and continue the first unfinished feature whose dependencies are satisfied.",
+    "   - Respect dependencies listed in `feature-list.json`; do not start a dependent feature before prerequisites are done.",
+    "   - If all features are `done` and no obvious harness gap remains, classify the state as `completed all` and ask the user for the next task.",
+    "   - Judge the active `project`, `feature`, or `sub-feature` before moving forward.",
+    "   - For a `project`, require `Why`, `What`, and `How` by default.",
+    "   - For a `feature` or `sub-feature`, require only the minimum of `Why`, `What`, and `How` needed to proceed safely.",
+    "",
+    "6. Ask for clarification instead of guessing:",
+    "   - If multiple plausible next steps exist, feature data conflicts, dependencies are unclear, or CodeGraph review points to several valid directions, use `ahe-thinking` to judge the missing detail.",
+    "   - If clarity is missing, call `ahe-conversation` for the exact missing `Why`, `What`, or `How`.",
+    "   - Continue only after one safe next step is clear.",
+    "",
+    "7. After the table, classify the harness into exactly one state.",
+    "   - Use exactly one state: `harness engineering not enough`, `in the middle of building features`, or `completed all`.",
+    "   - Do not include the next step inside the table.",
+    "   - Continue automatically after classification.",
+    "   - Follow this loop: `thinking -> conversation if needed -> execution -> thinking`.",
+].join("\\n");
+
+const AHE_INIT_DIRECTIVE = [
+    AHE_DIRECTIVE_MARKER,
+    "AHE automatic operation activated.",
+    "",
+    "The user sent the exact AHE init command. Treat this as a new start request:",
+    "",
+    "1. Route to `$ahe-init` first.",
+    "2. Treat this flow as a new start, not a progress continuation.",
+    "3. Read existing harness files only to determine whether initialization must refresh or overwrite them safely.",
+    "4. Use `ahe-thinking` before clarification when the next setup step is uncertain.",
+    "5. If clarification is needed, call `ahe-conversation` for the exact missing detail.",
+    "6. Continue through initialization work until the new start path is clear.",
+].join("\\n");
+
+function isExactAheCommand(prompt) {
+    return prompt.trim().toLowerCase() === "ahe";
+}
+
+function isExactAheInitCommand(prompt) {
+    return prompt.trim().toLowerCase() === "ahe init";
+}
+
+async function main() {
+    let raw = "";
+    process.stdin.setEncoding("utf8");
+    for await (const chunk of process.stdin) {
+        raw += chunk;
+    }
+
+    if (!raw.trim()) return;
+
+    let parsed;
+    try {
+        parsed = JSON.parse(raw);
+    } catch (e) {
+        return;
+    }
+
+    if (
+        parsed &&
+        parsed.hook_event_name === "UserPromptSubmit" &&
+        typeof parsed.prompt === "string"
+    ) {
+        if (isExactAheCommand(parsed.prompt)) {
+            const output = {
+                hookSpecificOutput: {
+                    hookEventName: "UserPromptSubmit",
+                    additionalContext: AHE_PROGRESS_DIRECTIVE
+                }
+            };
+            process.stdout.write(JSON.stringify(output) + "\n");
+        } else if (isExactAheInitCommand(parsed.prompt)) {
+            const output = {
+                hookSpecificOutput: {
+                    hookEventName: "UserPromptSubmit",
+                    additionalContext: AHE_INIT_DIRECTIVE
+                }
+            };
+            process.stdout.write(JSON.stringify(output) + "\n");
+        }
+    }
+}
+
+main().catch(() => {});

@@ -6,15 +6,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILL_PATHS = (
     REPO_ROOT / ".codex/skills/ahe-init/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-agent/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-product/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-todo/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-constraints/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-architecture/SKILL.md",
+    REPO_ROOT / ".codex/skills/ahe-spec/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-update/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-clear/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-help/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-copy/SKILL.md",
 )
 
 
@@ -39,21 +32,12 @@ def test_each_skill_md_has_yaml_frontmatter() -> None:
 
 
 def test_skill_files_match_expected_command_names() -> None:
-    expected_pairs = {
-        "ahe-init": "$ahe-init",
-        "ahe-agent": "$ahe-agent",
-        "ahe-product": "$ahe-product",
-        "ahe-todo": "$ahe-todo",
-        "ahe-constraints": "$ahe-constraints",
-        "ahe-architecture": "$ahe-architecture",
-        "ahe-update": "$ahe-update",
-        "ahe-clear": "$ahe-clear",
-        "ahe-help": "$ahe-help",
-        "ahe-copy": "$ahe-copy",
-    }
-    for skill_name, command_name in expected_pairs.items():
+    init_content = (REPO_ROOT / ".codex/skills/ahe-init/SKILL.md").read_text(encoding="utf-8")
+    assert "$ahe-init" in init_content
+
+    for skill_name in ("ahe-spec", "ahe-update"):
         content = (REPO_ROOT / f".codex/skills/{skill_name}/SKILL.md").read_text(encoding="utf-8")
-        assert command_name in content
+        assert "not a user-facing command" in content.lower()
 
 
 if __name__ == "__main__":

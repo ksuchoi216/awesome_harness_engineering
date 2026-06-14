@@ -13,49 +13,76 @@ Use this skill when the user invokes `$ahe-init`.
 
 - Read `AGENTS.md` if it already exists.
 - Read `docs/PRODUCT.md`, `docs/constraints.md`, and `docs/achitecture.md` when they exist.
+- Read existing workspace-root harness files that may be copied from templates, including `PROGRESS.md`, `SESSION-HANDOFF.md`, `feature-list.json`, and `init.sh`.
 - Read `.ahe/process_status.json` when it exists.
 
 ### Sequential Conversation Flow
 
+- Treat exact `ahe init` as a new start request.
 - If `AGENTS.md` already exists, ask the user whether the current `AGENTS.md` is right.
 - If the current `AGENTS.md` is not right or does not exist, ask for the purpose of this project.
+- If `AGENTS.md` does not exist, copy `AGENTS.md` from `.codex/ahe-shared/templates/`.
 - Update only the `PROJECT_PURPOSE` portion of `AGENTS.md`.
-- Execute the following six steps sequentially, calling each subprocess and updating the progress status (`current_step` in `.ahe/process_status.json`):
-  1. call "ahe-agents" (status: "ahe-agents")
-  2. call "ahe-product" (status: "ahe-product")
-  3. call "ahe-architecture" (status: "ahe-architecture")
-  4. call "ahe-constraints" (status: "ahe-constraints")
-  5. call "ahe-copy" (status: "ahe-copy")
-  6. call "ahe-update" (status: "ahe-update")
+- Ask whether the project language is Python using a Codex-supported structured response request with meaningful options and custom input.
+- If the user answers that the project language is not Python, ask again: "Which language do you use?".
+- If the workspace already has active harness files and the user wants a fresh start, create a timestamped backup directory under `.ahe/backups/`.
+- Copy `AGENTS.md` into the backup directory when it exists.
+- Copy the current `docs/PRODUCT.md` into the backup directory when it exists.
+- Copy the current `PROGRESS.md` into the backup directory when it exists.
+- Copy the current `SESSION-HANDOFF.md` into the backup directory when it exists.
+- Copy the current `feature-list.json` into the backup directory when it exists.
+- Copy `init.sh` into the backup directory when it exists.
+- Copy the `docs/` folder into the backup directory when it exists.
+- Remove the previous `docs/PRODUCT.md` when starting fresh after backup.
+- Remove the previous `PROGRESS.md` when starting fresh after backup.
+- Remove the previous `SESSION-HANDOFF.md` when starting fresh after backup.
+- Remove the previous `feature-list.json` when starting fresh after backup.
+- After backup, remove the previous `docs/PRODUCT.md`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `feature-list.json` before continuing the new start flow.
+- Find all template files under `.codex/ahe-shared/templates/`.
+- Ignore `AGENTS.md` and `PRODUCT.md` when copying template files.
+- Before copying a template file into the workspace root, check whether the target file already exists and ask for explicit overwrite confirmation when needed.
+- Execute the following three steps sequentially, updating the progress status (`current_step` in `.ahe/process_status.json`):
+  1. complete the embedded init setup work (status: "ahe-init")
+  2. call "ahe-spec" (status: "ahe-spec")
+  3. call "ahe-update" (status: "ahe-update")
 
 ### Harness Generation
 
 - Create or refresh `AGENTS.md`.
-- Create `.ahe/process_status.json` and update it at each step to indicate the active status from the six steps sequence.
+- Create or refresh missing workspace-root harness files from `.codex/ahe-shared/templates/`, converting markdown filenames to uppercase when needed.
+- Create `.ahe/process_status.json` and update it at each step to indicate the active status from the three-step sequence.
 - Create missing harness files from `.codex/ahe-shared/templates/`.
 - Keep the generated files aligned with the installed shared templates.
 
 ## Clarification Rule
 
-When required information is missing, follow the `ahe-ask-user` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
+When the next setup step is not clear, follow the `ahe-thinking` protocol first. If `ahe-thinking` finds missing information, follow the `ahe-conversation` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
 
 ### User Response Target
 
-- Collect the project purpose and any setup confirmation needed to continue the six-step initialization workflow.
+- Collect the project purpose, language choice, and overwrite decisions needed to continue initialization safely.
 
 ### Questions to Ask
 
 - Ask whether the existing `AGENTS.md` is correct.
+- Ask whether the user wants to preserve the current harness or start fresh when harness files already exist.
 - Ask what the purpose of this project is when `AGENTS.md` is missing or incorrect.
-- Ask follow-up questions when the purpose or setup choice is still unclear.
+- Ask whether the project language is Python and ask which language is used when the answer is no or custom.
+- Ask whether template files should be overwritten when target files already exist.
+- Ask follow-up questions when the purpose, language, or overwrite choice is still unclear.
 
 ### Clarification Criteria
 
 - The answer must be specific enough to update `PROJECT_PURPOSE`.
 - The answer must make it clear whether initialization should continue with the current `AGENTS.md` or with a new purpose.
+- The answer must clearly identify whether Python guidance applies.
+- The answer must make the fresh-start decision clear when existing harness files must be backed up or replaced.
+- The answer must make overwrite intent explicit for existing template targets.
 - The answer must resolve any setup choice that blocks the next workflow step.
 
 ### Re-ask When
 
 - Ask again when the answer is vague, off-topic, contradictory, or incomplete.
 - Ask again when the answer does not identify the project goal, target user, or intended outcome clearly enough to continue initialization.
+- Ask again when the language answer is ambiguous or does not clearly name the language in use.
+- Ask again when the overwrite decision is not explicit.

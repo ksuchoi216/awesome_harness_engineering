@@ -10,16 +10,10 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 REQUIRED_SKILL_FILES = (
     Path(".codex/skills/ahe-init/SKILL.md"),
-    Path(".codex/skills/ahe-agent/SKILL.md"),
-    Path(".codex/skills/ahe-ask-user/SKILL.md"),
-    Path(".codex/skills/ahe-product/SKILL.md"),
-    Path(".codex/skills/ahe-todo/SKILL.md"),
-    Path(".codex/skills/ahe-constraints/SKILL.md"),
-    Path(".codex/skills/ahe-architecture/SKILL.md"),
+    Path(".codex/skills/ahe-conversation/SKILL.md"),
+    Path(".codex/skills/ahe-thinking/SKILL.md"),
+    Path(".codex/skills/ahe-spec/SKILL.md"),
     Path(".codex/skills/ahe-update/SKILL.md"),
-    Path(".codex/skills/ahe-clear/SKILL.md"),
-    Path(".codex/skills/ahe-help/SKILL.md"),
-    Path(".codex/skills/ahe-copy/SKILL.md"),
     Path(".codex/ahe-shared/templates/AGENTS.md"),
     Path(".codex/ahe-shared/templates/PRODUCT.md"),
     Path(".codex/ahe-shared/templates/PROGRESS.md"),
@@ -28,6 +22,8 @@ REQUIRED_SKILL_FILES = (
     Path(".codex/ahe-shared/templates/feature-list.json"),
     Path(".codex/ahe-shared/schemas/process_status.schema.json"),
     Path(".codex/ahe-shared/schemas/feature-list-schema.json"),
+    Path(".codex/hooks/hooks.json"),
+    Path(".codex/hooks/ahe-hook.js"),
 )
 
 
@@ -83,9 +79,11 @@ def test_installer_copies_skill_files_into_target_workspace(tmp_path: Path) -> N
     assert completed_process.returncode == 0, completed_process.stderr
     assert "AHE Codex skill installed." in completed_process.stdout
     assert (workspace_root / ".codex/skills/ahe-init/SKILL.md").exists()
-    assert (workspace_root / ".codex/skills/ahe-ask-user/SKILL.md").exists()
-    assert (workspace_root / ".codex/skills/ahe-clear/SKILL.md").exists()
+    assert (workspace_root / ".codex/skills/ahe-conversation/SKILL.md").exists()
+    assert (workspace_root / ".codex/skills/ahe-thinking/SKILL.md").exists()
     assert (workspace_root / ".codex/ahe-shared/templates/AGENTS.md").exists()
+    assert (workspace_root / ".codex/hooks/hooks.json").exists()
+    assert (workspace_root / ".codex/hooks/ahe-hook.js").exists()
 
 
 def test_installer_supports_local_npx_package_flow(tmp_path: Path) -> None:
@@ -127,8 +125,10 @@ def test_installer_supports_local_npx_package_flow(tmp_path: Path) -> None:
     assert completed_process.returncode == 0, completed_process.stderr
     assert "AHE Codex skill installed." in completed_process.stdout
     assert (workspace_root / ".codex/skills/ahe-update/SKILL.md").exists()
-    assert (workspace_root / ".codex/skills/ahe-ask-user/SKILL.md").exists()
+    assert (workspace_root / ".codex/skills/ahe-conversation/SKILL.md").exists()
+    assert (workspace_root / ".codex/skills/ahe-thinking/SKILL.md").exists()
     assert (workspace_root / ".codex/ahe-shared/schemas/process_status.schema.json").exists()
+    assert (workspace_root / ".codex/hooks/hooks.json").exists()
 
 
 def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
@@ -156,9 +156,11 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
     )
 
     assert install_process.returncode == 0, install_process.stderr
-    assert (fake_home / ".codex/skills/ahe-product/SKILL.md").exists()
-    assert (fake_home / ".codex/skills/ahe-ask-user/SKILL.md").exists()
+    assert (fake_home / ".codex/skills/ahe-spec/SKILL.md").exists()
+    assert (fake_home / ".codex/skills/ahe-conversation/SKILL.md").exists()
+    assert (fake_home / ".codex/skills/ahe-thinking/SKILL.md").exists()
     assert (fake_home / ".codex/ahe-shared/templates/PRODUCT.md").exists()
+    assert (fake_home / ".codex/hooks/ahe-hook.js").exists()
 
     uninstall_process = subprocess.run(
         (str(REPO_ROOT / "scripts" / "uninstall.sh"),),
@@ -171,8 +173,10 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
 
     assert uninstall_process.returncode == 0, uninstall_process.stderr
     assert not (fake_home / ".codex/skills/ahe-init").exists()
-    assert not (fake_home / ".codex/skills/ahe-ask-user").exists()
+    assert not (fake_home / ".codex/skills/ahe-conversation").exists()
+    assert not (fake_home / ".codex/skills/ahe-thinking").exists()
     assert not (fake_home / ".codex/ahe-shared").exists()
+    assert not (fake_home / ".codex/hooks").exists()
 
 
 def test_template_directory_does_not_use_forbidden_lowercase_markdown_names() -> None:

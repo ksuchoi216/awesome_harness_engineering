@@ -18,18 +18,13 @@ readonly SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${SCRIPT_PATH}")" && pwd)"
 readonly PACKAGE_ROOT="$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)"
 readonly SOURCE_SKILLS_DIR="${PACKAGE_ROOT}/.codex/skills"
 readonly SOURCE_SHARED_DIR="${PACKAGE_ROOT}/.codex/ahe-shared"
+readonly SOURCE_HOOKS_DIR="${PACKAGE_ROOT}/.codex/hooks"
 readonly MANAGED_SKILLS=(
   "ahe-init"
-  "ahe-agent"
-  "ahe-ask-user"
-  "ahe-product"
-  "ahe-todo"
-  "ahe-constraints"
-  "ahe-architecture"
+  "ahe-conversation"
+  "ahe-thinking"
+  "ahe-spec"
   "ahe-update"
-  "ahe-clear"
-  "ahe-help"
-  "ahe-copy"
 )
 
 usage() {
@@ -85,6 +80,7 @@ install_skill() {
 
   local target_skills_dir="${PWD}/.codex/skills"
   local target_shared_dir="${PWD}/.codex/ahe-shared"
+  local target_hooks_dir="${PWD}/.codex/hooks"
   local backup_dir="${PWD}/.codex/_backups"
   local skill_name=""
   local skill_target=""
@@ -125,24 +121,43 @@ EOF
     fi
   fi
 
+  if [ -e "${target_hooks_dir}" ]; then
+    if [ "${backup}" = "true" ]; then
+      backup_existing_installation "${target_hooks_dir}" "${backup_dir}" "hooks"
+    elif [ "${force}" = "true" ]; then
+      rm -rf "${target_hooks_dir}"
+    else
+      cat <<EOF >&2
+AHE hooks are already installed at:
+  ${target_hooks_dir}
+
+Re-run with --force to overwrite or --backup to move the existing install aside first.
+EOF
+      exit 1
+    fi
+  fi
+
   mkdir -p "${target_skills_dir}"
   for skill_name in "${MANAGED_SKILLS[@]}"; do
     cp -R "${SOURCE_SKILLS_DIR}/${skill_name}" "${target_skills_dir}/${skill_name}"
   done
   cp -R "${SOURCE_SHARED_DIR}" "${target_shared_dir}"
+  cp -R "${SOURCE_HOOKS_DIR}" "${target_hooks_dir}"
 
-  cat <<EOF
+ cat <<EOF
 AHE Codex skill installed.
 
 Next:
 1. Open Codex chat in this workspace.
-2. Use one of: \`\$ahe-init\`, \`\$ahe-product\`, \`\$ahe-update\`, \`\$ahe-clear\`, \`\$ahe-help\`, or \`\$ahe-copy\`.
+2. Use \`ahe init\` for a new start.
+3. Use exact \`ahe\` to continue existing harness work.
 EOF
 }
 
 doctor() {
   local target_skills_dir="${PWD}/.codex/skills"
   local target_shared_dir="${PWD}/.codex/ahe-shared"
+  local target_hooks_dir="${PWD}/.codex/hooks"
   local skill_name=""
 
   for skill_name in "${MANAGED_SKILLS[@]}"; do
@@ -159,6 +174,11 @@ doctor() {
 
   if [ ! -d "${target_shared_dir}/schemas" ]; then
     printf 'Missing: %s/schemas\n' "${target_shared_dir}" >&2
+    exit 1
+  fi
+
+  if [ ! -f "${target_hooks_dir}/hooks.json" ]; then
+    printf 'Missing: %s/hooks.json\n' "${target_hooks_dir}" >&2
     exit 1
   fi
 

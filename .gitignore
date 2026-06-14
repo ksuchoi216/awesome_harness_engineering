@@ -217,5 +217,4 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-learn-harness-engineering/
-oh-my-openagent/
+ref/

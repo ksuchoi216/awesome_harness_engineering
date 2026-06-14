@@ -24,7 +24,7 @@
         "string",
         "null"
       ],
-      "description": "The current step of the active workflow. For the ahe-init command, it represents the active subprocess being executed sequentially: 'ahe-agents', 'ahe-product', 'ahe-architecture', 'ahe-constraints', 'ahe-copy', or 'ahe-update'."
+      "description": "The current step of the active workflow. For the ahe-init command, it represents the active stage being executed sequentially: 'ahe-init', 'ahe-spec', or 'ahe-update'."
     },
     "workflow_complete": {
       "type": "boolean"
