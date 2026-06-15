@@ -349,6 +349,16 @@
       ],
       "status": "done",
       "evidence": "Updated `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, and `tests/test_ahe_hook.py` so exact `ahe-init` and exact `$ahe-init` emit the same new-start directive as exact `ahe init`, while prompts that merely mention `ahe-init` do not trigger. Verified with `./init.sh`, `pytest tests/test_ahe_hook.py -x`, `pytest tests/ -k 'not helper_scripts_target_global_codex_home'`, `ruff check src/ tests/`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, direct hook smoke checks for `ahe init`, `ahe-init`, `$ahe-init`, and mention suppression, plus Python LSP diagnostics on `tests/test_ahe_hook.py`. Full `pytest tests/ -x` remains blocked by the existing helper-script installer smoke path hanging or being killed inside nested `npx`; `mypy` is not installed."
+    },
+    {
+      "id": "feat-036",
+      "name": "NPM Deployment Preparation",
+      "description": "Prepare package.json for NPM deployment with ahe-codex package name and update related documentation.",
+      "dependencies": [
+        "feat-035"
+      ],
+      "status": "done",
+      "evidence": "Updated package.json with name ahe-codex, repository, keywords, and author. Updated AGENTS.md and docs/PRODUCT.md to reflect the new npx installation command."
     }
   ]
 }

@@ -1,10 +1,27 @@
 {
-  "name": "ahe",
+  "name": "ahe-codex",
   "version": "0.1.0",
   "description": "Codex chat workflow skill installer for Awesome Harness Engineering",
   "bin": {
     "ahe": "./bin/ahe"
   },
+  "scripts": {
+    "test": "pytest tests/ -x",
+    "prepublishOnly": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ksuchoi216/awesome_harness_engineering.git"
+  },
+  "keywords": [
+    "codex",
+    "agent",
+    "workflow",
+    "harness",
+    "ahe",
+    "ahe-codex"
+  ],
+  "author": "ksuchoi216",
   "files": [
     "bin/",
     ".codex/"
