@@ -309,6 +309,16 @@
       ],
       "status": "done",
       "evidence": "Removed `.codex/skills/ahe-help/SKILL.md` and `.codex/skills/ahe-clear/SKILL.md`, updated `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `ahe-init` contract text, and hook coverage so users now rely on exact `ahe init` for a new start and exact `ahe` for progress while reset/backup behavior lives inside `ahe-init`. Verified with `./init.sh`, `pytest tests/ -x`, and `python3 -m json.tool feature-list.json`."
+    },
+    {
+      "id": "feat-032",
+      "name": "Scoped AHE Init Restart",
+      "description": "Require `ahe init` to start normally when no harness files exist, but inspect existing harness files and ask the user what restart scope they want before backing up or replacing anything.",
+      "dependencies": [
+        "feat-031"
+      ],
+      "status": "done",
+      "evidence": "Updated `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-spec/SKILL.md`, `.codex/hooks/ahe-hook.js`, and `docs/PRODUCT.md` so exact `ahe init` asks for a free-form restart scope when existing AHE-managed files are present, preserves `AGENTS.md` for project purpose/base settings, and sends product specification details to `docs/PRODUCT.md`. Added contract coverage in `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, and `tests/test_ahe_hook.py`. Verified with `./init.sh`, `pytest tests/ -x`, `python3 -m json.tool feature-list.json`, `python3 -m json.tool .ahe/process_status.json`, `ruff check src/`, `node --check .codex/hooks/ahe-hook.js`, and LSP diagnostics on changed Python tests. `mypy src/ --strict` could not run because `mypy` is not installed."
     }
   ]
 }

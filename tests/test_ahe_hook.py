@@ -129,6 +129,11 @@ def test_exact_ahe_init_prompt_emits_new_start_context() -> None:
     assert "AHE automatic operation activated." in additional_context
     assert "$ahe-init" in additional_context
     assert "new start" in additional_context.lower() or "initialize" in additional_context.lower()
+    assert "If no AHE-managed harness files exist, start initialization normally." in additional_context
+    assert "If any AHE-managed harness file exists, read the existing files" in additional_context
+    assert "ask what restart scope the user wants" in additional_context
+    assert "Do not back up, remove, overwrite, or refresh existing harness files before the user answers" in additional_context
+    assert "Product specification details belong in `docs/PRODUCT.md`, not `AGENTS.md`." in additional_context
 
 
 def test_ahe_mention_inside_normal_prompt_does_not_trigger() -> None:

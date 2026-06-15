@@ -3,11 +3,16 @@
 ## Current Product Context
 
 - Goal: Keep AHE's Codex skill surface small and focused while preserving the harness specification docs.
-- Current status: `feat-031 Two-Entrypoint AHE Surface` is complete.
-- Branch / commit: `develop`; users now rely on exact `ahe init` for a new start and exact `ahe` for progress, while `ahe-init` absorbs the old reset path.
+- Current status: `feat-032 Scoped AHE Init Restart` is complete.
+- Branch / commit: `develop`; users now rely on exact `ahe init` for initialization or scoped restarts and exact `ahe` for progress.
 
 ## Last Completed Work
 
+- [x] Updated `.codex/skills/ahe-init/SKILL.md` so empty workspaces start normally, but existing AHE-managed harness files must be read and summarized before asking what restart scope the user wants.
+- [x] Required free-form restart-scope interpretation, including `purpose` as a full project-purpose restart and `product` as preserving `AGENTS.md` while restarting product specification work.
+- [x] Added guard language so existing harness files are not backed up, removed, overwritten, or refreshed until the restart scope is clear.
+- [x] Updated `.codex/skills/ahe-spec/SKILL.md`, `.codex/hooks/ahe-hook.js`, and `docs/PRODUCT.md` so product behavior, scope, requirements, success criteria, and workflow details belong in `docs/PRODUCT.md`, not `AGENTS.md`.
+- [x] Added contract coverage in `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, and `tests/test_ahe_hook.py`.
 - [x] Removed `.codex/skills/ahe-help/SKILL.md`.
 - [x] Removed `.codex/skills/ahe-clear/SKILL.md` and deleted `tests/test_clear_workflow.py`.
 - [x] Folded the previous reset/backup semantics into `.codex/skills/ahe-init/SKILL.md`.
@@ -82,12 +87,13 @@
 - `.codex/skills/ahe-thinking/SKILL.md` - Internal decision protocol that judges the current project, feature, or sub-feature and decides whether AHE should clarify or execute next.
 - `.codex/skills/ahe-spec/SKILL.md` - Combined product, constraints, and architecture specification workflow.
 - `.codex/hooks/ahe-hook.js` - Exact `ahe` and exact `ahe init` command hook; the directives now split new-start and progress routing while keeping adaptive CodeGraph preflight for progress.
+- `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, `tests/test_ahe_hook.py` - Contract coverage for scoped restart semantics and canonical product-spec placement.
 - `.ahe/backups/20260608-215651/AGENTS.md` - Clear-workflow backup of the current global instructions.
 - `.ahe/backups/20260608-215651/docs/` - Clear-workflow backup of the current docs folder.
 - `.ahe/backups/20260608-215651/PROGRESS.md` - Clear-workflow backup of the current progress log.
 - `.ahe/backups/20260608-215651/SESSION-HANDOFF.md` - Clear-workflow backup of the current handoff file.
 - `.ahe/backups/20260608-215651/init.sh` - Clear-workflow backup of the current startup script.
-- `.codex/skills/ahe-init/SKILL.md` - The only user-facing installed skill; it now covers both first-time setup and fresh-start reset behavior.
+- `.codex/skills/ahe-init/SKILL.md` - The only user-facing installed skill; it now covers first-time setup and scoped restart behavior for existing harnesses.
 - `tests/test_clarification_prompt.py` - Contract coverage for Codex UI-compatible clarification guidance, skill-specific clarification sections, and the internal `ahe-conversation` protocol.
 - `.codex/skills/ahe-update/SKILL.md` - Update workflow that now consumes `docs/todo.md` into `docs/PRODUCT.md`.
 - `.codex/ahe-shared/` - Shared templates and schemas used by the split skills and installer.
@@ -112,9 +118,12 @@
 | Check | Command | Result | Notes |
 |---|---|---|---|
 | Init sanity | `./init.sh` | Pass | Startup check still reports the expected Python-default environment guidance. |
-| Full tests | `pytest tests/ -x` | Pass | Full contract suite passed after adding the internal `ahe-thinking` orchestrator and automatic exact `ahe` state classification. |
-| Lint | `ruff check src/` | Pass | Ruff reported no Python files under `src/` and still exited successfully. |
-| Type check | `mypy src/ --strict` | Not applicable | Command exited with code 2 because `src/` contains no `.py` or `.pyi` files under `src/`. |
+| Full tests | `pytest tests/ -x` | Pass | Full contract suite passed with 45 tests. |
+| Targeted tests | `python3 tests/test_init_workflow.py`; `python3 tests/test_spec_workflow.py`; `pytest tests/test_ahe_hook.py -x` | Pass | Scoped restart and product-spec placement contract tests pass. |
+| Lint | `ruff check src/` | Pass | Ruff reported no Python files under `src/` and exited successfully. |
+| Type check | `mypy src/ --strict`; `python3 -m mypy src/ --strict` | Blocked | `mypy` is not installed as a command or Python module in this workspace. |
+| LSP diagnostics | Changed Python test files | Pass | No diagnostics found for `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, or `tests/test_ahe_hook.py`. |
+| Hook syntax | `node --check .codex/hooks/ahe-hook.js` | Pass | Edited hook parses successfully. |
 | Shell syntax | `bash -n bin/ahe` and `bash -n scripts/uninstall.sh` | Pass | Installer and uninstaller scripts parse cleanly. |
 | JSON validation | `python3 -m json.tool feature-list.json` | Pass | `feature-list.json` is valid JSON. |
 | CodeGraph sync | `codegraph sync` | Pass | Local CodeGraph index synced after adaptive CodeGraph preflight hook edits. |

@@ -78,15 +78,30 @@ The installed skills must not store workspace runtime state under `.codex/`.
 ### `$ahe-init`
 
 - Initialize the harness in the current workspace.
+- If no AHE-managed harness files exist, start initialization normally without
+  asking a restart-scope question.
+- If any AHE-managed harness file exists, read the existing files first,
+  summarize the current project purpose and product specification state, and
+  ask what restart scope the user wants before backing up, removing,
+  overwriting, or refreshing existing harness files.
+- Interpret restart scope from the user's free-form answer. For example,
+  `purpose` means restart the whole harness from the project purpose, while
+  `product` means preserve the project purpose in `AGENTS.md`, back up the
+  current product/specification files in scope, and restart product
+  specification work in `docs/PRODUCT.md`.
 - If `AGENTS.md` already exists, ask the user whether the current `AGENTS.md` is right.
 - If not, ask for the purpose of this project.
 - If `AGENTS.md` does not exist, copy it from the installed templates.
 - Update only the project-purpose portion of `AGENTS.md`.
+- Keep product behavior, requirements, scope, success criteria, and workflow
+  details out of `AGENTS.md`; these specification details belong in
+  `docs/PRODUCT.md` through `ahe-spec`.
 - Ask whether the project language is Python using a Codex-supported structured response request with meaningful options and custom input.
 - If the user answers "No", ask again: "Which language do you use?".
-- When exact `ahe init` is used for a fresh start on an existing harness, back
-  up the current harness files under `.ahe/backups/`, remove the resettable
-  harness files, and continue the initialization flow.
+- When exact `ahe init` is used for a user-scoped restart on an existing
+  harness, back up the affected current harness files under `.ahe/backups/`,
+  remove only the files in the chosen restart scope, and continue the
+  initialization flow.
 - Copy missing template-managed root files from `ahe-shared/templates`, excluding `PRODUCT.md`, and ask for explicit overwrite confirmation before replacing an existing file.
 - Execute the following three sequential steps:
   1. complete init setup work
@@ -97,6 +112,8 @@ The installed skills must not store workspace runtime state under `.codex/`.
 ### `ahe-spec` (internal)
 
 - Modify `docs/PRODUCT.md`, `docs/constraints.md`, and `docs/achitecture.md`.
+- Treat `docs/PRODUCT.md` as the canonical home for product specification
+  details collected during `ahe init`.
 - Ask recursively for product, constraint, and architecture details until the affected specification areas are clear.
 - Update only the relevant docs among the three specification files.
 

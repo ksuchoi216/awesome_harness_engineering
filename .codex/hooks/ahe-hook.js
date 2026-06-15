@@ -62,14 +62,17 @@ const AHE_INIT_DIRECTIVE = [
     AHE_DIRECTIVE_MARKER,
     "AHE automatic operation activated.",
     "",
-    "The user sent the exact AHE init command. Treat this as a new start request:",
+    "The user sent the exact AHE init command. Treat this as a possible new start request:",
     "",
     "1. Route to `$ahe-init` first.",
-    "2. Treat this flow as a new start, not a progress continuation.",
-    "3. Read existing harness files only to determine whether initialization must refresh or overwrite them safely.",
-    "4. Use `ahe-thinking` before clarification when the next setup step is uncertain.",
-    "5. If clarification is needed, call `ahe-conversation` for the exact missing detail.",
-    "6. Continue through initialization work until the new start path is clear.",
+    "2. If no AHE-managed harness files exist, start initialization normally.",
+    "3. If any AHE-managed harness file exists, read the existing files, summarize the current project purpose and product specification state, and ask what restart scope the user wants.",
+    "4. Do not back up, remove, overwrite, or refresh existing harness files before the user answers the restart-scope question.",
+    "5. Interpret the restart scope from the user's free-form answer; examples like `purpose` and `product` are not a closed list.",
+    "6. Product specification details belong in `docs/PRODUCT.md`, not `AGENTS.md`.",
+    "7. Use `ahe-thinking` before clarification when the next setup step is uncertain.",
+    "8. If clarification is needed, call `ahe-conversation` for the exact missing detail.",
+    "9. Continue through initialization work until the new start path is clear.",
 ].join("\\n");
 
 function isExactAheCommand(prompt) {

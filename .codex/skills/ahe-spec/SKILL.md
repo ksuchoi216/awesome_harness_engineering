@@ -21,6 +21,7 @@ Use it after `ahe-thinking` decides that specification work must continue.
 
 ### Sequential Spec Conversation Flow
 
+- `docs/PRODUCT.md` is the canonical home for product specification details collected during `ahe init`.
 - Clarify product goal, scope, and success criteria when `docs/PRODUCT.md` needs to change.
 - Clarify project constraints when `docs/constraints.md` needs to change.
 - Clarify architecture direction when `docs/achitecture.md` needs to change.
@@ -29,6 +30,8 @@ Use it after `ahe-thinking` decides that specification work must continue.
 
 ### Spec Completion
 
+- Write product behavior, scope, requirements, success criteria, and workflow details into `docs/PRODUCT.md`.
+- Do not move product specification details into `AGENTS.md`.
 - Update only the relevant docs among `docs/PRODUCT.md`, `docs/constraints.md`, and `docs/achitecture.md`.
 - Update `.ahe/process_status.json`.
 - Update `PROGRESS.md` and `SESSION-HANDOFF.md` when specification changes affect active work.

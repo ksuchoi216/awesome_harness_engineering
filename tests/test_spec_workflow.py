@@ -45,8 +45,22 @@ def test_skill_md_targets_all_spec_docs_and_tracking_files() -> None:
         )
 
 
+def test_product_spec_is_canonical_home_for_init_specification_details() -> None:
+    content = SKILL_MD_PATH.read_text(encoding="utf-8")
+    required_behaviors = [
+        "`docs/PRODUCT.md` is the canonical home for product specification details collected during `ahe init`.",
+        "Write product behavior, scope, requirements, success criteria, and workflow details into `docs/PRODUCT.md`.",
+        "Do not move product specification details into `AGENTS.md`.",
+    ]
+    for required_behavior in required_behaviors:
+        assert required_behavior in content, (
+            f"Missing canonical product-spec behavior '{required_behavior}' in ahe-spec"
+        )
+
+
 if __name__ == "__main__":
     test_skill_md_contains_spec_workflow_sections()
     test_skill_md_contains_expected_spec_conversation_contract()
     test_skill_md_targets_all_spec_docs_and_tracking_files()
+    test_product_spec_is_canonical_home_for_init_specification_details()
     print("test_spec_workflow.py passed!")
