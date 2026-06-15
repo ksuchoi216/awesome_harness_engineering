@@ -359,6 +359,16 @@
       ],
       "status": "done",
       "evidence": "Updated package.json with name @ksuchoi216/ahe and publishConfig. Added uninstall command to bin/ahe."
+    },
+    {
+      "id": "feat-037",
+      "name": "README Usage and Flow Documentation",
+      "description": "Explain the published AHE install commands, the exact Codex chat commands, and the end-to-end AHE workflow process in README.md.",
+      "dependencies": [
+        "feat-036"
+      ],
+      "status": "done",
+      "evidence": "Updated README.md to use the @ksuchoi216/ahe package name, document terminal maintenance commands, list exact chat commands (`ahe init`, `ahe-init`, `$ahe-init`, and `ahe`), and add a Mermaid process flow showing inspection, status, clarification, routing, spec updates, work execution, and tracker updates. Verified with `./init.sh`, `python3 -m json.tool feature-list.json`, `pytest tests/ -x`, and `ruff check src/`. `make check` is unavailable because the repository has no `check` target; `mypy src/ --strict` could not run because `mypy` is not installed."
     }
   ]
 }

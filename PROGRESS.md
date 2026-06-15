@@ -2,11 +2,13 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-15 16:07 +0900
-**Session ID:** feat-034-product-instructions-contract
+**Last Updated:** 2026-06-15 17:14 +0900
+**Session ID:** feat-037-readme-usage-flow-docs
 **Active Feature:** None
 
 ## Completed
+
+- [x] Implemented `feat-037 README Usage and Flow Documentation` by updating `README.md` to use the published `@ksuchoi216/ahe` package name, clearly separate terminal CLI maintenance commands from Codex chat workflow commands, list exact chat prompts (`ahe init`, `ahe-init`, `$ahe-init`, and `ahe`), and add a Mermaid process flow showing install, chat command routing, harness inspection, status reporting, clarification when specs are insufficient, workflow execution, and tracker updates. Updated `feature-list.json` with the completed documentation feature.
 
 - [x] Implemented `feat-035 AHE Init Alias Hook Detection` by updating the `UserPromptSubmit` hook so exact `ahe-init` and exact `$ahe-init` route to the same new-start directive as exact `ahe init`, while normal prompts that merely mention `ahe-init` still do not trigger AHE. Updated `docs/PRODUCT.md` and `tests/test_ahe_hook.py` to document and verify the alias behavior. Verified with `./init.sh`, `pytest tests/test_ahe_hook.py -x`, `pytest tests/ -k 'not helper_scripts_target_global_codex_home'`, `ruff check src/ tests/`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, direct hook smoke checks for `ahe init`, `ahe-init`, `$ahe-init`, and normal mention suppression, plus Python LSP diagnostics on `tests/test_ahe_hook.py`. Full `pytest tests/ -x` remains blocked by the pre-existing `scripts/install.sh` nested `npx --package=... ahe install` smoke path hanging or being killed with signal 9; `mypy` is not installed.
 
