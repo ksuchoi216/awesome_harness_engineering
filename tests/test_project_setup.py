@@ -45,7 +45,7 @@ def test_installer_package_metadata_exists() -> None:
 
     package_json = json.loads(package_json_path.read_text(encoding="utf-8"))
 
-    assert package_json["name"] == "ahe"
+    assert package_json["name"] == "ahe-codex"
     assert package_json["bin"]["ahe"] == "./bin/ahe"
 
 

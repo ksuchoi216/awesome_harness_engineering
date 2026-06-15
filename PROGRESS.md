@@ -235,3 +235,4 @@
 - `.codex/skills/ahe/SKILL.md`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_clear_workflow.py` - Added `ahe clear` workflow routing, behavior, tracking, and tests.
 - `.codex/skills/ahe/SKILL.md`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_clarification_prompt.py` - Added the exact clarification prompt format for unclear or under-detailed user responses.
 - [x] Implemented `feat-036 NPM Deployment Preparation` by renaming the package in `package.json` to `ahe-codex`, adding repository URL, author info, keywords, and prepublish scripts. Updated `AGENTS.md` and `docs/PRODUCT.md` so that the installation instructions now reflect the `ahe-codex` name, effectively enabling `npm install ahe-codex` or `npx --package=ahe-codex ahe install`.
+- [x] Added `scripts/deploy.sh` to provide an interactive, automated flow for publishing the `ahe-codex` package to npm.
