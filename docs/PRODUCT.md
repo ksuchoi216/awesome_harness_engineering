@@ -12,7 +12,7 @@ The user works in Codex chat, not primarily in the terminal. The package install
 
 - `$ahe-init`
 
-Users should start new harness work with exact `ahe init` or `$ahe-init`, and
+Users should start new harness work with exact `ahe init`, exact `ahe-init`, or `$ahe-init`, and
 continue existing harness work with exact `ahe`.
 
 The package also installs `ahe-thinking`, `ahe-conversation`, `ahe-spec`, and
@@ -51,8 +51,8 @@ The packaged install must create the following structure inside Codex home or th
     ahe-hook.js
 ```
 
-Only `$ahe-init` should be shown as a user-facing skill. Exact `ahe` and exact
-`ahe init` are the user-facing chat commands. The installed `ahe-thinking`
+Only `$ahe-init` should be shown as a user-facing skill. Exact `ahe`, exact
+`ahe init`, and exact `ahe-init` are the user-facing chat commands. The installed `ahe-thinking`
 skill is the internal decision layer that judges what
 must be clarified, what can be executed, and which workflow should run next.
 The installed `ahe-conversation` skill is internal support for multi-turn
@@ -111,11 +111,11 @@ The installed skills must not store workspace runtime state under `.codex/`.
 
 ### `ahe-spec` (internal)
 
-- Modify `docs/PRODUCT.md`, `docs/constraints.md`, and `docs/achitecture.md`.
-- Treat `docs/PRODUCT.md` as the canonical home for product specification
+- Modify `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md`. `docs/ARCHITECTURE.md` is optional.
+- Treat `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` as the required harness contract. `docs/PRODUCT.md` is the canonical home for product specification
   details collected during `ahe init`.
-- Ask recursively for product, constraint, and architecture details until the affected specification areas are clear.
-- Update only the relevant docs among the three specification files.
+- Ask recursively for product and instructions details until the affected specification areas are clear.
+- Update only the relevant docs among the specification files.
 
 ### `ahe-update` (internal)
 
@@ -132,19 +132,19 @@ The installed skills must not store workspace runtime state under `.codex/`.
 
 When the user sends exactly `ahe` in Codex chat, the installed
 `UserPromptSubmit` hook must inject an AHE progress directive. When the user
-sends exactly `ahe init`, the hook must inject a new-start directive. Normal
+sends exactly `ahe init`, exact `ahe-init`, or exact `$ahe-init`, the hook must inject a new-start directive. Normal
 prompts that merely mention AHE, such as "explain ahe", must not activate the
 flow.
 
 The directive must tell Codex to:
 
-- Inspect harness state before choosing a workflow: `AGENTS.md`, `docs/PRODUCT.md`, `feature-list.json`, and `PROGRESS.md`.
+- Inspect harness state before choosing a workflow: `AGENTS.md`, `docs/PRODUCT.md`, `docs/INSTRUCTIONS.md`, `feature-list.json`, and `PROGRESS.md`.
 - Run CodeGraph preflight before harness status reporting: check `command -v codegraph`; if missing, report `NOT INSTALLATION of codegraph`, skip `codegraph init` and `codegraph sync`, and continue with normal repo inspection.
 - If the CodeGraph CLI exists and `.codegraph/` is missing, run `codegraph init` before reviewing code.
 - If the CodeGraph CLI exists and `.codegraph/` is present, run `codegraph sync` before reviewing code.
 - Review code through CodeGraph when available after preflight succeeds by preferring CodeGraph MCP or exploration behavior.
 - Make the first response a concise harness engineering status report table before proceeding to edits or workflow execution.
-- Use a stable Markdown table with `Item` and `Content` columns, covering `AGENTS.md`, `PRODUCT.md`, `feature-list.json`, and `PROGRESS.md`.
+- Use a stable Markdown table with `Item` and `Content` columns, covering `AGENTS.md`, `PRODUCT.md`, `INSTRUCTIONS.md`, `feature-list.json`, and `PROGRESS.md`.
 - Keep the table short and readable.
 - Do not include the next step inside the table.
 - Use `ahe-thinking` as the internal decision layer before choosing the next
@@ -166,7 +166,7 @@ The directive must tell Codex to:
 - Follow this loop while routing work: `thinking -> conversation if needed ->
   execution -> thinking`.
 - Treat exact `ahe` as the progress path for continuing existing harness work.
-- Treat exact `ahe init` as the new-start path for beginning or reinitializing
+- Treat exact `ahe init`, exact `ahe-init`, and exact `$ahe-init` as the new-start path for beginning or reinitializing
   harness work through `$ahe-init`.
 
 ## 7. Thinking Protocol
@@ -216,7 +216,7 @@ If a user response needs clarification or more detail, each interactive AHE skil
 
 - Codex shows only `$ahe-init` as a user-facing skill instead of a broad AHE
   command list.
-- Users can start new harness work with exact `ahe init` and continue existing
+- Users can start new harness work with exact `ahe init`, exact `ahe-init`, or exact `$ahe-init` and continue existing
   harness work with exact `ahe`.
 - Exact `ahe` prompts activate automatic status, CodeGraph, and next-workflow routing; ordinary mentions of AHE do not.
 - The installer copies all user-facing skill directories, the internal

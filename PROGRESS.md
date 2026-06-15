@@ -2,11 +2,17 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-15 11:52 +0900
-**Session ID:** feat-032-scoped-ahe-init-restart
+**Last Updated:** 2026-06-15 16:07 +0900
+**Session ID:** feat-034-product-instructions-contract
 **Active Feature:** None
 
 ## Completed
+
+- [x] Implemented `feat-035 AHE Init Alias Hook Detection` by updating the `UserPromptSubmit` hook so exact `ahe-init` and exact `$ahe-init` route to the same new-start directive as exact `ahe init`, while normal prompts that merely mention `ahe-init` still do not trigger AHE. Updated `docs/PRODUCT.md` and `tests/test_ahe_hook.py` to document and verify the alias behavior. Verified with `./init.sh`, `pytest tests/test_ahe_hook.py -x`, `pytest tests/ -k 'not helper_scripts_target_global_codex_home'`, `ruff check src/ tests/`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, direct hook smoke checks for `ahe init`, `ahe-init`, `$ahe-init`, and normal mention suppression, plus Python LSP diagnostics on `tests/test_ahe_hook.py`. Full `pytest tests/ -x` remains blocked by the pre-existing `scripts/install.sh` nested `npx --package=... ahe install` smoke path hanging or being killed with signal 9; `mypy` is not installed.
+
+- [x] Implemented `feat-034 PRODUCT+INSTRUCTIONS Required Contract` by replacing the old constraints/architecture requirements with a new `docs/INSTRUCTIONS.md` contract. Updated `ahe-init`, `ahe-spec`, `ahe-thinking`, `ahe-conversation`, and `ahe-hook.js` to enforce `INSTRUCTIONS.md` alongside `PRODUCT.md` as the required harness documents. Updated `docs/PRODUCT.md` and tests (`test_init_workflow.py`, `test_spec_workflow.py`, `test_specialized_workflows.py`, `test_clarification_prompt.py`, `test_command_set.py`, `test_ahe_hook.py`) to drop the constraints doc and validate the new instructions doc. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`, and `node --check .codex/hooks/ahe-hook.js`.
+
+- [x] Implemented `feat-033 PRODUCT.md First Harness Contract` by enforcing `docs/PRODUCT.md` as the canonical source of truth for product/specification, making `feature-list.json` a derived tracker. Updated `ahe-hook.js`, `ahe-thinking`, `ahe-update`, `ahe-init`, and `ahe-spec` to prioritize `docs/PRODUCT.md` and require it to be populated before writing specific features. Updated `tests/test_ahe_hook.py`, `tests/test_spec_workflow.py`, `tests/test_specialized_workflows.py`, and `tests/test_init_workflow.py`. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`. `mypy` is not installed so it could not run.
 
 - [x] Implemented `feat-032 Scoped AHE Init Restart` by changing the `ahe-init` contract so empty workspaces start normally, existing AHE-managed harness files are read and summarized before any reset, and the user must choose a free-form restart scope before backup/removal/overwrite work begins. Updated `ahe-spec` and the exact `ahe init` hook so product specification details go to `docs/PRODUCT.md`, not `AGENTS.md`. Added contract coverage in `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, and `tests/test_ahe_hook.py`, then verified with `./init.sh`, `pytest tests/ -x`, JSON validation, `ruff check src/`, `node --check .codex/hooks/ahe-hook.js`, and LSP diagnostics. `mypy` is not installed, so the documented type-check command could not run.
 
@@ -89,7 +95,7 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-032 Scoped AHE Init Restart` is complete. Exact `ahe init` now starts immediately only when no harness files exist; existing harnesses require a scope question before any reset.
+  - Details: `feat-035 AHE Init Alias Hook Detection` is complete. Exact `ahe init`, exact `ahe-init`, and exact `$ahe-init` now inject the same AHE new-start directive.
   - Blockers: None.
 
 ## Blocked
@@ -104,6 +110,9 @@
 - **Specification details belong in `docs/PRODUCT.md`**: `AGENTS.md` remains limited to project purpose and base agent settings; product behavior, requirements, success criteria, and workflow details flow through `ahe-spec`.
   - Context: The user clarified that free conversation during `ahe init` can produce specification details, but those details should be reflected in `product.md` rather than expanding `AGENTS.md`.
   - Alternatives considered: Keeping all init-collected detail in `AGENTS.md` would blur the project-purpose file with the product specification.
+- **Exact init aliases are new-start commands**: The hook now treats exact `ahe-init` and exact `$ahe-init` as aliases for exact `ahe init`, but still ignores normal sentences that merely mention those strings.
+  - Context: The user reported that `ahe init` or `ahe-init` did not seem to be detected; local reproduction confirmed `ahe-init` and `$ahe-init` emitted no hook output.
+  - Alternatives considered: Supporting only `$ahe-init` through Codex skill invocation would leave the plain `ahe-init` chat command ambiguous and would not fix the observed hook detection gap.
 
 - **AHE keyword detection acts via a hook, not a skill trigger**: Added `ahe-hook.js` and `hooks.json` to leverage Codex's `UserPromptSubmit` hook instead of just adding a `triggers` block to `ahe-help`.
   - Context: The user requested "detecting the 'ahe' in user's query like ultrawork in codex", and ultrawork works by injecting a transparent directive via hooks.
@@ -186,6 +195,7 @@
 
 ## Change Log
 
+- `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, `tests/test_ahe_hook.py`, `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md` - Added exact init alias hook detection for `ahe-init` and `$ahe-init`, with normal mention suppression.
 - `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-spec/SKILL.md`, `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, `tests/test_ahe_hook.py` - Added scoped `ahe init` restart semantics and canonical `docs/PRODUCT.md` specification placement.
 - `.codex/hooks/hooks.json`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `scripts/uninstall.sh`, `tests/test_project_setup.py`, `feature-list.json` - Added native keyword detection via a Node.js `UserPromptSubmit` hook script.
 - `.codex/skills/ahe-thinking/SKILL.md`, `.codex/skills/ahe-conversation/SKILL.md`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-spec/SKILL.md`, `.codex/skills/ahe-update/SKILL.md`, `.codex/skills/ahe-clear/SKILL.md`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `scripts/uninstall.sh`, `docs/PRODUCT.md`, `feature-list.json`, `SESSION-HANDOFF.md`, `tests/test_ahe_hook.py`, `tests/test_clarification_prompt.py`, `tests/test_command_set.py`, `tests/test_project_setup.py` - Added the internal `ahe-thinking` orchestrator, split decision-making from recursive clarification, and changed exact `ahe` routing from post-table confirmation into automatic state classification and continuation.

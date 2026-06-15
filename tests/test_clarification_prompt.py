@@ -48,8 +48,7 @@ def test_skill_md_contains_representative_skill_specific_rules() -> None:
         REPO_ROOT / ".codex/skills/ahe-spec/SKILL.md"
     ).read_text(encoding="utf-8")
     assert "docs/PRODUCT.md" in spec_content
-    assert "docs/constraints.md" in spec_content
-    assert "docs/achitecture.md" in spec_content
+    assert "docs/INSTRUCTIONS.md" in spec_content
     assert "success" in spec_content.lower()
 
     assert "overwrite" in init_content.lower()

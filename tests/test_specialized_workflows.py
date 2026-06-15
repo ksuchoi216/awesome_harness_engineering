@@ -25,8 +25,7 @@ def test_skill_md_contains_spec_workflow() -> None:
     content = SPEC_SKILL_MD_PATH.read_text(encoding="utf-8")
     assert "## Command Workflow: ahe-spec" in content
     assert "docs/PRODUCT.md" in content
-    assert "docs/constraints.md" in content
-    assert "docs/achitecture.md" in content
+    assert "docs/INSTRUCTIONS.md" in content
 
 
 def test_skill_md_contains_update_workflow() -> None:
@@ -37,7 +36,7 @@ def test_skill_md_contains_update_workflow() -> None:
     assert "append" in content.lower() or "capture" in content.lower()
     assert "Apply the queued `docs/todo.md` content to `docs/PRODUCT.md`." in content
     assert "Remove the applied content from `docs/todo.md`" in content
-    assert "Update `feature-list.json`." in content
+    assert "Update `feature-list.json` to derive the specific feature items from the updated `docs/PRODUCT.md`." in content
     assert "Update `PROGRESS.md`." in content
     assert "Update `SESSION-HANDOFF.md`." in content
 

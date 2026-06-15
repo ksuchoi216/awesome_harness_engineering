@@ -20,7 +20,7 @@ one of these:
 
 - Project purpose or target user.
 - Product behavior, scope, success criteria, or out-of-scope boundaries.
-- Implementation constraints, architecture direction, or verification commands.
+- Implementation instructions, architecture direction, or verification commands.
 - Harness file ownership, overwrite behavior, or reset behavior.
 - `.ahe/process_status.json`, `PROGRESS.md`, or `SESSION-HANDOFF.md` state.
 - The next workflow step when several valid paths are possible.

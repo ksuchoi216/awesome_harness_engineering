@@ -19,8 +19,7 @@ def test_skill_md_contains_expected_spec_conversation_contract() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
     required_inputs = [
         "Clarify product goal, scope, and success criteria",
-        "Clarify project constraints",
-        "Clarify architecture direction",
+        "Clarify project instructions",
         "Update only the relevant docs",
     ]
     for required_input in required_inputs:
@@ -33,8 +32,7 @@ def test_skill_md_targets_all_spec_docs_and_tracking_files() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
     required_updates = [
         "docs/PRODUCT.md",
-        "docs/constraints.md",
-        "docs/achitecture.md",
+        "docs/INSTRUCTIONS.md",
         ".ahe/process_status.json",
         "PROGRESS.md",
         "SESSION-HANDOFF.md",
@@ -50,6 +48,7 @@ def test_product_spec_is_canonical_home_for_init_specification_details() -> None
     required_behaviors = [
         "`docs/PRODUCT.md` is the canonical home for product specification details collected during `ahe init`.",
         "Write product behavior, scope, requirements, success criteria, and workflow details into `docs/PRODUCT.md`.",
+        "`docs/PRODUCT.md` is the canonical source of truth. Concrete feature items for `feature-list.json` must be derived from it only after it has been populated.",
         "Do not move product specification details into `AGENTS.md`.",
     ]
     for required_behavior in required_behaviors:

@@ -12,10 +12,11 @@ Use this skill when the user invokes `$ahe-init`.
 ### Workspace Inspection
 
 - Read `AGENTS.md` if it already exists.
-- Read `docs/PRODUCT.md`, `docs/constraints.md`, and `docs/achitecture.md` when they exist.
+- Read `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` when they exist.
+- Read `docs/ARCHITECTURE.md` if it exists, but treat it as an optional document.
 - Read existing workspace-root harness files that may be copied from templates, including `PROGRESS.md`, `SESSION-HANDOFF.md`, `feature-list.json`, and `init.sh`.
 - Read `.ahe/process_status.json` when it exists.
-- Treat `AGENTS.md`, `docs/PRODUCT.md`, `docs/constraints.md`, `docs/achitecture.md`, `PROGRESS.md`, `SESSION-HANDOFF.md`, `feature-list.json`, `init.sh`, and `.ahe/process_status.json` as AHE-managed harness files for restart-scope decisions.
+- Treat `AGENTS.md`, `docs/PRODUCT.md`, `docs/INSTRUCTIONS.md`, `PROGRESS.md`, `SESSION-HANDOFF.md`, `feature-list.json`, `init.sh`, and `.ahe/process_status.json` as AHE-managed harness files for restart-scope decisions.
 
 ### Sequential Conversation Flow
 
@@ -34,7 +35,8 @@ Use this skill when the user invokes `$ahe-init`.
 - Update only the `PROJECT_PURPOSE` portion of `AGENTS.md`.
 - Keep `AGENTS.md` limited to the project purpose and base agent settings.
 - Do not put product specification details in `AGENTS.md`.
-- Send product behavior, scope, requirements, success criteria, and workflow details to `ahe-spec` so they are written in `docs/PRODUCT.md`.
+- Send product behavior, scope, requirements, success criteria, and workflow details to `ahe-spec` so they are written in `docs/PRODUCT.md` first.
+- Generating an empty `feature-list.json` from a template is allowed, but do not write concrete feature items until `docs/PRODUCT.md` is populated.
 - Ask whether the project language is Python using a Codex-supported structured response request with meaningful options and custom input.
 - If the user answers that the project language is not Python, ask again: "Which language do you use?".
 - If the workspace already has active harness files and the user chooses a restart scope, create a timestamped backup directory under `.ahe/backups/`.
@@ -45,7 +47,7 @@ Use this skill when the user invokes `$ahe-init`.
 - Copy the current `feature-list.json` into the backup directory when it exists.
 - Copy `init.sh` into the backup directory when it exists.
 - Copy the `docs/` folder into the backup directory when it exists.
-- Remove the previous `docs/PRODUCT.md` when the chosen restart scope includes product specification after backup.
+- Remove the previous `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` when the chosen restart scope includes product specification after backup.
 - Remove the previous `PROGRESS.md` when the chosen restart scope includes progress tracking after backup.
 - Remove the previous `SESSION-HANDOFF.md` when the chosen restart scope includes session handoff after backup.
 - Remove the previous `feature-list.json` when the chosen restart scope includes feature tracking after backup.
@@ -65,6 +67,7 @@ Use this skill when the user invokes `$ahe-init`.
 - Create `.ahe/process_status.json` and update it at each step to indicate the active status from the three-step sequence.
 - Create missing harness files from `.codex/ahe-shared/templates/`.
 - Keep the generated files aligned with the installed shared templates.
+- Only allow additions/removals/edits to `docs/INSTRUCTIONS.md` inside `## CAN CHANGE INSTRUCTIONS`; preserve `## MUST NOT CHANGE INSTRUCTIONS`.
 
 ## Clarification Rule
 

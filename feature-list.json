@@ -319,6 +319,36 @@
       ],
       "status": "done",
       "evidence": "Updated `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-spec/SKILL.md`, `.codex/hooks/ahe-hook.js`, and `docs/PRODUCT.md` so exact `ahe init` asks for a free-form restart scope when existing AHE-managed files are present, preserves `AGENTS.md` for project purpose/base settings, and sends product specification details to `docs/PRODUCT.md`. Added contract coverage in `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, and `tests/test_ahe_hook.py`. Verified with `./init.sh`, `pytest tests/ -x`, `python3 -m json.tool feature-list.json`, `python3 -m json.tool .ahe/process_status.json`, `ruff check src/`, `node --check .codex/hooks/ahe-hook.js`, and LSP diagnostics on changed Python tests. `mypy src/ --strict` could not run because `mypy` is not installed."
+    },
+    {
+      "id": "feat-033",
+      "name": "PRODUCT.md First Harness Contract",
+      "description": "Enforce `docs/PRODUCT.md` as the canonical source of truth for product/specification, making `feature-list.json` a derived tracker. Require `docs/PRODUCT.md` to be populated before writing specific features.",
+      "dependencies": [
+        "feat-032"
+      ],
+      "status": "done",
+      "evidence": "Updated `ahe-hook.js`, `ahe-thinking`, `ahe-update`, `ahe-init`, `ahe-spec` to prioritize `docs/PRODUCT.md` and treat `feature-list.json` as derived. Updated `test_ahe_hook.py`, `test_spec_workflow.py`, `test_specialized_workflows.py`, `test_init_workflow.py`. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`. `mypy` not installed."
+    },
+    {
+      "id": "feat-034",
+      "name": "PRODUCT+INSTRUCTIONS Required Contract",
+      "description": "Make docs/PRODUCT.md and docs/INSTRUCTIONS.md the required AHE harness spec documents, replacing constraints.md and making architecture.md optional.",
+      "dependencies": [
+        "feat-033"
+      ],
+      "status": "done",
+      "evidence": "Created .codex/ahe-shared/templates/INSTRUCTIONS.md, updated AGENTS.md, ahe-init, ahe-spec, ahe-thinking, ahe-conversation, ahe-hook.js, docs/PRODUCT.md, and all verification tests to drop mandatory constraints/architecture enforcement and replace it with INSTRUCTIONS.md. Verified with pytest tests/ -x, ruff check, and node --check."
+    },
+    {
+      "id": "feat-035",
+      "name": "AHE Init Alias Hook Detection",
+      "description": "Detect exact `ahe-init` and exact `$ahe-init` as new-start aliases for exact `ahe init` while keeping ordinary mentions inactive.",
+      "dependencies": [
+        "feat-031"
+      ],
+      "status": "done",
+      "evidence": "Updated `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, and `tests/test_ahe_hook.py` so exact `ahe-init` and exact `$ahe-init` emit the same new-start directive as exact `ahe init`, while prompts that merely mention `ahe-init` do not trigger. Verified with `./init.sh`, `pytest tests/test_ahe_hook.py -x`, `pytest tests/ -k 'not helper_scripts_target_global_codex_home'`, `ruff check src/ tests/`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, direct hook smoke checks for `ahe init`, `ahe-init`, `$ahe-init`, and mention suppression, plus Python LSP diagnostics on `tests/test_ahe_hook.py`. Full `pytest tests/ -x` remains blocked by the existing helper-script installer smoke path hanging or being killed inside nested `npx`; `mypy` is not installed."
     }
   ]
 }

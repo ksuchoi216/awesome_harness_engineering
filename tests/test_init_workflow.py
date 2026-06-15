@@ -57,7 +57,7 @@ def test_skill_md_absorbs_reset_and_backup_behavior_for_new_start() -> None:
         ".ahe/backups/",
         "Copy `AGENTS.md` into the backup directory",
         "Copy the current `docs/PRODUCT.md` into the backup directory",
-        "Remove the previous `docs/PRODUCT.md`",
+        "Remove the previous `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md`",
         "Remove the previous `feature-list.json`",
         "new start",
     ]
@@ -89,7 +89,8 @@ def test_skill_md_keeps_specification_details_out_of_agents_md() -> None:
     required_behaviors = [
         "Keep `AGENTS.md` limited to the project purpose and base agent settings.",
         "Do not put product specification details in `AGENTS.md`.",
-        "Send product behavior, scope, requirements, success criteria, and workflow details to `ahe-spec` so they are written in `docs/PRODUCT.md`.",
+        "Send product behavior, scope, requirements, success criteria, and workflow details to `ahe-spec` so they are written in `docs/PRODUCT.md` first.",
+        "Generating an empty `feature-list.json` from a template is allowed, but do not write concrete feature items until `docs/PRODUCT.md` is populated.",
     ]
     for required_behavior in required_behaviors:
         assert required_behavior in content, (
