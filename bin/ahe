@@ -31,6 +31,7 @@ usage() {
   cat <<'EOF'
 Usage:
   ahe install [--force] [--backup]
+  ahe uninstall
   ahe doctor
   ahe version
 EOF
@@ -185,6 +186,24 @@ doctor() {
   printf 'AHE skill installation looks healthy.\n'
 }
 
+uninstall_skill() {
+  local target_skills_dir="${PWD}/.codex/skills"
+  local target_shared_dir="${PWD}/.codex/ahe-shared"
+  local target_hooks_dir="${PWD}/.codex/hooks"
+  local skill_name=""
+
+  echo "Uninstalling AHE skills from ${PWD}/.codex..."
+
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    rm -rf "${target_skills_dir}/${skill_name}"
+  done
+
+  rm -rf "${target_shared_dir}"
+  rm -rf "${target_hooks_dir}"
+
+  echo "AHE skills uninstalled successfully."
+}
+
 main() {
   if [ "$#" -eq 0 ]; then
     usage
@@ -197,6 +216,9 @@ main() {
   case "${command}" in
     install)
       install_skill "$@"
+      ;;
+    uninstall)
+      uninstall_skill
       ;;
     doctor)
       doctor

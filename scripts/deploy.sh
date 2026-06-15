@@ -37,7 +37,7 @@ fi
 echo "Publishing package to npm..."
 if npm publish; then
     echo "Successfully published to npm!"
-    echo "You can now install the package globally with: npm install -g ahe-codex"
+    echo "You can now install the package globally with: npm install -g @ksuchoi216/ahe"
 else
     echo "Failed to publish to npm. Check the error messages above."
     exit 1

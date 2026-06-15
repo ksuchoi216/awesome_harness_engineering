@@ -207,7 +207,7 @@ If a user response needs clarification or more detail, each interactive AHE skil
 - Local development install after cloning the repo:
   - `npx --yes --package=file:. ahe install`
 - **Global Published Installation**
-  - `npx --package=ahe-codex ahe install` (or `npm install -g ahe-codex` then `ahe install`)
+  - `npx --package=@ksuchoi216/ahe ahe install` (or `npm install -g @ksuchoi216/ahe` then `ahe install`)
 - Helper scripts:
   - `scripts/install.sh` installs into `~/.codex`
   - `scripts/uninstall.sh` removes the installed AHE skills, `.codex/ahe-shared`, and `.codex/hooks`

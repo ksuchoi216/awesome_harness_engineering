@@ -236,3 +236,6 @@
 - `.codex/skills/ahe/SKILL.md`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_clarification_prompt.py` - Added the exact clarification prompt format for unclear or under-detailed user responses.
 - [x] Implemented `feat-036 NPM Deployment Preparation` by renaming the package in `package.json` to `ahe-codex`, adding repository URL, author info, keywords, and prepublish scripts. Updated `AGENTS.md` and `docs/PRODUCT.md` so that the installation instructions now reflect the `ahe-codex` name, effectively enabling `npm install ahe-codex` or `npx --package=ahe-codex ahe install`.
 - [x] Added `scripts/deploy.sh` to provide an interactive, automated flow for publishing the `ahe-codex` package to npm.
+- [x] Changed package name to `@ksuchoi216/ahe` per the user's request, referencing the `@openai/codex` convention.
+- [x] Added `publishConfig: {"access": "public"}` to `package.json` to allow publishing scoped packages.
+- [x] Implemented `ahe uninstall` inside `bin/ahe` to provide users an easy way to clean up installed Codex skills.

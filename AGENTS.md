@@ -4,7 +4,7 @@
 Automatically build harness by using the templates.
 user will use codex to use this skill in codex's conversation(chat), not in terminal.
 for local development after cloning the repo, install with `npx --yes --package=file:. ahe install`.
-after deployment, the target user command is `npx --package=ahe-codex ahe install` (or `npm install -g ahe-codex` then `ahe install`).
+after deployment, the target user command is `npx --package=@ksuchoi216/ahe ahe install` (or `npm install -g @ksuchoi216/ahe` then `ahe install`).
 templates folder is for initilizing, and for agent, product, constraint, init.sh, feature-list.json, PROGRESS.md, SESSION-HANDOFF.md, schemas, examples
 don't modify the template.
 

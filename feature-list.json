@@ -353,12 +353,12 @@
     {
       "id": "feat-036",
       "name": "NPM Deployment Preparation",
-      "description": "Prepare package.json for NPM deployment with ahe-codex package name and update related documentation.",
+      "description": "Prepare package.json for NPM deployment with @ksuchoi216/ahe package name and implement ahe uninstall command.",
       "dependencies": [
         "feat-035"
       ],
       "status": "done",
-      "evidence": "Updated package.json with name ahe-codex, repository, keywords, and author. Updated AGENTS.md and docs/PRODUCT.md to reflect the new npx installation command."
+      "evidence": "Updated package.json with name @ksuchoi216/ahe and publishConfig. Added uninstall command to bin/ahe."
     }
   ]
 }
