@@ -17,10 +17,9 @@ Use it after `ahe-thinking` decides that tracked harness work should be synchron
 - Read `SESSION-HANDOFF.md`.
 - Read `docs/todo.md` when it exists.
 - If the user is adding new work, clarify the todo item, append it under the last `## TODO` section in `docs/todo.md`, and create that section when it does not exist.
-- Update `feature-list.json` so queued todo work is visible before any spec synchronization.
-- Apply the queued `docs/todo.md` content to `docs/PRODUCT.md`. if `docs/PRODUCT.md` does not exist, create it.
+- Apply the queued `docs/todo.md` content to `docs/PRODUCT.md`. If `docs/PRODUCT.md` does not exist, create it.
 - Remove the applied content from `docs/todo.md` because that todo content was already applied in `docs/PRODUCT.md`.
-- Update `feature-list.json`.
+- Update `feature-list.json` to derive the specific feature items from the updated `docs/PRODUCT.md`.
 - Update `PROGRESS.md`.
 - Update `SESSION-HANDOFF.md`.
 

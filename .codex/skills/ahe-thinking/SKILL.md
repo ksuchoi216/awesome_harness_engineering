@@ -56,7 +56,12 @@ safely.
 
 ## Next-Step Decision
 
-- If harness essentials are missing or inconsistent, classify the state as
+- If `docs/PRODUCT.md` or `docs/INSTRUCTIONS.md` is missing or empty, classify the state as
+  `harness engineering not enough` and prioritize product/instructions specification work.
+- `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` form the required harness contract. `docs/PRODUCT.md` is the product/specification source of truth, and
+  `feature-list.json` is a derived tracker. Do not write specific feature items
+  to `feature-list.json` until `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` are established.
+- If other harness essentials are missing or inconsistent, classify the state as
   `harness engineering not enough` and continue the harness-building workflow.
 - If the harness exists and there is unfinished tracked work, classify the
   state as `in the middle of building features` and continue the first safe

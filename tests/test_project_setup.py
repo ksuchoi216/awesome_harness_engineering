@@ -16,6 +16,7 @@ REQUIRED_SKILL_FILES = (
     Path(".codex/skills/ahe-update/SKILL.md"),
     Path(".codex/ahe-shared/templates/AGENTS.md"),
     Path(".codex/ahe-shared/templates/PRODUCT.md"),
+    Path(".codex/ahe-shared/templates/INSTRUCTIONS.md"),
     Path(".codex/ahe-shared/templates/PROGRESS.md"),
     Path(".codex/ahe-shared/templates/SESSION-HANDOFF.md"),
     Path(".codex/ahe-shared/templates/init.sh"),
@@ -44,7 +45,7 @@ def test_installer_package_metadata_exists() -> None:
 
     package_json = json.loads(package_json_path.read_text(encoding="utf-8"))
 
-    assert package_json["name"] == "ahe"
+    assert package_json["name"] == "@ksuchoi216/ahe"
     assert package_json["bin"]["ahe"] == "./bin/ahe"
 
 

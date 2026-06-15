@@ -14,8 +14,8 @@ const AHE_PROGRESS_DIRECTIVE = [
     "",
     "2. Inspect current harness state before choosing a workflow:",
     "   - Check `AGENTS.md`.",
-    "   - Check `docs/PRODUCT.md`.",
-    "   - Check `feature-list.json`.",
+    "   - Check `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` as the product/specification source of truth.",
+    "   - Check `feature-list.json` as a derived tracker.",
     "   - Check `PROGRESS.md`.",
     "   - Use `ahe-thinking` as the internal decision layer before choosing the next action.",
     "",
@@ -30,6 +30,7 @@ const AHE_PROGRESS_DIRECTIVE = [
     "     |---|---|",
     "     | AGENTS.md | Exists/missing, purpose status, and any obvious issue. |",
     "     | PRODUCT.md | Exists/missing, completion state, and whether product scope needs work. |",
+    "     | INSTRUCTIONS.md | Exists/missing, and whether instruction boundaries need work. |",
     "     | feature-list.json | Valid/missing/invalid, unfinished feature summary, and all-done status. |",
     "     | PROGRESS.md | Exists/missing and current session state. |",
     "   - Keep the table short and readable.",
@@ -37,8 +38,8 @@ const AHE_PROGRESS_DIRECTIVE = [
     "",
     "5. Decide the next AHE workflow with `ahe-thinking`:",
     "   - If no harness files exist, route to `$ahe-init`.",
-    "   - If harness files exist but core harness engineering is incomplete, classify the state as `harness engineering not enough` and continue harness engineering work.",
-    "   - If `feature-list.json` is missing or invalid, repair the harness state or route to initialization behavior.",
+    "   - If `docs/PRODUCT.md` or `docs/INSTRUCTIONS.md` is missing or empty, classify the state as `harness engineering not enough` and prioritize product/instructions specification.",
+    "   - If `feature-list.json` is missing or invalid, generating an empty one from template is allowed, but do not write specific features until `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` are created and organized.",
     "   - If any feature in `feature-list.json` has a status other than `done`, classify the state as `in the middle of building features` and continue the first unfinished feature whose dependencies are satisfied.",
     "   - Respect dependencies listed in `feature-list.json`; do not start a dependent feature before prerequisites are done.",
     "   - If all features are `done` and no obvious harness gap remains, classify the state as `completed all` and ask the user for the next task.",
@@ -62,22 +63,34 @@ const AHE_INIT_DIRECTIVE = [
     AHE_DIRECTIVE_MARKER,
     "AHE automatic operation activated.",
     "",
-    "The user sent the exact AHE init command. Treat this as a new start request:",
+    "The user sent the exact AHE init command. Treat this as a possible new start request:",
     "",
     "1. Route to `$ahe-init` first.",
-    "2. Treat this flow as a new start, not a progress continuation.",
-    "3. Read existing harness files only to determine whether initialization must refresh or overwrite them safely.",
-    "4. Use `ahe-thinking` before clarification when the next setup step is uncertain.",
-    "5. If clarification is needed, call `ahe-conversation` for the exact missing detail.",
-    "6. Continue through initialization work until the new start path is clear.",
+    "2. If no AHE-managed harness files exist, start initialization normally.",
+    "3. If any AHE-managed harness file exists, read the existing files, summarize the current project purpose and product specification state, and ask what restart scope the user wants.",
+    "4. Do not back up, remove, overwrite, or refresh existing harness files before the user answers the restart-scope question.",
+    "5. Interpret the restart scope from the user's free-form answer; examples like `purpose` and `product` are not a closed list.",
+    "6. Product/instructions specification details belong in `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md`, not `AGENTS.md`.",
+    "7. Use `ahe-thinking` before clarification when the next setup step is uncertain.",
+    "8. If clarification is needed, call `ahe-conversation` for the exact missing detail.",
+    "9. Continue through initialization work until the new start path is clear.",
 ].join("\\n");
 
 function isExactAheCommand(prompt) {
-    return prompt.trim().toLowerCase() === "ahe";
+    return normalizePrompt(prompt) === "ahe";
 }
 
 function isExactAheInitCommand(prompt) {
-    return prompt.trim().toLowerCase() === "ahe init";
+    const normalizedPrompt = normalizePrompt(prompt);
+    return (
+        normalizedPrompt === "ahe init" ||
+        normalizedPrompt === "ahe-init" ||
+        normalizedPrompt === "$ahe-init"
+    );
+}
+
+function normalizePrompt(prompt) {
+    return prompt.trim().toLowerCase();
 }
 
 async function main() {

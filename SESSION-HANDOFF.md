@@ -3,11 +3,25 @@
 ## Current Product Context
 
 - Goal: Keep AHE's Codex skill surface small and focused while preserving the harness specification docs.
-- Current status: `feat-031 Two-Entrypoint AHE Surface` is complete.
-- Branch / commit: `develop`; users now rely on exact `ahe init` for a new start and exact `ahe` for progress, while `ahe-init` absorbs the old reset path.
+- Current status: `feat-035 AHE Init Alias Hook Detection` is complete.
+- Branch / commit: `develop`; users now rely on exact `ahe init`, exact `ahe-init`, or exact `$ahe-init` for initialization or scoped restarts and exact `ahe` for progress.
 
 ## Last Completed Work
 
+- [x] Updated `.codex/hooks/ahe-hook.js` so exact `ahe-init` and exact `$ahe-init` emit the same AHE new-start directive as exact `ahe init`.
+- [x] Kept normal mention suppression intact: prompts like `please explain ahe-init` still do not trigger AHE.
+- [x] Updated `docs/PRODUCT.md` and `tests/test_ahe_hook.py` to document and verify the exact init aliases.
+- [x] Verified the change with `./init.sh`, `pytest tests/test_ahe_hook.py -x`, `pytest tests/ -k 'not helper_scripts_target_global_codex_home'`, `ruff check src/ tests/`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, direct hook smoke checks for `ahe init`, `ahe-init`, `$ahe-init`, and mention suppression, plus Python LSP diagnostics on `tests/test_ahe_hook.py`.
+- [x] Full `pytest tests/ -x` remains blocked by the existing helper-script installer smoke path: `scripts/install.sh` hangs or is killed with signal 9 inside nested `npx --yes --package=... ahe install`.
+
+- [x] Enforced `docs/PRODUCT.md` as the canonical source of truth for product specification, making `feature-list.json` a derived tracker.
+- [x] Updated `.codex/hooks/ahe-hook.js`, `.codex/skills/ahe-thinking/SKILL.md`, `.codex/skills/ahe-update/SKILL.md`, `.codex/skills/ahe-init/SKILL.md`, and `.codex/skills/ahe-spec/SKILL.md` to prioritize `docs/PRODUCT.md` creation and population before allowing specific features to be added.
+- [x] Updated `tests/test_ahe_hook.py`, `tests/test_spec_workflow.py`, `tests/test_specialized_workflows.py`, and `tests/test_init_workflow.py` to assert the new PRODUCT.md contract.
+- [x] Updated `.codex/skills/ahe-init/SKILL.md` so empty workspaces start normally, but existing AHE-managed harness files must be read and summarized before asking what restart scope the user wants.
+- [x] Required free-form restart-scope interpretation, including `purpose` as a full project-purpose restart and `product` as preserving `AGENTS.md` while restarting product specification work.
+- [x] Added guard language so existing harness files are not backed up, removed, overwritten, or refreshed until the restart scope is clear.
+- [x] Updated `.codex/skills/ahe-spec/SKILL.md`, `.codex/hooks/ahe-hook.js`, and `docs/PRODUCT.md` so product behavior, scope, requirements, success criteria, and workflow details belong in `docs/PRODUCT.md`, not `AGENTS.md`.
+- [x] Added contract coverage in `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, and `tests/test_ahe_hook.py`.
 - [x] Removed `.codex/skills/ahe-help/SKILL.md`.
 - [x] Removed `.codex/skills/ahe-clear/SKILL.md` and deleted `tests/test_clear_workflow.py`.
 - [x] Folded the previous reset/backup semantics into `.codex/skills/ahe-init/SKILL.md`.
@@ -81,13 +95,14 @@
 - `.codex/skills/ahe-conversation/SKILL.md` - Internal recursive clarification, conversation state, and resume-aware workflow protocol used by interactive AHE skills.
 - `.codex/skills/ahe-thinking/SKILL.md` - Internal decision protocol that judges the current project, feature, or sub-feature and decides whether AHE should clarify or execute next.
 - `.codex/skills/ahe-spec/SKILL.md` - Combined product, constraints, and architecture specification workflow.
-- `.codex/hooks/ahe-hook.js` - Exact `ahe` and exact `ahe init` command hook; the directives now split new-start and progress routing while keeping adaptive CodeGraph preflight for progress.
+- `.codex/hooks/ahe-hook.js` - Exact `ahe`, exact `ahe init`, exact `ahe-init`, and exact `$ahe-init` command hook; the directives split new-start and progress routing while keeping adaptive CodeGraph preflight for progress.
+- `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, `tests/test_ahe_hook.py` - Contract coverage for scoped restart semantics and canonical product-spec placement.
 - `.ahe/backups/20260608-215651/AGENTS.md` - Clear-workflow backup of the current global instructions.
 - `.ahe/backups/20260608-215651/docs/` - Clear-workflow backup of the current docs folder.
 - `.ahe/backups/20260608-215651/PROGRESS.md` - Clear-workflow backup of the current progress log.
 - `.ahe/backups/20260608-215651/SESSION-HANDOFF.md` - Clear-workflow backup of the current handoff file.
 - `.ahe/backups/20260608-215651/init.sh` - Clear-workflow backup of the current startup script.
-- `.codex/skills/ahe-init/SKILL.md` - The only user-facing installed skill; it now covers both first-time setup and fresh-start reset behavior.
+- `.codex/skills/ahe-init/SKILL.md` - The only user-facing installed skill; it now covers first-time setup and scoped restart behavior for existing harnesses.
 - `tests/test_clarification_prompt.py` - Contract coverage for Codex UI-compatible clarification guidance, skill-specific clarification sections, and the internal `ahe-conversation` protocol.
 - `.codex/skills/ahe-update/SKILL.md` - Update workflow that now consumes `docs/todo.md` into `docs/PRODUCT.md`.
 - `.codex/ahe-shared/` - Shared templates and schemas used by the split skills and installer.
@@ -112,12 +127,16 @@
 | Check | Command | Result | Notes |
 |---|---|---|---|
 | Init sanity | `./init.sh` | Pass | Startup check still reports the expected Python-default environment guidance. |
-| Full tests | `pytest tests/ -x` | Pass | Full contract suite passed after adding the internal `ahe-thinking` orchestrator and automatic exact `ahe` state classification. |
-| Lint | `ruff check src/` | Pass | Ruff reported no Python files under `src/` and still exited successfully. |
-| Type check | `mypy src/ --strict` | Not applicable | Command exited with code 2 because `src/` contains no `.py` or `.pyi` files under `src/`. |
+| Full tests | `pytest tests/ -x` | Blocked | Stops in `test_helper_scripts_target_global_codex_home` because nested `npx --yes --package=... ahe install` hangs or is killed with signal 9. |
+| Tests except blocked installer helper | `pytest tests/ -k 'not helper_scripts_target_global_codex_home'` | Pass | 45 passed, 1 deselected. |
+| Targeted tests | `pytest tests/test_ahe_hook.py -x` | Pass | Exact `ahe init`, `ahe-init`, and `$ahe-init` route to the new-start directive; normal mentions do not trigger. |
+| Lint | `ruff check src/` | Pass | Ruff reported no Python files under `src/` and exited successfully. |
+| Type check | `mypy src/ --strict`; `python3 -m mypy src/ --strict` | Blocked | `mypy` is not installed as a command or Python module in this workspace. |
+| LSP diagnostics | Changed Python test files | Pass | No diagnostics found for `tests/test_ahe_hook.py`; JavaScript LSP was unavailable because `typescript-language-server` is not installed. |
+| Hook syntax | `node --check .codex/hooks/ahe-hook.js` | Pass | Edited hook parses successfully. |
 | Shell syntax | `bash -n bin/ahe` and `bash -n scripts/uninstall.sh` | Pass | Installer and uninstaller scripts parse cleanly. |
 | JSON validation | `python3 -m json.tool feature-list.json` | Pass | `feature-list.json` is valid JSON. |
 | CodeGraph sync | `codegraph sync` | Pass | Local CodeGraph index synced after adaptive CodeGraph preflight hook edits. |
 | Runtime state JSON | `python3 -m json.tool .ahe/process_status.json` | Pass | Process status file is valid JSON. |
-| Installer checks | `bash bin/ahe doctor`, `bash bin/ahe version`, and `pytest tests/test_project_setup.py -x` | Pass | Split-skill install metadata, copy behavior, `npx` flow, internal protocol installation, and global helper scripts passed. |
+| Installer checks | `pytest tests/test_project_setup.py -x` | Blocked | The helper-script global install test hangs or is killed inside nested `npx`; not changed by the init-alias hook fix. |
 | Direct module tests | `python3 tests/test_*.py` modules | Not run this session | Full pytest coverage passed, so direct module execution was not repeated. |

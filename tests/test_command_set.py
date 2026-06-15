@@ -44,8 +44,7 @@ def test_split_skill_set_covers_required_context_docs() -> None:
     )
     for required_file in (
         "docs/PRODUCT.md",
-        "docs/constraints.md",
-        "docs/achitecture.md",
+        "docs/INSTRUCTIONS.md",
         "docs/todo.md",
         "feature-list.json",
         "PROGRESS.md",
