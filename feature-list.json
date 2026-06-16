@@ -369,6 +369,16 @@
       ],
       "status": "done",
       "evidence": "Updated README.md to use the @ksuchoi216/ahe package name, document terminal maintenance commands, list exact chat commands (`ahe init`, `ahe-init`, `$ahe-init`, and `ahe`), and add a Mermaid process flow showing inspection, status, clarification, routing, spec updates, work execution, and tracker updates. Verified with `./init.sh`, `python3 -m json.tool feature-list.json`, `pytest tests/ -x`, and `ruff check src/`. `make check` is unavailable because the repository has no `check` target; `mypy src/ --strict` could not run because `mypy` is not installed."
+    },
+    {
+      "id": "feat-038",
+      "name": "Broad Natural-Language AHE Router",
+      "description": "Make AHE parse varied human phrasing for harness/work-management intent, adaptive directive flow, and creating INSTRUCTIONS.md if missing.",
+      "dependencies": [
+        "feat-037"
+      ],
+      "status": "done",
+      "evidence": "Updated .codex/hooks/ahe-hook.js, .codex/skills/ahe-thinking/SKILL.md, and .codex/skills/ahe-spec/SKILL.md to support broad natural-language intents and explicit routing. Added test coverage in tests/test_ahe_hook.py. Verified with pytest tests/ -x."
     }
   ]
 }

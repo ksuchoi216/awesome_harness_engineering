@@ -69,6 +69,14 @@ safely.
 - If tracked work is complete and no obvious essential harness gap remains,
   classify the state as `completed all` and ask for the next task.
 
+## Broad User Intent Routing
+
+When the user provides a broad natural-language work intent (e.g., "add features", "update spec"), use their original prompt to determine the exact path:
+- Route **product/spec changes** to `ahe-spec`.
+- Route **instruction changes** to `ahe-spec`.
+- Route **feature/todo tracking** to `ahe-update`.
+- Route **unclear AHE work** to `ahe-conversation` and ask exactly one detail question before editing if the request is vague.
+
 ## Conversation Handoff
 
 If clarity is missing, call `ahe-conversation` with the exact missing `Why`,
