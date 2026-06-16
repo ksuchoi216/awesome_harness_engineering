@@ -208,9 +208,15 @@ If a user response needs clarification or more detail, each interactive AHE skil
   - `npx --yes --package=file:. ahe install`
 - **Global Published Installation**
   - `npx --package=@ksuchoi216/ahe ahe install` (or `npm install -g @ksuchoi216/ahe` then `ahe install`)
+- `ahe install` must remove stale AHE-owned entries from `.codex/config.toml`
+  before installing files. It must preserve unrelated plugin, hook, and agent
+  configuration.
+- `ahe uninstall` must remove installed AHE skills, shared assets, hooks, and
+  stale AHE-owned entries from `.codex/config.toml`. It must preserve unrelated
+  config entries.
 - Helper scripts:
   - `scripts/install.sh` installs into `~/.codex`
-  - `scripts/uninstall.sh` removes the installed AHE skills, `.codex/ahe-shared`, and `.codex/hooks`
+  - `scripts/uninstall.sh` removes the installed AHE skills, `.codex/ahe-shared`, `.codex/hooks`, and AHE-owned `.codex/config.toml` entries through the packaged uninstall command.
 
 ## 10. Success Criteria
 

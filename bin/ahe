@@ -19,6 +19,8 @@ readonly PACKAGE_ROOT="$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)"
 readonly SOURCE_SKILLS_DIR="${PACKAGE_ROOT}/.codex/skills"
 readonly SOURCE_SHARED_DIR="${PACKAGE_ROOT}/.codex/ahe-shared"
 readonly SOURCE_HOOKS_DIR="${PACKAGE_ROOT}/.codex/hooks"
+readonly AHE_CONFIG_BLOCK_START="# BEGIN AHE MANAGED CONFIG"
+readonly AHE_CONFIG_BLOCK_END="# END AHE MANAGED CONFIG"
 readonly MANAGED_SKILLS=(
   "ahe-init"
   "ahe-conversation"
@@ -46,6 +48,48 @@ backup_existing_installation() {
   timestamp="$(date '+%Y%m%d-%H%M%S')"
   mkdir -p "${backup_root}"
   mv "${target_dir}" "${backup_root}/${backup_name}-${timestamp}"
+}
+
+cleanup_ahe_config_entries() {
+  local config_path="$1"
+  local temp_path=""
+
+  if [ ! -f "${config_path}" ]; then
+    return 0
+  fi
+
+  temp_path="${config_path}.ahe-cleanup"
+  awk -v block_start="${AHE_CONFIG_BLOCK_START}" -v block_end="${AHE_CONFIG_BLOCK_END}" '
+    function is_ahe_header(line) {
+      return line ~ /^\[agents\."?ahe[-_][^]]*"?\]$/ ||
+        line ~ /^\[hooks\.state\."ahe[^"]*"\]$/ ||
+        line ~ /^\[plugins\."?ahe[^]]*"?\]$/ ||
+        line ~ /^\[plugins\."@ksuchoi216\/ahe[^"]*"\]$/
+    }
+
+    $0 == block_start {
+      skip = 1
+      next
+    }
+
+    $0 == block_end {
+      skip = 0
+      next
+    }
+
+    /^\[/ {
+      if (is_ahe_header($0)) {
+        skip = 1
+        next
+      }
+      skip = 0
+    }
+
+    skip != 1 {
+      print
+    }
+  ' "${config_path}" > "${temp_path}"
+  mv "${temp_path}" "${config_path}"
 }
 
 install_skill() {
@@ -82,9 +126,12 @@ install_skill() {
   local target_skills_dir="${PWD}/.codex/skills"
   local target_shared_dir="${PWD}/.codex/ahe-shared"
   local target_hooks_dir="${PWD}/.codex/hooks"
+  local target_config_path="${PWD}/.codex/config.toml"
   local backup_dir="${PWD}/.codex/_backups"
   local skill_name=""
   local skill_target=""
+
+  cleanup_ahe_config_entries "${target_config_path}"
 
   for skill_name in "${MANAGED_SKILLS[@]}"; do
     skill_target="${target_skills_dir}/${skill_name}"
@@ -190,6 +237,7 @@ uninstall_skill() {
   local target_skills_dir="${PWD}/.codex/skills"
   local target_shared_dir="${PWD}/.codex/ahe-shared"
   local target_hooks_dir="${PWD}/.codex/hooks"
+  local target_config_path="${PWD}/.codex/config.toml"
   local skill_name=""
 
   echo "Uninstalling AHE skills from ${PWD}/.codex..."
@@ -200,6 +248,7 @@ uninstall_skill() {
 
   rm -rf "${target_shared_dir}"
   rm -rf "${target_hooks_dir}"
+  cleanup_ahe_config_entries "${target_config_path}"
 
   echo "AHE skills uninstalled successfully."
 }

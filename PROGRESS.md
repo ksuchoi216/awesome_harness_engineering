@@ -2,11 +2,13 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-15 17:14 +0900
-**Session ID:** feat-037-readme-usage-flow-docs
+**Last Updated:** 2026-06-16 14:15 +0900
+**Session ID:** feat-039-config-cleanup-install-uninstall
 **Active Feature:** None
 
 ## Completed
+
+- [x] Implemented `feat-039 AHE Config Cleanup on Install and Uninstall` by updating `bin/ahe` so `ahe install` and `ahe uninstall` remove stale AHE-owned entries from `.codex/config.toml` while preserving unrelated config. Changed `scripts/uninstall.sh` to delegate through packaged `ahe uninstall`, documented the behavior in `docs/PRODUCT.md`, and added coverage in `tests/test_project_setup.py`. Verified with `./init.sh`, `pytest tests/ -x`, `pytest tests/test_project_setup.py -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `bash -n scripts/uninstall.sh`, and JSON validation. `mypy` is not installed as a command or module; `make check` has no target.
 
 - [x] Implemented `feat-038 Broad Natural-Language AHE Router` by updating `.codex/hooks/ahe-hook.js` to parse varied human phrasing for harness/work-management intent, adjusting `ahe-thinking` for explicit routing, and updating `ahe-spec` to create `docs/INSTRUCTIONS.md` from the template if missing. Added contract coverage in `tests/test_ahe_hook.py`. Verified with `./init.sh`, `pytest tests/ -x`.
 
@@ -99,7 +101,7 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-035 AHE Init Alias Hook Detection` is complete. Exact `ahe init`, exact `ahe-init`, and exact `$ahe-init` now inject the same AHE new-start directive.
+  - Details: `feat-039 AHE Config Cleanup on Install and Uninstall` is complete. Install/uninstall now clean only AHE-owned `.codex/config.toml` entries and preserve unrelated config.
   - Blockers: None.
 
 ## Blocked
