@@ -177,6 +177,11 @@ def test_broad_natural_language_ahe_intents() -> None:
         "we need a new requirement",
         "update the product spec",
         "track this as work",
+        "Please add a new feature for user login.",
+        "Let's update the product spec to include dark mode.",
+        "I need to track this bug fix as new work.",
+        "Can we add an instruction about writing clean code?",
+        "We have a new product requirement for the dashboard.",
     ]
     for prompt in prompts:
         context = additional_context_for_prompt(prompt)
@@ -192,7 +197,10 @@ def test_broad_natural_language_ignores_unrelated_prompts() -> None:
         "how to fix the bug",
         "add a new file for the product",
         "can you explain the spec?",
-        "write some code for this feature"
+        "write some code for this feature",
+        "Can you show me where the instructions are?",
+        "Please explain the requirements to me.",
+        "How do I update the database schema?"
     ]
     for prompt in prompts:
         assert hook_output_for_prompt(prompt) is None

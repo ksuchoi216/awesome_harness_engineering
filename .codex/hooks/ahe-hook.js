@@ -108,9 +108,6 @@ function isBroadAheIntent(prompt) {
         /explain/,
         /how to/,
         /how do/,
-        /fix/,
-        /bug/,
-        /code/,
         /file/,
         /error/,
         /issue/
