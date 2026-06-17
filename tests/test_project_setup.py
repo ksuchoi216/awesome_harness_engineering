@@ -236,26 +236,21 @@ def test_installer_supports_local_npx_package_flow(tmp_path: Path) -> None:
 
 
 def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
-    npx_binary = shutil.which("npx")
-
-    if npx_binary is None:
-        return
-
     fake_home = tmp_path / "home"
-    npm_cache_root = tmp_path / "npm-cache"
     fake_home.mkdir()
-    npm_cache_root.mkdir()
 
-    environment = os.environ.copy()
-    environment["HOME"] = str(fake_home)
-    environment["npm_config_cache"] = str(npm_cache_root)
+    package_root = tmp_path / "package"
+    package_root.mkdir()
+
+    shutil.copy2(REPO_ROOT / "package.json", package_root / "package.json")
+    shutil.copytree(REPO_ROOT / "bin", package_root / "bin")
+    shutil.copytree(REPO_ROOT / ".codex", package_root / ".codex")
 
     install_process = subprocess.run(
-        (str(REPO_ROOT / "scripts" / "install.sh"),),
-        cwd=REPO_ROOT,
+        (str(package_root / "bin" / "ahe"), "install"),
+        cwd=fake_home,
         check=False,
         capture_output=True,
-        env=environment,
         text=True,
     )
 
@@ -277,11 +272,10 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
     )
 
     uninstall_process = subprocess.run(
-        (str(REPO_ROOT / "scripts" / "uninstall.sh"),),
-        cwd=REPO_ROOT,
+        (str(package_root / "bin" / "ahe"), "uninstall"),
+        cwd=fake_home,
         check=False,
         capture_output=True,
-        env=environment,
         text=True,
     )
 

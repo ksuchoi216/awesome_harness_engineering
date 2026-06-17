@@ -4,9 +4,7 @@ set -euo pipefail
 # awesome_harness_engineering npm deploy script
 
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-PACKAGE_ROOT="$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)"
-
-cd "${PACKAGE_ROOT}"
+cd "${SCRIPT_DIR}"
 
 echo "Starting NPM deployment preparation..."
 
