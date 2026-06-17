@@ -2,11 +2,13 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-17 17:42 +0900
-**Session ID:** feat-040-internal-ahe-compression-skill
+**Last Updated:** 2026-06-17 19:18 +0900
+**Session ID:** feat-041-configurable-ahe-compression-thresholds
 **Active Feature:** None
 
 ## Completed
+
+- [x] Implemented `feat-041 Configurable AHE Compression Thresholds` by adding `.codex/ahe-shared/config.yaml` to specify per-file line limits for ahe-compression. Updated `scripts/check-harness-size.sh` to parse this config and use environment variable overrides (e.g., `AHE_AGENT_MD_LIMIT`). Updated `ahe-compression` and `ahe-thinking` SKILL.md docs, `docs/PRODUCT.md`, `bin/ahe`, and installer tests. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`, and `sh -n`.
 
 - [x] Implemented `feat-040 Internal AHE Compression Skill` by adding `.codex/skills/ahe-compression/SKILL.md` plus a deterministic `scripts/check-harness-size.sh` line-count detector. Updated `ahe-thinking`, exact/broad hook directives, `bin/ahe`, `docs/PRODUCT.md`, and contract tests so AHE decides on compression before reading oversized harness files wholesale. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`, skill quick validation, `bash -n bin/ahe`, `sh -n .codex/skills/ahe-compression/scripts/check-harness-size.sh`, `node --check .codex/hooks/ahe-hook.js`, and JSON validation.
 

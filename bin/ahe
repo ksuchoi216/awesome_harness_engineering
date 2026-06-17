@@ -216,6 +216,11 @@ doctor() {
     fi
   done
 
+  if [ ! -f "${target_shared_dir}/config.yaml" ]; then
+    printf 'Missing: %s/config.yaml\n' "${target_shared_dir}" >&2
+    exit 1
+  fi
+
   if [ ! -d "${target_shared_dir}/templates" ]; then
     printf 'Missing: %s/templates\n' "${target_shared_dir}" >&2
     exit 1

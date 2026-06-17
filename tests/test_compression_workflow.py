@@ -59,6 +59,66 @@ def test_product_docs_route_thinking_to_compression() -> None:
     assert '"ahe-compression"' in bin_content
 
 
+def test_config_yaml_overrides_thresholds(tmp_path: Path) -> None:
+    config_dir = tmp_path / ".codex" / "ahe-shared"
+    config_dir.mkdir(parents=True)
+    config_file = config_dir / "config.yaml"
+    config_file.write_text(
+        "agent_md: 80\n"
+        "product_md: 180\n"
+        "# This is a comment\n\n"
+        "total: 750\n",
+        encoding="utf-8"
+    )
+
+    harness_file = tmp_path / "AGENTS.md"
+    harness_file.write_text(
+        "\n".join(f"- item {index}" for index in range(80)) + "\n",
+        encoding="utf-8",
+    )
+
+    completed_process = run_detector(tmp_path, "AGENTS.md")
+
+    assert completed_process.returncode == 2
+    assert "COMPRESS\tAGENTS.md\t80\tlimit=80" in completed_process.stdout
+
+    config_file.write_text("agent_md: 100\n", encoding="utf-8")
+    
+    completed_process = run_detector(tmp_path, "AGENTS.md")
+    assert completed_process.returncode == 0
+    assert "OK\tAGENTS.md\t80\tlimit=100" in completed_process.stdout
+
+
+def test_config_yaml_total_override(tmp_path: Path) -> None:
+    config_dir = tmp_path / ".codex" / "ahe-shared"
+    config_dir.mkdir(parents=True)
+    config_file = config_dir / "config.yaml"
+    config_file.write_text("total: 100\n", encoding="utf-8")
+
+    harness_file = tmp_path / "AGENTS.md"
+    harness_file.write_text(
+        "\n".join(f"- item {index}" for index in range(105)) + "\n",
+        encoding="utf-8",
+    )
+
+    completed_process = run_detector(tmp_path, "AGENTS.md")
+
+    assert completed_process.returncode == 2
+    assert "COMPRESS_TOTAL\t105\tlimit=100" in completed_process.stdout
+
+
+def test_missing_config_preserves_defaults(tmp_path: Path) -> None:
+    harness_file = tmp_path / "AGENTS.md"
+    harness_file.write_text(
+        "\n".join(f"- item {index}" for index in range(179)) + "\n",
+        encoding="utf-8",
+    )
+
+    completed_process = run_detector(tmp_path, "AGENTS.md")
+    assert completed_process.returncode == 0
+    assert "OK\tAGENTS.md\t179\tlimit=180" in completed_process.stdout
+
+
 if __name__ == "__main__":
     test_product_docs_route_thinking_to_compression()
     print("test_compression_workflow.py passed!")

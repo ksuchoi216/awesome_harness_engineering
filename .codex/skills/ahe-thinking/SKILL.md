@@ -58,9 +58,9 @@ safely.
 
 - Before reading full harness files, decide whether compression is needed.
   Run `sh .codex/skills/ahe-compression/scripts/check-harness-size.sh` when the
-  script exists, or fall back to `wc -l` over `AGENTS.md`,
-  `docs/PRODUCT.md`, `docs/INSTRUCTIONS.md`, `feature-list.json`,
-  `PROGRESS.md`, `SESSION-HANDOFF.md`, and `docs/todo.md`.
+  script exists (which checks against configurable thresholds in `.codex/ahe-shared/config.yaml`),
+  or fall back to `wc -l` over `AGENTS.md`, `docs/PRODUCT.md`, `docs/INSTRUCTIONS.md`, 
+  `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `docs/todo.md`.
 - If the detector reports `COMPRESSION_REQUIRED` or exits with code `2`, call
   `ahe-compression` before normal routing. Do not spend context reading the
   oversized files wholesale first.

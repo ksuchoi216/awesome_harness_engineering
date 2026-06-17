@@ -41,6 +41,7 @@ The packaged install must create the following structure inside Codex home or th
     ahe-update/
       SKILL.md
   ahe-shared/
+    config.yaml
     templates/
       AGENTS.md
       PRODUCT.md
@@ -139,6 +140,7 @@ The installed skills must not store workspace runtime state under `.codex/`.
 ### `ahe-compression` (internal)
 
 - Provide a shell-script line-count detector for AHE-managed harness files.
+- Read configurable thresholds from `.codex/ahe-shared/config.yaml` with fallback to built-in defaults.
 - Treat oversized `AGENTS.md`, `docs/PRODUCT.md`, `docs/INSTRUCTIONS.md`,
   `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `docs/todo.md`
   as candidates for compression.

@@ -399,6 +399,16 @@
       ],
       "status": "done",
       "evidence": "Added `.codex/skills/ahe-compression/SKILL.md` and `scripts/check-harness-size.sh`, wired `ahe-thinking`, exact/broad hook directives, installer managed skill lists, docs, and contract tests to use `ahe-compression` before reading oversized harness files. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`, skill quick validation, `bash -n bin/ahe`, `sh -n .codex/skills/ahe-compression/scripts/check-harness-size.sh`, `node --check .codex/hooks/ahe-hook.js`, and `python3 -m json.tool feature-list.json`."
+    },
+    {
+      "id": "feat-041",
+      "name": "Configurable AHE Compression Thresholds",
+      "description": "Add a packaged .codex/ahe-shared/config.yaml that controls when ahe-thinking routes to ahe-compression.",
+      "dependencies": [
+        "feat-040"
+      ],
+      "status": "done",
+      "evidence": "Updated .codex/ahe-shared/config.yaml, check-harness-size.sh, SKILL.md docs, PRODUCT.md, bin/ahe, and tests. Verified with ./init.sh, pytest tests/ -x, ruff check src/ tests/, and sh -n."
     }
   ]
 }

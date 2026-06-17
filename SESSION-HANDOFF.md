@@ -3,10 +3,16 @@
 ## Current Product Context
 
 - Goal: Keep AHE's Codex skill surface small and focused while preserving the harness specification docs.
-- Current status: `feat-040 Internal AHE Compression Skill` is complete.
-- Branch / commit: `develop`; AHE now has an internal rule-based compression workflow for oversized harness context.
+- Current status: `feat-041 Configurable AHE Compression Thresholds` is complete.
+- Branch / commit: `develop`; AHE now uses `.codex/ahe-shared/config.yaml` to specify line limits for compression detection.
 
 ## Last Completed Work
+
+- [x] Added packaged `.codex/ahe-shared/config.yaml` to configure per-file line thresholds for compression routing.
+- [x] Updated `scripts/check-harness-size.sh` to parse the config file and support environment variable overrides (`AHE_AGENT_MD_LIMIT`, etc.).
+- [x] Updated `ahe-compression` and `ahe-thinking` skills to document the new `config.yaml` behavior.
+- [x] Updated `docs/PRODUCT.md`, `bin/ahe`, and installer tests to include the configuration file.
+- [x] Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`, and shell syntax checks.
 
 - [x] Added `.codex/skills/ahe-compression/SKILL.md` as an internal workflow skill, not a user-facing command.
 - [x] Added `.codex/skills/ahe-compression/scripts/check-harness-size.sh` to count AHE-managed harness file lines and exit `2` with `COMPRESSION_REQUIRED` when compression is needed.

@@ -29,15 +29,21 @@ The script checks these AHE-managed files when they exist:
 - `SESSION-HANDOFF.md`
 - `docs/todo.md`
 
-Default thresholds:
+Default thresholds are configured in `.codex/ahe-shared/config.yaml`:
 
-- Compress a single file at 180 lines or more.
-- Compress the combined harness context at 750 lines or more.
+- `agent_md`: 80
+- `product_md`: 180
+- `instructions_md`: 180
+- `feature_list_json`: 180
+- `progress_md`: 180
+- `session_handoff_md`: 180
+- `todo_md`: 180
+- `total`: 750 (combined harness context limit)
 
-Override thresholds only when the workspace has an explicit local rule:
+Override thresholds only when the workspace has an explicit local rule using environment variables (e.g., `AHE_AGENT_MD_LIMIT`, `AHE_FILE_LINE_LIMIT`, `AHE_TOTAL_LINE_LIMIT`):
 
 ```bash
-AHE_FILE_LINE_LIMIT=220 AHE_TOTAL_LINE_LIMIT=900 sh .codex/skills/ahe-compression/scripts/check-harness-size.sh
+AHE_AGENT_MD_LIMIT=100 AHE_TOTAL_LINE_LIMIT=900 sh .codex/skills/ahe-compression/scripts/check-harness-size.sh
 ```
 
 Exit code meanings:
