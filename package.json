@@ -1,6 +1,6 @@
 {
   "name": "@ksuchoi216/ahe",
-  "version": "0.1.2",
+  "version": "0.1.6",
   "description": "Codex chat workflow skill installer for Awesome Harness Engineering",
   "publishConfig": {
     "access": "public"
