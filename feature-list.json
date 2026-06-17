@@ -389,6 +389,16 @@
       ],
       "status": "done",
       "evidence": "Added config cleanup tests in `tests/test_project_setup.py`; updated `bin/ahe` to clean AHE-owned config tables and managed blocks during install/uninstall; changed `scripts/uninstall.sh` to delegate through packaged `ahe uninstall`; documented the behavior in `docs/PRODUCT.md`. Verified with `./init.sh`, `pytest tests/ -x`, `pytest tests/test_project_setup.py -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `bash -n scripts/uninstall.sh`, and JSON validation. `mypy` is not installed as a command or module; `make check` has no target."
+    },
+    {
+      "id": "feat-040",
+      "name": "Internal AHE Compression Skill",
+      "description": "Add an internal compression workflow so `ahe-thinking` can detect oversized harness-engineering files with a rule-based shell preflight and route to compression before reading large context.",
+      "dependencies": [
+        "feat-039"
+      ],
+      "status": "done",
+      "evidence": "Added `.codex/skills/ahe-compression/SKILL.md` and `scripts/check-harness-size.sh`, wired `ahe-thinking`, exact/broad hook directives, installer managed skill lists, docs, and contract tests to use `ahe-compression` before reading oversized harness files. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`, skill quick validation, `bash -n bin/ahe`, `sh -n .codex/skills/ahe-compression/scripts/check-harness-size.sh`, `node --check .codex/hooks/ahe-hook.js`, and `python3 -m json.tool feature-list.json`."
     }
   ]
 }

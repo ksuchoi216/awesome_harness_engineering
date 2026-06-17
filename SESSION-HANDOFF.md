@@ -3,10 +3,16 @@
 ## Current Product Context
 
 - Goal: Keep AHE's Codex skill surface small and focused while preserving the harness specification docs.
-- Current status: `feat-039 AHE Config Cleanup on Install and Uninstall` is complete.
-- Branch / commit: `develop`; installs and uninstalls now clean stale AHE-owned `.codex/config.toml` entries while preserving unrelated Codex config.
+- Current status: `feat-040 Internal AHE Compression Skill` is complete.
+- Branch / commit: `develop`; AHE now has an internal rule-based compression workflow for oversized harness context.
 
 ## Last Completed Work
+
+- [x] Added `.codex/skills/ahe-compression/SKILL.md` as an internal workflow skill, not a user-facing command.
+- [x] Added `.codex/skills/ahe-compression/scripts/check-harness-size.sh` to count AHE-managed harness file lines and exit `2` with `COMPRESSION_REQUIRED` when compression is needed.
+- [x] Updated `ahe-thinking` so it runs the compression detector before reading full harness files and calls `ahe-compression` when line-count thresholds are exceeded.
+- [x] Updated `.codex/hooks/ahe-hook.js`, `bin/ahe`, `docs/PRODUCT.md`, `feature-list.json`, and tests so packaged installs and exact/broad AHE routing include the internal compression skill.
+- [x] Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`, skill quick validation, shell syntax checks, hook syntax check, and JSON validation.
 
 - [x] Updated `bin/ahe` so `ahe install` and `ahe uninstall` remove stale AHE-owned config tables and managed blocks from `.codex/config.toml`.
 - [x] Kept config cleanup scoped to AHE-owned entries such as `agents.ahe-*`, AHE hook state tables, AHE plugin tables, and `# BEGIN/END AHE MANAGED CONFIG` blocks.
@@ -100,6 +106,8 @@
 - `docs/PRODUCT.md` - Canonical product specification and scope reference.
 - `.codex/skills/ahe-conversation/SKILL.md` - Internal recursive clarification, conversation state, and resume-aware workflow protocol used by interactive AHE skills.
 - `.codex/skills/ahe-thinking/SKILL.md` - Internal decision protocol that judges the current project, feature, or sub-feature and decides whether AHE should clarify or execute next.
+- `.codex/skills/ahe-compression/SKILL.md` - Internal compression protocol that tells AHE how to compact oversized harness files safely.
+- `.codex/skills/ahe-compression/scripts/check-harness-size.sh` - Rule-based shell detector used before reading large harness files wholesale.
 - `.codex/skills/ahe-spec/SKILL.md` - Combined product, constraints, and architecture specification workflow.
 - `.codex/hooks/ahe-hook.js` - Exact `ahe`, exact `ahe init`, exact `ahe-init`, and exact `$ahe-init` command hook; the directives split new-start and progress routing while keeping adaptive CodeGraph preflight for progress.
 - `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, `tests/test_ahe_hook.py` - Contract coverage for scoped restart semantics and canonical product-spec placement.
@@ -134,14 +142,14 @@
 | Check | Command | Result | Notes |
 |---|---|---|---|
 | Init sanity | `./init.sh` | Pass | Startup check still reports the expected Python-default environment guidance. |
-| Full tests | `pytest tests/ -x` | Pass | 51 passed. |
+| Full tests | `pytest tests/ -x` | Pass | 55 passed. |
 | Tests except blocked installer helper | `pytest tests/ -k 'not helper_scripts_target_global_codex_home'` | Not run this session | No longer needed because full pytest passed. |
 | Targeted tests | `pytest tests/test_project_setup.py -x` | Pass | 9 passed; covers direct install/uninstall and global helper cleanup of AHE-owned config entries. |
 | Lint | `ruff check src/ tests/` | Pass | Ruff reported all checks passed. |
 | Type check | `mypy src/ --strict`; `python3 -m mypy src/ --strict` | Blocked | `mypy` is not installed as a command or Python module in this workspace. |
 | LSP diagnostics | Changed Python test files | Pass | No diagnostics found for `tests/test_project_setup.py`. |
 | Hook syntax | `node --check .codex/hooks/ahe-hook.js` | Pass | Edited hook parses successfully. |
-| Shell syntax | `bash -n bin/ahe` and `bash -n scripts/uninstall.sh` | Pass | Installer and uninstaller scripts parse cleanly after config cleanup changes. |
+| Shell syntax | `bash -n bin/ahe` and `sh -n .codex/skills/ahe-compression/scripts/check-harness-size.sh` | Pass | Installer and compression detector parse cleanly. |
 | JSON validation | `python3 -m json.tool feature-list.json` | Pass | `feature-list.json` is valid JSON. |
 | CodeGraph sync | `codegraph sync` | Pass | Local CodeGraph index synced after adaptive CodeGraph preflight hook edits. |
 | Runtime state JSON | `python3 -m json.tool .ahe/process_status.json` | Pass | Process status file is valid JSON. |

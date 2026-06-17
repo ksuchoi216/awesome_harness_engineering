@@ -24,6 +24,7 @@ readonly AHE_CONFIG_BLOCK_END="# END AHE MANAGED CONFIG"
 readonly MANAGED_SKILLS=(
   "ahe-init"
   "ahe-conversation"
+  "ahe-compression"
   "ahe-thinking"
   "ahe-spec"
   "ahe-update"

@@ -15,8 +15,9 @@ The user works in Codex chat, not primarily in the terminal. The package install
 Users should start new harness work with exact `ahe init`, exact `ahe-init`, or `$ahe-init`, and
 continue existing harness work with exact `ahe`.
 
-The package also installs `ahe-thinking`, `ahe-conversation`, `ahe-spec`, and
-`ahe-update` as internal workflow skills. They are not user-facing commands.
+The package also installs `ahe-thinking`, `ahe-compression`,
+`ahe-conversation`, `ahe-spec`, and `ahe-update` as internal workflow skills.
+They are not user-facing commands.
 
 ## 3. Installed Layout
 
@@ -29,6 +30,10 @@ The packaged install must create the following structure inside Codex home or th
       SKILL.md
     ahe-thinking/
       SKILL.md
+    ahe-compression/
+      SKILL.md
+      scripts/
+        check-harness-size.sh
     ahe-conversation/
       SKILL.md
     ahe-spec/
@@ -60,6 +65,9 @@ clarification, stateful conversation, and resume-aware guidance after
 `ahe-thinking` identifies a missing decision. Shared templates and schemas must
 live outside `skills/`. Hooks provide exact-command routing support for users
 who type `ahe`.
+The installed `ahe-compression` skill is internal support for rule-based
+line-count detection and compression of oversized harness-engineering files
+before AHE spends context reading them.
 
 ## 4. Workspace Runtime State
 
@@ -128,6 +136,18 @@ The installed skills must not store workspace runtime state under `.codex/`.
 - Update `SESSION-HANDOFF.md`.
 - Keep `.ahe/process_status.json` aligned with the active workflow.
 
+### `ahe-compression` (internal)
+
+- Provide a shell-script line-count detector for AHE-managed harness files.
+- Treat oversized `AGENTS.md`, `docs/PRODUCT.md`, `docs/INSTRUCTIONS.md`,
+  `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `docs/todo.md`
+  as candidates for compression.
+- Return a deterministic compression decision before `ahe-thinking` reads large
+  files wholesale.
+- Compress only stale, duplicated, or historical context while preserving active
+  requirements, current decisions, unfinished work, blockers, dependencies,
+  required headers, and valid JSON.
+
 ## 6. Exact `ahe` Command Auto Operation
 
 When the user sends exactly `ahe` in Codex chat, the installed
@@ -149,6 +169,8 @@ The directive must tell Codex to:
 - Do not include the next step inside the table.
 - Use `ahe-thinking` as the internal decision layer before choosing the next
   action.
+- Use `ahe-compression` through `ahe-thinking` before reading full harness files
+  when rule-based line counts show oversized context.
 - Route to `$ahe-init` when no harness files exist.
 - Classify the harness into exactly one state after the table:
   - `harness engineering not enough`
@@ -175,6 +197,10 @@ Each interactive AHE workflow must follow the internal `ahe-thinking` protocol
 before acting when the next safe step is not already obvious.
 
 - Inspect the current unit as `project`, `feature`, or `sub-feature`.
+- Before reading full harness files, run the `ahe-compression` size detector or
+  an equivalent rule-based `wc -l` check.
+- If compression is required, call `ahe-compression` before continuing normal
+  harness-state routing.
 - Judge the current unit against `Why`, `What`, and `How`.
 - For a `project`, require `Why`, `What`, and `How` by default.
 - For a `feature` or `sub-feature`, require only the minimum of `Why`, `What`,
@@ -226,7 +252,7 @@ If a user response needs clarification or more detail, each interactive AHE skil
   harness work with exact `ahe`.
 - Exact `ahe` prompts activate automatic status, CodeGraph, and next-workflow routing; ordinary mentions of AHE do not.
 - The installer copies all user-facing skill directories, the internal
-  `ahe-thinking` and `ahe-conversation` protocol skills, shared assets, and
-  hooks.
+  `ahe-thinking`, `ahe-compression`, and `ahe-conversation` protocol skills,
+  shared assets, and hooks.
 - The uninstall script removes the installed AHE skills, shared assets, and hooks cleanly.
 - Tests validate the split-skill structure and expected workflow contracts.

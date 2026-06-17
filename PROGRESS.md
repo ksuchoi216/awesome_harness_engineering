@@ -2,11 +2,13 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-16 14:15 +0900
-**Session ID:** feat-039-config-cleanup-install-uninstall
+**Last Updated:** 2026-06-17 17:42 +0900
+**Session ID:** feat-040-internal-ahe-compression-skill
 **Active Feature:** None
 
 ## Completed
+
+- [x] Implemented `feat-040 Internal AHE Compression Skill` by adding `.codex/skills/ahe-compression/SKILL.md` plus a deterministic `scripts/check-harness-size.sh` line-count detector. Updated `ahe-thinking`, exact/broad hook directives, `bin/ahe`, `docs/PRODUCT.md`, and contract tests so AHE decides on compression before reading oversized harness files wholesale. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`, skill quick validation, `bash -n bin/ahe`, `sh -n .codex/skills/ahe-compression/scripts/check-harness-size.sh`, `node --check .codex/hooks/ahe-hook.js`, and JSON validation.
 
 - [x] Implemented `feat-039 AHE Config Cleanup on Install and Uninstall` by updating `bin/ahe` so `ahe install` and `ahe uninstall` remove stale AHE-owned entries from `.codex/config.toml` while preserving unrelated config. Changed `scripts/uninstall.sh` to delegate through packaged `ahe uninstall`, documented the behavior in `docs/PRODUCT.md`, and added coverage in `tests/test_project_setup.py`. Verified with `./init.sh`, `pytest tests/ -x`, `pytest tests/test_project_setup.py -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `bash -n scripts/uninstall.sh`, and JSON validation. `mypy` is not installed as a command or module; `make check` has no target.
 
@@ -101,7 +103,7 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-039 AHE Config Cleanup on Install and Uninstall` is complete. Install/uninstall now clean only AHE-owned `.codex/config.toml` entries and preserve unrelated config.
+  - Details: `feat-040 Internal AHE Compression Skill` is complete. AHE now has a rule-based line-count detector and internal compression routing through `ahe-thinking`.
   - Blockers: None.
 
 ## Blocked
@@ -109,6 +111,10 @@
 - [ ] No current blocker.
 
 ## Decisions
+
+- **Compression decision is rule-based before full reads**: `ahe-thinking` now runs the `ahe-compression` detector before reading full harness files and routes to compression when any managed file or total harness context crosses deterministic line-count thresholds.
+  - Context: The user said AHE thinking should decide when AGENTS, PRODUCT, feature-list, and related harness files have too many lines, and that detection should use shell script or rules instead of spending tokens reading everything.
+  - Alternatives considered: Letting Codex notice bloat while reading files would preserve the old flow but defeats the token-saving purpose.
 
 - **Existing harness files require a restart-scope question**: Exact `ahe init` now reads existing AHE-managed files, summarizes the current project purpose and product specification state, and asks what scope to restart before backing up, removing, overwriting, or refreshing anything.
   - Context: The user said missing files should initialize normally, but existing files must be inspected first and the user must decide how far to restart, such as from `purpose` or from `product`.
@@ -200,6 +206,8 @@
   - Alternatives considered: Repeating partial tracking rules in each command section would leave the sync contract fragmented and easier to drift.
 
 ## Change Log
+
+- `.codex/skills/ahe-compression/SKILL.md`, `.codex/skills/ahe-compression/scripts/check-harness-size.sh`, `.codex/skills/ahe-compression/agents/openai.yaml`, `.codex/skills/ahe-thinking/SKILL.md`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, `tests/test_compression_workflow.py`, `tests/test_clarification_prompt.py`, `tests/test_command_set.py` - Added the internal compression workflow, deterministic line-count detector, thinking-level routing, packaging, documentation, tracking, and tests.
 
 - `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, `tests/test_ahe_hook.py`, `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md` - Added exact init alias hook detection for `ahe-init` and `$ahe-init`, with normal mention suppression.
 - `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-spec/SKILL.md`, `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, `tests/test_ahe_hook.py` - Added scoped `ahe init` restart semantics and canonical `docs/PRODUCT.md` specification placement.

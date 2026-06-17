@@ -56,6 +56,14 @@ safely.
 
 ## Next-Step Decision
 
+- Before reading full harness files, decide whether compression is needed.
+  Run `sh .codex/skills/ahe-compression/scripts/check-harness-size.sh` when the
+  script exists, or fall back to `wc -l` over `AGENTS.md`,
+  `docs/PRODUCT.md`, `docs/INSTRUCTIONS.md`, `feature-list.json`,
+  `PROGRESS.md`, `SESSION-HANDOFF.md`, and `docs/todo.md`.
+- If the detector reports `COMPRESSION_REQUIRED` or exits with code `2`, call
+  `ahe-compression` before normal routing. Do not spend context reading the
+  oversized files wholesale first.
 - If `docs/PRODUCT.md` or `docs/INSTRUCTIONS.md` is missing or empty, classify the state as
   `harness engineering not enough` and prioritize product/instructions specification work.
 - `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` form the required harness contract. `docs/PRODUCT.md` is the product/specification source of truth, and
