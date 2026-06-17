@@ -56,6 +56,14 @@ safely.
 
 ## Next-Step Decision
 
+- Before reading full harness files, decide whether compression is needed.
+  Run `sh .codex/skills/ahe-compression/scripts/check-harness-size.sh` when the
+  script exists (which checks against configurable thresholds in `.codex/ahe-shared/config.yaml`),
+  or fall back to `wc -l` over `AGENTS.md`, `docs/PRODUCT.md`, `docs/INSTRUCTIONS.md`, 
+  `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `docs/todo.md`.
+- If the detector reports `COMPRESSION_REQUIRED` or exits with code `2`, call
+  `ahe-compression` before normal routing. Do not spend context reading the
+  oversized files wholesale first.
 - If `docs/PRODUCT.md` or `docs/INSTRUCTIONS.md` is missing or empty, classify the state as
   `harness engineering not enough` and prioritize product/instructions specification work.
 - `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` form the required harness contract. `docs/PRODUCT.md` is the product/specification source of truth, and
@@ -68,6 +76,14 @@ safely.
   unfinished feature.
 - If tracked work is complete and no obvious essential harness gap remains,
   classify the state as `completed all` and ask for the next task.
+
+## Broad User Intent Routing
+
+When the user provides a broad natural-language work intent (e.g., "add features", "update spec"), use their original prompt to determine the exact path:
+- Route **product/spec changes** to `ahe-spec`.
+- Route **instruction changes** to `ahe-spec`.
+- Route **feature/todo tracking** to `ahe-update`.
+- Route **unclear AHE work** to `ahe-conversation` and ask exactly one detail question before editing if the request is vague.
 
 ## Conversation Handoff
 

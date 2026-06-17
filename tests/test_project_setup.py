@@ -14,6 +14,7 @@ REQUIRED_SKILL_FILES = (
     Path(".codex/skills/ahe-thinking/SKILL.md"),
     Path(".codex/skills/ahe-spec/SKILL.md"),
     Path(".codex/skills/ahe-update/SKILL.md"),
+    Path(".codex/ahe-shared/config.yaml"),
     Path(".codex/ahe-shared/templates/AGENTS.md"),
     Path(".codex/ahe-shared/templates/PRODUCT.md"),
     Path(".codex/ahe-shared/templates/INSTRUCTIONS.md"),
@@ -85,6 +86,108 @@ def test_installer_copies_skill_files_into_target_workspace(tmp_path: Path) -> N
     assert (workspace_root / ".codex/ahe-shared/templates/AGENTS.md").exists()
     assert (workspace_root / ".codex/hooks/hooks.json").exists()
     assert (workspace_root / ".codex/hooks/ahe-hook.js").exists()
+
+
+def test_installer_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
+    package_root = tmp_path / "package"
+    workspace_root = tmp_path / "workspace"
+    config_path = workspace_root / ".codex/config.toml"
+
+    package_root.mkdir()
+    workspace_root.mkdir()
+    config_path.parent.mkdir()
+
+    shutil.copy2(REPO_ROOT / "package.json", package_root / "package.json")
+    shutil.copytree(REPO_ROOT / "bin", package_root / "bin")
+    shutil.copytree(REPO_ROOT / ".codex", package_root / ".codex")
+
+    config_path.write_text(
+        "\n".join(
+            (
+                "[agents.ahe-next-step-reviewer]",
+                'config_file = "./agents/ahe-next-step-reviewer.toml"',
+                "",
+                '[hooks.state."ahe:hooks/hooks.json:user_prompt_submit:0:0"]',
+                'trusted_hash = "sha256:stale"',
+                "",
+                "# BEGIN AHE MANAGED CONFIG",
+                '[plugins."ahe@local"]',
+                "enabled = true",
+                "# END AHE MANAGED CONFIG",
+                "",
+                "[agents.explorer]",
+                'config_file = "./agents/explorer.toml"',
+                "",
+                '[hooks.state."omo@sisyphuslabs:hooks/hooks.json:user_prompt_submit:0:0"]',
+                'trusted_hash = "sha256:keep"',
+                "",
+            )
+        ),
+        encoding="utf-8",
+    )
+
+    completed_process = subprocess.run(
+        (str(package_root / "bin" / "ahe"), "install"),
+        cwd=workspace_root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed_process.returncode == 0, completed_process.stderr
+    config_content = config_path.read_text(encoding="utf-8")
+    assert "ahe-next-step-reviewer" not in config_content
+    assert "ahe:hooks/hooks.json" not in config_content
+    assert "AHE MANAGED CONFIG" not in config_content
+    assert "[agents.explorer]" in config_content
+    assert "omo@sisyphuslabs" in config_content
+
+
+def test_uninstaller_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
+    package_root = tmp_path / "package"
+    workspace_root = tmp_path / "workspace"
+    config_path = workspace_root / ".codex/config.toml"
+
+    package_root.mkdir()
+    workspace_root.mkdir()
+    config_path.parent.mkdir()
+
+    shutil.copy2(REPO_ROOT / "package.json", package_root / "package.json")
+    shutil.copytree(REPO_ROOT / "bin", package_root / "bin")
+    shutil.copytree(REPO_ROOT / ".codex", package_root / ".codex")
+    shutil.copytree(package_root / ".codex/skills", workspace_root / ".codex/skills")
+    shutil.copytree(package_root / ".codex/ahe-shared", workspace_root / ".codex/ahe-shared")
+    shutil.copytree(package_root / ".codex/hooks", workspace_root / ".codex/hooks")
+
+    config_path.write_text(
+        "\n".join(
+            (
+                '[plugins."@ksuchoi216/ahe"]',
+                "enabled = true",
+                "",
+                '[plugins."other"]',
+                "enabled = true",
+                "",
+            )
+        ),
+        encoding="utf-8",
+    )
+
+    completed_process = subprocess.run(
+        (str(package_root / "bin" / "ahe"), "uninstall"),
+        cwd=workspace_root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed_process.returncode == 0, completed_process.stderr
+    config_content = config_path.read_text(encoding="utf-8")
+    assert "@ksuchoi216/ahe" not in config_content
+    assert '[plugins."other"]' in config_content
+    assert not (workspace_root / ".codex/skills/ahe-init").exists()
+    assert not (workspace_root / ".codex/ahe-shared").exists()
+    assert not (workspace_root / ".codex/hooks").exists()
 
 
 def test_installer_supports_local_npx_package_flow(tmp_path: Path) -> None:
@@ -163,6 +266,16 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
     assert (fake_home / ".codex/ahe-shared/templates/PRODUCT.md").exists()
     assert (fake_home / ".codex/hooks/ahe-hook.js").exists()
 
+    config_path = fake_home / ".codex/config.toml"
+    config_path.write_text(
+        '[agents.ahe-architecture-reviewer]\n'
+        'config_file = "./agents/ahe-architecture-reviewer.toml"\n'
+        '\n'
+        '[agents.explorer]\n'
+        'config_file = "./agents/explorer.toml"\n',
+        encoding="utf-8",
+    )
+
     uninstall_process = subprocess.run(
         (str(REPO_ROOT / "scripts" / "uninstall.sh"),),
         cwd=REPO_ROOT,
@@ -178,6 +291,9 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
     assert not (fake_home / ".codex/skills/ahe-thinking").exists()
     assert not (fake_home / ".codex/ahe-shared").exists()
     assert not (fake_home / ".codex/hooks").exists()
+    config_content = config_path.read_text(encoding="utf-8")
+    assert "ahe-architecture-reviewer" not in config_content
+    assert "[agents.explorer]" in config_content
 
 
 def test_template_directory_does_not_use_forbidden_lowercase_markdown_names() -> None:

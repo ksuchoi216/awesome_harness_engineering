@@ -22,7 +22,7 @@ Use it after `ahe-thinking` decides that specification work must continue.
 
 - `docs/PRODUCT.md` is the canonical home for product specification details collected during `ahe init`.
 - Clarify product goal, scope, and success criteria when `docs/PRODUCT.md` needs to change.
-- Clarify project instructions when `docs/INSTRUCTIONS.md` needs to change.
+- Clarify project instructions when `docs/INSTRUCTIONS.md` needs to change. If `docs/INSTRUCTIONS.md` is missing, create it from `.codex/ahe-shared/templates/INSTRUCTIONS.md` first, then ask what additional instructions belong under `## CAN CHANGE INSTRUCTIONS`.
 - Draft the relevant specification updates in chat and ask for user approval.
 - Ask recursively for more detail until the affected specification areas are clear and approved.
 

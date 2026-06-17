@@ -18,6 +18,7 @@ const AHE_PROGRESS_DIRECTIVE = [
     "   - Check `feature-list.json` as a derived tracker.",
     "   - Check `PROGRESS.md`.",
     "   - Use `ahe-thinking` as the internal decision layer before choosing the next action.",
+    "   - Before reading large harness files wholesale, let `ahe-thinking` run the `ahe-compression` size detector and call `ahe-compression` if compression is required.",
     "",
     "3. Review code through CodeGraph when available:",
     "   - Prefer CodeGraph MCP or CodeGraph exploration for code review and impact context after the preflight command succeeds.",
@@ -89,6 +90,96 @@ function isExactAheInitCommand(prompt) {
     );
 }
 
+function isBroadAheIntent(prompt) {
+    if (isExactAheCommand(prompt) || isExactAheInitCommand(prompt)) {
+        return false;
+    }
+    
+    const p = normalizePrompt(prompt);
+    
+    const hasAction = /(add|new|update|change|track|manage)/.test(p);
+    const hasTarget = /(product|feature|instruction|requirement|spec|work|todo)/.test(p);
+    
+    if (!(hasAction && hasTarget)) {
+        return false;
+    }
+    
+    const falsePositives = [
+        /what is/,
+        /explain/,
+        /how to/,
+        /how do/,
+        /file/,
+        /error/,
+        /issue/
+    ];
+    
+    for (const fp of falsePositives) {
+        if (fp.test(p)) return false;
+    }
+    
+    return true;
+}
+
+function getAdaptiveDirective(prompt) {
+    return [
+        AHE_DIRECTIVE_MARKER,
+        "AHE automatic operation activated.",
+        "",
+        `Original prompt: "${prompt}"`,
+        "",
+        "The user provided a broad natural-language AHE work intent.",
+        "Operate as the Awesome Harness Engineering router with an adaptive workflow:",
+        "",
+        "1. Run CodeGraph preflight before inspecting harness status:",
+        "   - Check whether the CodeGraph CLI is installed with `command -v codegraph`.",
+        "   - If the `codegraph` command is not installed, report `NOT INSTALLATION of codegraph`, skip `codegraph init` and `codegraph sync`, and continue with normal repo inspection.",
+        "   - If `.codegraph/` does not exist, run `codegraph init` before reviewing code.",
+        "   - If `.codegraph/` exists, run `codegraph sync` before reviewing code.",
+        "",
+        "2. Inspect current harness state before choosing a workflow:",
+        "   - Check `AGENTS.md`.",
+        "   - Check `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` as the product/specification source of truth.",
+        "   - Check `feature-list.json` as a derived tracker.",
+        "   - Check `PROGRESS.md`.",
+        "   - Use `ahe-thinking` as the internal decision layer before choosing the next action.",
+        "   - Before reading large harness files wholesale, let `ahe-thinking` run the `ahe-compression` size detector and call `ahe-compression` if compression is required.",
+        "",
+        "3. Review code through CodeGraph when available.",
+        "",
+        "4. Make the first response a simple harness engineering status report table before proceeding:",
+        "   - Start the response with a concise status report table.",
+        "   - Use this consistent Markdown table format:",
+        "     | Item | Content |",
+        "     |---|---|",
+        "     | AGENTS.md | Exists/missing, purpose status, and any obvious issue. |",
+        "     | PRODUCT.md | Exists/missing, completion state, and whether product scope needs work. |",
+        "     | INSTRUCTIONS.md | Exists/missing, and whether instruction boundaries need work. |",
+        "     | feature-list.json | Valid/missing/invalid, unfinished feature summary, and all-done status. |",
+        "     | PROGRESS.md | Exists/missing and current session state. |",
+        "   - Keep the table short and readable.",
+        "   - Do not include the next step inside the table.",
+        "",
+        "5. Decide the next AHE workflow with `ahe-thinking` based on the original prompt:",
+        "   - Classify the user intent from the original prompt as: `product/spec changes`, `instruction changes`, `feature/todo tracking`, or `unclear AHE work`.",
+        "   - Route product/spec changes to `ahe-spec`.",
+        "   - Route instruction changes to `ahe-spec`, and create `docs/INSTRUCTIONS.md` from the template when needed.",
+        "   - Route feature/todo tracking to `ahe-update`.",
+        "   - Route unclear AHE work to `ahe-conversation`.",
+        "",
+        "6. Ask for clarification instead of guessing:",
+        "   - If the request is vague, ask exactly one detail question before editing.",
+        "   - Call `ahe-conversation` for missing `Why`, `What`, or `How`.",
+        "   - Continue only after one safe next step is clear.",
+        "",
+        "7. After the table, classify the harness into exactly one state.",
+        "   - Use exactly one state: `harness engineering not enough`, `in the middle of building features`, or `completed all`.",
+        "   - Do not include the next step inside the table.",
+        "   - Continue automatically after classification.",
+        "   - Follow this loop: `thinking -> conversation if needed -> execution -> thinking`.",
+    ].join("\\n");
+}
+
 function normalizePrompt(prompt) {
     return prompt.trim().toLowerCase();
 }
@@ -127,6 +218,14 @@ async function main() {
                 hookSpecificOutput: {
                     hookEventName: "UserPromptSubmit",
                     additionalContext: AHE_INIT_DIRECTIVE
+                }
+            };
+            process.stdout.write(JSON.stringify(output) + "\n");
+        } else if (isBroadAheIntent(parsed.prompt)) {
+            const output = {
+                hookSpecificOutput: {
+                    hookEventName: "UserPromptSubmit",
+                    additionalContext: getAdaptiveDirective(parsed.prompt)
                 }
             };
             process.stdout.write(JSON.stringify(output) + "\n");

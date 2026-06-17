@@ -3,10 +3,28 @@
 ## Current Product Context
 
 - Goal: Keep AHE's Codex skill surface small and focused while preserving the harness specification docs.
-- Current status: `feat-035 AHE Init Alias Hook Detection` is complete.
-- Branch / commit: `develop`; users now rely on exact `ahe init`, exact `ahe-init`, or exact `$ahe-init` for initialization or scoped restarts and exact `ahe` for progress.
+- Current status: `feat-041 Configurable AHE Compression Thresholds` is complete.
+- Branch / commit: `develop`; AHE now uses `.codex/ahe-shared/config.yaml` to specify line limits for compression detection.
 
 ## Last Completed Work
+
+- [x] Added packaged `.codex/ahe-shared/config.yaml` to configure per-file line thresholds for compression routing.
+- [x] Updated `scripts/check-harness-size.sh` to parse the config file and support environment variable overrides (`AHE_AGENT_MD_LIMIT`, etc.).
+- [x] Updated `ahe-compression` and `ahe-thinking` skills to document the new `config.yaml` behavior.
+- [x] Updated `docs/PRODUCT.md`, `bin/ahe`, and installer tests to include the configuration file.
+- [x] Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`, and shell syntax checks.
+
+- [x] Added `.codex/skills/ahe-compression/SKILL.md` as an internal workflow skill, not a user-facing command.
+- [x] Added `.codex/skills/ahe-compression/scripts/check-harness-size.sh` to count AHE-managed harness file lines and exit `2` with `COMPRESSION_REQUIRED` when compression is needed.
+- [x] Updated `ahe-thinking` so it runs the compression detector before reading full harness files and calls `ahe-compression` when line-count thresholds are exceeded.
+- [x] Updated `.codex/hooks/ahe-hook.js`, `bin/ahe`, `docs/PRODUCT.md`, `feature-list.json`, and tests so packaged installs and exact/broad AHE routing include the internal compression skill.
+- [x] Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`, skill quick validation, shell syntax checks, hook syntax check, and JSON validation.
+
+- [x] Updated `bin/ahe` so `ahe install` and `ahe uninstall` remove stale AHE-owned config tables and managed blocks from `.codex/config.toml`.
+- [x] Kept config cleanup scoped to AHE-owned entries such as `agents.ahe-*`, AHE hook state tables, AHE plugin tables, and `# BEGIN/END AHE MANAGED CONFIG` blocks.
+- [x] Changed `scripts/uninstall.sh` to delegate through packaged `ahe uninstall` so global helper behavior stays aligned with the main CLI.
+- [x] Updated `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, and `tests/test_project_setup.py` for config cleanup behavior.
+- [x] Verified with `./init.sh`, `pytest tests/ -x`, `pytest tests/test_project_setup.py -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `bash -n scripts/uninstall.sh`, JSON validation, and LSP diagnostics on `tests/test_project_setup.py`.
 
 - [x] Updated `.codex/hooks/ahe-hook.js` so exact `ahe-init` and exact `$ahe-init` emit the same AHE new-start directive as exact `ahe init`.
 - [x] Kept normal mention suppression intact: prompts like `please explain ahe-init` still do not trigger AHE.
@@ -94,6 +112,8 @@
 - `docs/PRODUCT.md` - Canonical product specification and scope reference.
 - `.codex/skills/ahe-conversation/SKILL.md` - Internal recursive clarification, conversation state, and resume-aware workflow protocol used by interactive AHE skills.
 - `.codex/skills/ahe-thinking/SKILL.md` - Internal decision protocol that judges the current project, feature, or sub-feature and decides whether AHE should clarify or execute next.
+- `.codex/skills/ahe-compression/SKILL.md` - Internal compression protocol that tells AHE how to compact oversized harness files safely.
+- `.codex/skills/ahe-compression/scripts/check-harness-size.sh` - Rule-based shell detector used before reading large harness files wholesale.
 - `.codex/skills/ahe-spec/SKILL.md` - Combined product, constraints, and architecture specification workflow.
 - `.codex/hooks/ahe-hook.js` - Exact `ahe`, exact `ahe init`, exact `ahe-init`, and exact `$ahe-init` command hook; the directives split new-start and progress routing while keeping adaptive CodeGraph preflight for progress.
 - `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, `tests/test_ahe_hook.py` - Contract coverage for scoped restart semantics and canonical product-spec placement.
@@ -113,6 +133,7 @@
 - `tests/test_clarification_prompt.py` - Contract coverage for the clarification prompt format.
 - `tests/test_session_tracking_handoff.py` - Contract coverage for process-status, progress-log, and handoff synchronization rules.
 - `tests/test_project_setup.py`, `bin/ahe` - Packaging and installer coverage for direct and `npx` install paths.
+- `scripts/uninstall.sh` - Delegates to packaged `ahe uninstall` so global uninstall also cleans AHE-owned `.codex/config.toml` entries.
 
 ## Next Recommended Action
 
@@ -127,16 +148,16 @@
 | Check | Command | Result | Notes |
 |---|---|---|---|
 | Init sanity | `./init.sh` | Pass | Startup check still reports the expected Python-default environment guidance. |
-| Full tests | `pytest tests/ -x` | Blocked | Stops in `test_helper_scripts_target_global_codex_home` because nested `npx --yes --package=... ahe install` hangs or is killed with signal 9. |
-| Tests except blocked installer helper | `pytest tests/ -k 'not helper_scripts_target_global_codex_home'` | Pass | 45 passed, 1 deselected. |
-| Targeted tests | `pytest tests/test_ahe_hook.py -x` | Pass | Exact `ahe init`, `ahe-init`, and `$ahe-init` route to the new-start directive; normal mentions do not trigger. |
-| Lint | `ruff check src/` | Pass | Ruff reported no Python files under `src/` and exited successfully. |
+| Full tests | `pytest tests/ -x` | Pass | 55 passed. |
+| Tests except blocked installer helper | `pytest tests/ -k 'not helper_scripts_target_global_codex_home'` | Not run this session | No longer needed because full pytest passed. |
+| Targeted tests | `pytest tests/test_project_setup.py -x` | Pass | 9 passed; covers direct install/uninstall and global helper cleanup of AHE-owned config entries. |
+| Lint | `ruff check src/ tests/` | Pass | Ruff reported all checks passed. |
 | Type check | `mypy src/ --strict`; `python3 -m mypy src/ --strict` | Blocked | `mypy` is not installed as a command or Python module in this workspace. |
-| LSP diagnostics | Changed Python test files | Pass | No diagnostics found for `tests/test_ahe_hook.py`; JavaScript LSP was unavailable because `typescript-language-server` is not installed. |
+| LSP diagnostics | Changed Python test files | Pass | No diagnostics found for `tests/test_project_setup.py`. |
 | Hook syntax | `node --check .codex/hooks/ahe-hook.js` | Pass | Edited hook parses successfully. |
-| Shell syntax | `bash -n bin/ahe` and `bash -n scripts/uninstall.sh` | Pass | Installer and uninstaller scripts parse cleanly. |
+| Shell syntax | `bash -n bin/ahe` and `sh -n .codex/skills/ahe-compression/scripts/check-harness-size.sh` | Pass | Installer and compression detector parse cleanly. |
 | JSON validation | `python3 -m json.tool feature-list.json` | Pass | `feature-list.json` is valid JSON. |
 | CodeGraph sync | `codegraph sync` | Pass | Local CodeGraph index synced after adaptive CodeGraph preflight hook edits. |
 | Runtime state JSON | `python3 -m json.tool .ahe/process_status.json` | Pass | Process status file is valid JSON. |
-| Installer checks | `pytest tests/test_project_setup.py -x` | Blocked | The helper-script global install test hangs or is killed inside nested `npx`; not changed by the init-alias hook fix. |
+| Installer checks | `pytest tests/test_project_setup.py -x` | Pass | Covers stale AHE `.codex/config.toml` cleanup on install/uninstall and preservation of unrelated config. |
 | Direct module tests | `python3 tests/test_*.py` modules | Not run this session | Full pytest coverage passed, so direct module execution was not repeated. |

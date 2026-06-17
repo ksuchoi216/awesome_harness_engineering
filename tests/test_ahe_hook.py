@@ -167,3 +167,52 @@ def test_non_user_prompt_submit_event_emits_nothing() -> None:
     )
 
     assert run_hook(payload) == ""
+
+
+def test_broad_natural_language_ahe_intents() -> None:
+    prompts = [
+        "new product will be added",
+        "I want to add features",
+        "add more instructions",
+        "we need a new requirement",
+        "update the product spec",
+        "track this as work",
+        "Please add a new feature for user login.",
+        "Let's update the product spec to include dark mode.",
+        "I need to track this bug fix as new work.",
+        "Can we add an instruction about writing clean code?",
+        "We have a new product requirement for the dashboard.",
+    ]
+    for prompt in prompts:
+        context = additional_context_for_prompt(prompt)
+        assert context is not None
+        assert "AHE automatic operation activated." in context
+        assert f'Original prompt: "{prompt}"' in context
+        assert "adaptive workflow" in context
+
+
+def test_broad_natural_language_ignores_unrelated_prompts() -> None:
+    prompts = [
+        "what is a product feature?",
+        "how to fix the bug",
+        "add a new file for the product",
+        "can you explain the spec?",
+        "write some code for this feature",
+        "Can you show me where the instructions are?",
+        "Please explain the requirements to me.",
+        "How do I update the database schema?"
+    ]
+    for prompt in prompts:
+        assert hook_output_for_prompt(prompt) is None
+
+
+def test_adaptive_directive_contract() -> None:
+    context = additional_context_for_prompt("I want to add features")
+    assert context is not None
+    assert "Inspect current harness state before choosing a workflow" in context
+    assert "| AGENTS.md |" in context
+    assert "Use `ahe-thinking` as the internal decision layer" in context
+    assert "Decide the next AHE workflow with `ahe-thinking` based on the original prompt" in context
+    assert "ask exactly one detail question before editing" in context
+    assert "Call `ahe-conversation` for missing" in context
+    assert "create `docs/INSTRUCTIONS.md` from the template when needed" in context

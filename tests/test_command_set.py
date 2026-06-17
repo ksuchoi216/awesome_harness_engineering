@@ -12,6 +12,7 @@ def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
     expected_skill_names = sorted(
         [
             "ahe-conversation",
+            "ahe-compression",
             "ahe-init",
             "ahe-spec",
             "ahe-thinking",
@@ -27,6 +28,7 @@ def test_only_init_is_user_facing_command() -> None:
 
     internal_skill_names = (
         "ahe-conversation",
+        "ahe-compression",
         "ahe-thinking",
         "ahe-spec",
         "ahe-update",

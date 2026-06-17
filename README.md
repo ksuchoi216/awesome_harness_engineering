@@ -29,14 +29,14 @@ npx --yes --package=file:. ahe install
 
 ### CLI Commands
 
-| Command | Description |
-|---|---|
-| `ahe install` | Install AHE skills into `.codex/` |
-| `ahe install --force` | Overwrite existing installation |
+| Command                | Description                                     |
+| ---------------------- | ----------------------------------------------- |
+| `ahe install`          | Install AHE skills into `.codex/`               |
+| `ahe install --force`  | Overwrite existing installation                 |
 | `ahe install --backup` | Backup existing installation before overwriting |
-| `ahe uninstall` | Remove all AHE skills, shared assets, and hooks |
-| `ahe doctor` | Check installation health and integrity |
-| `ahe version` | Print the current version |
+| `ahe uninstall`        | Remove all AHE skills, shared assets, and hooks |
+| `ahe doctor`           | Check installation health and integrity         |
+| `ahe version`          | Print the current version                       |
 
 ---
 
@@ -46,10 +46,10 @@ AHE works inside **Codex chat**. After installing via the terminal, open Codex c
 
 ### Chat Commands
 
-| Command | What it does |
-|---|---|
+| Command    | What it does                                                                                                            |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `ahe init` | **Start a new harness.** Creates harness skeleton files, asks about your project, and writes the product specification. |
-| `ahe` | **Continue existing work.** Inspects the current state, reports status, decides the next step, and keeps working. |
+| `ahe`      | **Continue existing work.** Inspects the current state, reports status, decides the next step, and keeps working.       |
 
 > **Note:** Only exact commands trigger AHE. Normal messages like "explain ahe" or "what does ahe do" will not start any workflow.
 
@@ -82,15 +82,16 @@ $ ahe install
 
 ### Skills Overview
 
-AHE is composed of five internal skills that coordinate automatically:
+AHE is composed of six core skills that coordinate automatically:
 
-| Skill | Role |
-|---|---|
-| **ahe-init** | Entry point for new projects. Creates harness files, asks for project info, then calls ahe-spec and ahe-update. |
-| **ahe-thinking** | Internal decision engine. Evaluates clarity on **Why** / **What** / **How** for each work unit and routes to the right action. |
-| **ahe-conversation** | Internal question protocol. Asks exactly one focused question at a time when information is missing. |
-| **ahe-spec** | Writes and updates `docs/PRODUCT.md` (canonical source of truth) and `docs/INSTRUCTIONS.md`. |
-| **ahe-update** | Syncs tracking artifacts: `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`. |
+| Skill                | Role                                                                                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ahe-init**         | Entry point for new projects. Creates harness files, asks for project info, then calls ahe-spec and ahe-update.                                   |
+| **ahe-thinking**     | Internal decision engine. Evaluates clarity on **Why** / **What** / **How** for each work unit and routes to the right action.                    |
+| **ahe-compression**  | Internal size detector & compressor. Monitors file sizes via configurable thresholds (`config.yaml`) and compresses bloated files before reading. |
+| **ahe-conversation** | Internal question protocol. Asks exactly one focused question at a time when information is missing.                                              |
+| **ahe-spec**         | Writes and updates `docs/PRODUCT.md` (canonical source of truth) and `docs/INSTRUCTIONS.md`.                                                      |
+| **ahe-update**       | Syncs tracking artifacts: `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`.                                                               |
 
 ### Process Flow
 
@@ -113,7 +114,8 @@ flowchart TD
     Step2 --> Step3["<b>Step 3: ahe-update</b><br/>Sync feature-list.json<br/>and PROGRESS.md"]
     Step3 --> Done["Harness ready ✓"]
 
-    Feature --> Thinking["<b>ahe-thinking</b><br/>Check Why / What / How"]
+    Feature --> Compression["<b>ahe-compression</b><br/>Check & compress oversized files"]
+    Compression --> Thinking["<b>ahe-thinking</b><br/>Check Why / What / How"]
     Thinking --> Clear{"Clear enough<br/>to proceed?"}
     Clear -->|"No"| Convo["<b>ahe-conversation</b><br/>Ask one focused question"]
     Convo --> UserAnswer["User answers"]
@@ -143,10 +145,11 @@ flowchart TD
    - **"Not enough spec"** → routes to `ahe-init` to fill gaps.
    - **"Building features"** → picks the next unfinished feature from `feature-list.json`.
    - **"All completed"** → asks the user for the next task.
-4. **ahe-thinking** checks clarity (Why / What / How) for the current work unit.
-5. If unclear → **ahe-conversation** asks exactly one question, then re-evaluates.
-6. If clear → executes the next safe step.
-7. **ahe-update** syncs all tracking artifacts at the end.
+4. **ahe-thinking** checks file sizes using **ahe-compression** and compresses oversized files based on `config.yaml` thresholds.
+5. **ahe-thinking** checks clarity (Why / What / How) for the current work unit.
+6. If unclear → **ahe-conversation** asks exactly one question, then re-evaluates.
+7. If clear → executes the next safe step.
+8. **ahe-update** syncs all tracking artifacts at the end.
 
 #### Execution Loop
 
@@ -169,9 +172,11 @@ your-project/
 │   │   ├── ahe-init/           # New-start workflow skill
 │   │   ├── ahe-conversation/   # Internal question protocol
 │   │   ├── ahe-thinking/       # Internal decision engine
+│   │   ├── ahe-compression/    # Internal size detector & compressor
 │   │   ├── ahe-spec/           # Specification writer
 │   │   └── ahe-update/         # Tracking artifact syncer
 │   ├── ahe-shared/
+│   │   ├── config.yaml         # Compression thresholds & configuration
 │   │   ├── templates/          # Harness file templates
 │   │   └── schemas/            # Validation schemas
 │   └── hooks/
@@ -198,6 +203,13 @@ your-project/
 ## Agent Working Rules
 
 If you are an AI agent working on this repository, please strictly follow the guidelines in [AGENTS.md](AGENTS.md). It includes critical instructions regarding the definition of done, verification commands, and file modification rules (e.g., you must update `PROGRESS.md` and `feature-list.json` appropriately).
+
+## References
+
+This repository was greatly influenced by the following projects:
+
+- [oh-my-openagent](https://github.com/code-yeongyu/oh-my-openagent): Greatly influenced the code structure of this project.
+- [learn-harness-engineering](https://github.com/walkinglabs/learn-harness-engineering): Provided the harness engineering templates used in this project.
 
 ## License
 

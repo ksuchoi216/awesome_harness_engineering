@@ -50,7 +50,7 @@ done
 # 4. 루트 디렉토리의 불필요한 폴더 및 파일 삭제
 echo "Cleaning up root directory..."
 for item in .*; do
-  if [ "$item" != "." ] && [ "$item" != ".." ] && [ "$item" != ".git" ] && [ "$item" != ".gitignore" ]; then
+  if [ "$item" != "." ] && [ "$item" != ".." ] && [ "$item" != ".gitignore" ]; then
     rm -rf "$item"
   fi
 done
