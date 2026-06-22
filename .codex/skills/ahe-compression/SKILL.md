@@ -1,6 +1,6 @@
 ---
 name: ahe-compression
-description: Internal AHE compression workflow for detecting oversized harness-engineering files and compacting them before AHE thinking reads or routes large context. Use when AGENTS.md, docs/PRODUCT.md, docs/INSTRUCTIONS.md, feature-list.json, PROGRESS.md, SESSION-HANDOFF.md, docs/todo.md, or other AHE harness artifacts have too many lines or waste context.
+description: Internal AHE compression workflow for detecting oversized harness-engineering files and compacting them before AHE thinker or harness routing reads large context. Use when AGENTS.md, docs/PRODUCT.md, docs/INSTRUCTIONS.md, feature-list.json, PROGRESS.md, SESSION-HANDOFF.md, docs/todo.md, or other AHE harness artifacts have too many lines or waste context.
 ---
 
 # AHE Compression
@@ -8,7 +8,7 @@ description: Internal AHE compression workflow for detecting oversized harness-e
 This is an internal AHE workflow skill, not a user-facing command.
 
 Do not treat `$ahe-compression` as a user command.
-Use it after `ahe-thinking` decides that harness context is too large to read
+Use it after `ahe-thinker` or `ahe-harness` decides that harness context is too large to read
 efficiently.
 
 ## Size Detection

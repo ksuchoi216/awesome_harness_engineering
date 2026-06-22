@@ -46,7 +46,10 @@ def test_detector_requires_compression_for_oversized_file(tmp_path: Path) -> Non
 
 def test_product_docs_route_thinking_to_compression() -> None:
     thinking_content = (
-        REPO_ROOT / ".codex/skills/ahe-thinking/SKILL.md"
+        REPO_ROOT / ".codex/skills/ahe-thinker/SKILL.md"
+    ).read_text(encoding="utf-8")
+    harness_content = (
+        REPO_ROOT / ".codex/skills/ahe-harness/SKILL.md"
     ).read_text(encoding="utf-8")
     product_content = (REPO_ROOT / "docs/PRODUCT.md").read_text(encoding="utf-8")
     hook_content = (REPO_ROOT / ".codex/hooks/ahe-hook.js").read_text(encoding="utf-8")
@@ -54,6 +57,7 @@ def test_product_docs_route_thinking_to_compression() -> None:
 
     assert "check-harness-size.sh" in thinking_content
     assert "COMPRESSION_REQUIRED" in thinking_content
+    assert "compress completed feature items" in harness_content
     assert "ahe-compression" in product_content
     assert "ahe-compression" in hook_content
     assert '"ahe-compression"' in bin_content

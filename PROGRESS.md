@@ -2,13 +2,15 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-17 19:18 +0900
-**Session ID:** feat-041-configurable-ahe-compression-thresholds
+**Last Updated:** 2026-06-23 02:45 +0900
+**Session ID:** feat-042-ahe-logical-agent-network
 **Active Feature:** None
 
 ## Completed
 
 - [x] Implemented `feat-041 Configurable AHE Compression Thresholds` by adding `.codex/ahe-shared/config.yaml` to specify per-file line limits for ahe-compression. Updated `scripts/check-harness-size.sh` to parse this config and use environment variable overrides (e.g., `AHE_AGENT_MD_LIMIT`). Updated `ahe-compression` and `ahe-thinking` SKILL.md docs, `docs/PRODUCT.md`, `bin/ahe`, and installer tests. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`, and `sh -n`.
+
+- [x] Implemented `feat-042 AHE Logical Agent Network` by replacing the old `ahe-thinking` / `ahe-conversation` / `ahe-spec` / `ahe-update` split with the centered `ahe-thinker` network and explicit `ahe <query>` routing. Added `.codex/skills/ahe-thinker`, `ahe-conversator`, `ahe-reviewer`, `ahe-harness`, and `ahe-solver`; removed the old internal skill contracts; rewrote `.codex/hooks/ahe-hook.js`, `bin/ahe`, `README.md`, and `docs/PRODUCT.md`; and updated the AHE contract tests to validate harness-owned compression and conversation routing. Verified with `./init.sh`, `pytest tests/ -x`, `node --check .codex/hooks/ahe-hook.js`, `bash -n bin/ahe`, `ruff check src/ tests/`, and `python3 -m json.tool feature-list.json`. `mypy src/ --strict` exits with code 2 because `src/` contains no Python files.
 
 - [x] Implemented `feat-040 Internal AHE Compression Skill` by adding `.codex/skills/ahe-compression/SKILL.md` plus a deterministic `scripts/check-harness-size.sh` line-count detector. Updated `ahe-thinking`, exact/broad hook directives, `bin/ahe`, `docs/PRODUCT.md`, and contract tests so AHE decides on compression before reading oversized harness files wholesale. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check src/ tests/`, skill quick validation, `bash -n bin/ahe`, `sh -n .codex/skills/ahe-compression/scripts/check-harness-size.sh`, `node --check .codex/hooks/ahe-hook.js`, and JSON validation.
 
@@ -105,7 +107,7 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-  - Details: `feat-040 Internal AHE Compression Skill` is complete. AHE now has a rule-based line-count detector and internal compression routing through `ahe-thinking`.
+  - Details: `feat-042 AHE Logical Agent Network` is complete. AHE now routes exact `ahe`, exact `ahe init`, and explicit `ahe <query>` through `ahe-thinker` and the new worker agents.
   - Blockers: None.
 
 ## Blocked

@@ -36,16 +36,14 @@ def test_skill_md_contains_generated_files() -> None:
 def test_skill_md_contains_three_sequential_steps_and_status_tracking() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
     expected_steps = [
-        'call "ahe-spec"',
-        'call "ahe-update"',
+        'call "ahe-harness"',
     ]
     for step in expected_steps:
         assert step in content, f"Missing step '{step}' in ahe-init workflow definition"
 
     expected_statuses = [
         'ahe-init',
-        'ahe-spec',
-        'ahe-update',
+        'ahe-harness',
     ]
     for status in expected_statuses:
         assert status in content, f"Missing progress status '{status}' in ahe-init workflow definition"
@@ -89,7 +87,7 @@ def test_skill_md_keeps_specification_details_out_of_agents_md() -> None:
     required_behaviors = [
         "Keep `AGENTS.md` limited to the project purpose and base agent settings.",
         "Do not put product specification details in `AGENTS.md`.",
-        "Send product behavior, scope, requirements, success criteria, and workflow details to `ahe-spec` so they are written in `docs/PRODUCT.md` first.",
+        "Send product behavior, scope, requirements, success criteria, and workflow details to `ahe-harness` so they are written in `docs/PRODUCT.md` first.",
         "Generating an empty `feature-list.json` from a template is allowed, but do not write concrete feature items until `docs/PRODUCT.md` is populated.",
     ]
     for required_behavior in required_behaviors:

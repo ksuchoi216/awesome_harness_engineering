@@ -409,6 +409,16 @@
       ],
       "status": "done",
       "evidence": "Updated .codex/ahe-shared/config.yaml, check-harness-size.sh, SKILL.md docs, PRODUCT.md, bin/ahe, and tests. Verified with ./init.sh, pytest tests/ -x, ruff check src/ tests/, and sh -n."
+    },
+    {
+      "id": "feat-042",
+      "name": "AHE Logical Agent Network",
+      "description": "Replace the old thinker/spec/update conversation split with the centered `ahe-thinker` agent network, explicit `ahe <query>` routing, and harness-owned feature-list compression logic.",
+      "dependencies": [
+        "feat-041"
+      ],
+      "status": "done",
+      "evidence": "Added `.codex/skills/ahe-thinker`, `ahe-conversator`, `ahe-reviewer`, `ahe-harness`, and `ahe-solver`; removed the old `ahe-thinking`, `ahe-conversation`, `ahe-spec`, and `ahe-update` skill contracts; rewrote `.codex/hooks/ahe-hook.js`, `bin/ahe`, `README.md`, and `docs/PRODUCT.md` for exact `ahe`, exact `ahe init`, and explicit `ahe <query>` routing; and updated the contract test suites. Verified with `./init.sh`, `pytest tests/ -x`, `pytest` on the focused AHE contract suites, `node --check .codex/hooks/ahe-hook.js`, `bash -n bin/ahe`, `ruff check src/ tests/`, and `python3 -m json.tool feature-list.json`. `mypy src/ --strict` exits with code 2 because `src/` has no Python files."
     }
   ]
 }

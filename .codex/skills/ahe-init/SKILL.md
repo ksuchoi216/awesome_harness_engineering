@@ -35,7 +35,7 @@ Use this skill when the user invokes `$ahe-init`.
 - Update only the `PROJECT_PURPOSE` portion of `AGENTS.md`.
 - Keep `AGENTS.md` limited to the project purpose and base agent settings.
 - Do not put product specification details in `AGENTS.md`.
-- Send product behavior, scope, requirements, success criteria, and workflow details to `ahe-spec` so they are written in `docs/PRODUCT.md` first.
+- Send product behavior, scope, requirements, success criteria, and workflow details to `ahe-harness` so they are written in `docs/PRODUCT.md` first.
 - Generating an empty `feature-list.json` from a template is allowed, but do not write concrete feature items until `docs/PRODUCT.md` is populated.
 - Ask whether the project language is Python using a Codex-supported structured response request with meaningful options and custom input.
 - If the user answers that the project language is not Python, ask again: "Which language do you use?".
@@ -55,10 +55,9 @@ Use this skill when the user invokes `$ahe-init`.
 - Find all template files under `.codex/ahe-shared/templates/`.
 - Ignore `AGENTS.md` and `PRODUCT.md` when copying template files.
 - Before copying a template file into the workspace root, check whether the target file already exists and ask for explicit overwrite confirmation when needed.
-- Execute the following three steps sequentially, updating the progress status (`current_step` in `.ahe/process_status.json`):
+- Execute the following two steps sequentially, updating the progress status (`current_step` in `.ahe/process_status.json`):
   1. complete the embedded init setup work (status: "ahe-init")
-  2. call "ahe-spec" (status: "ahe-spec")
-  3. call "ahe-update" (status: "ahe-update")
+  2. call "ahe-harness" (status: "ahe-harness")
 
 ### Harness Generation
 
@@ -71,7 +70,7 @@ Use this skill when the user invokes `$ahe-init`.
 
 ## Clarification Rule
 
-When the next setup step is not clear, follow the `ahe-thinking` protocol first. If `ahe-thinking` finds missing information, follow the `ahe-conversation` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
+When the next setup step is not clear, follow the `ahe-thinker` protocol first. If `ahe-thinker` finds missing information, follow the `ahe-conversator` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
 
 ### User Response Target
 

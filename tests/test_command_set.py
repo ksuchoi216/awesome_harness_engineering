@@ -8,15 +8,16 @@ SKILL_DIR = REPO_ROOT / ".codex/skills"
 
 
 def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
-    actual_skill_names = sorted(path.name for path in SKILL_DIR.iterdir() if path.is_dir())
+    actual_skill_names = sorted(path.parent.name for path in SKILL_DIR.glob("*/SKILL.md"))
     expected_skill_names = sorted(
         [
-            "ahe-conversation",
             "ahe-compression",
+            "ahe-conversator",
+            "ahe-harness",
             "ahe-init",
-            "ahe-spec",
-            "ahe-thinking",
-            "ahe-update",
+            "ahe-reviewer",
+            "ahe-solver",
+            "ahe-thinker",
         ]
     )
     assert actual_skill_names == expected_skill_names
@@ -27,11 +28,12 @@ def test_only_init_is_user_facing_command() -> None:
     assert "$ahe-init" in init_content
 
     internal_skill_names = (
-        "ahe-conversation",
         "ahe-compression",
-        "ahe-thinking",
-        "ahe-spec",
-        "ahe-update",
+        "ahe-conversator",
+        "ahe-harness",
+        "ahe-reviewer",
+        "ahe-solver",
+        "ahe-thinker",
     )
 
     for skill_name in internal_skill_names:
@@ -53,6 +55,17 @@ def test_split_skill_set_covers_required_context_docs() -> None:
         "SESSION-HANDOFF.md",
     ):
         assert required_file in combined_content, f"Missing file reference '{required_file}'"
+
+    for required_skill_name in (
+        "ahe-thinker",
+        "ahe-reviewer",
+        "ahe-conversator",
+        "ahe-harness",
+        "ahe-solver",
+    ):
+        assert required_skill_name in combined_content, (
+            f"Missing internal agent reference '{required_skill_name}'"
+        )
 
 
 if __name__ == "__main__":

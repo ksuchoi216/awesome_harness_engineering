@@ -10,10 +10,12 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 REQUIRED_SKILL_FILES = (
     Path(".codex/skills/ahe-init/SKILL.md"),
-    Path(".codex/skills/ahe-conversation/SKILL.md"),
-    Path(".codex/skills/ahe-thinking/SKILL.md"),
-    Path(".codex/skills/ahe-spec/SKILL.md"),
-    Path(".codex/skills/ahe-update/SKILL.md"),
+    Path(".codex/skills/ahe-conversator/SKILL.md"),
+    Path(".codex/skills/ahe-thinker/SKILL.md"),
+    Path(".codex/skills/ahe-reviewer/SKILL.md"),
+    Path(".codex/skills/ahe-harness/SKILL.md"),
+    Path(".codex/skills/ahe-solver/SKILL.md"),
+    Path(".codex/skills/ahe-compression/SKILL.md"),
     Path(".codex/ahe-shared/config.yaml"),
     Path(".codex/ahe-shared/templates/AGENTS.md"),
     Path(".codex/ahe-shared/templates/PRODUCT.md"),
@@ -81,8 +83,9 @@ def test_installer_copies_skill_files_into_target_workspace(tmp_path: Path) -> N
     assert completed_process.returncode == 0, completed_process.stderr
     assert "AHE Codex skill installed." in completed_process.stdout
     assert (workspace_root / ".codex/skills/ahe-init/SKILL.md").exists()
-    assert (workspace_root / ".codex/skills/ahe-conversation/SKILL.md").exists()
-    assert (workspace_root / ".codex/skills/ahe-thinking/SKILL.md").exists()
+    assert (workspace_root / ".codex/skills/ahe-conversator/SKILL.md").exists()
+    assert (workspace_root / ".codex/skills/ahe-thinker/SKILL.md").exists()
+    assert (workspace_root / ".codex/skills/ahe-harness/SKILL.md").exists()
     assert (workspace_root / ".codex/ahe-shared/templates/AGENTS.md").exists()
     assert (workspace_root / ".codex/hooks/hooks.json").exists()
     assert (workspace_root / ".codex/hooks/ahe-hook.js").exists()
@@ -228,9 +231,9 @@ def test_installer_supports_local_npx_package_flow(tmp_path: Path) -> None:
 
     assert completed_process.returncode == 0, completed_process.stderr
     assert "AHE Codex skill installed." in completed_process.stdout
-    assert (workspace_root / ".codex/skills/ahe-update/SKILL.md").exists()
-    assert (workspace_root / ".codex/skills/ahe-conversation/SKILL.md").exists()
-    assert (workspace_root / ".codex/skills/ahe-thinking/SKILL.md").exists()
+    assert (workspace_root / ".codex/skills/ahe-harness/SKILL.md").exists()
+    assert (workspace_root / ".codex/skills/ahe-conversator/SKILL.md").exists()
+    assert (workspace_root / ".codex/skills/ahe-thinker/SKILL.md").exists()
     assert (workspace_root / ".codex/ahe-shared/schemas/process_status.schema.json").exists()
     assert (workspace_root / ".codex/hooks/hooks.json").exists()
 
@@ -255,9 +258,9 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
     )
 
     assert install_process.returncode == 0, install_process.stderr
-    assert (fake_home / ".codex/skills/ahe-spec/SKILL.md").exists()
-    assert (fake_home / ".codex/skills/ahe-conversation/SKILL.md").exists()
-    assert (fake_home / ".codex/skills/ahe-thinking/SKILL.md").exists()
+    assert (fake_home / ".codex/skills/ahe-harness/SKILL.md").exists()
+    assert (fake_home / ".codex/skills/ahe-conversator/SKILL.md").exists()
+    assert (fake_home / ".codex/skills/ahe-thinker/SKILL.md").exists()
     assert (fake_home / ".codex/ahe-shared/templates/PRODUCT.md").exists()
     assert (fake_home / ".codex/hooks/ahe-hook.js").exists()
 
@@ -281,8 +284,8 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
 
     assert uninstall_process.returncode == 0, uninstall_process.stderr
     assert not (fake_home / ".codex/skills/ahe-init").exists()
-    assert not (fake_home / ".codex/skills/ahe-conversation").exists()
-    assert not (fake_home / ".codex/skills/ahe-thinking").exists()
+    assert not (fake_home / ".codex/skills/ahe-conversator").exists()
+    assert not (fake_home / ".codex/skills/ahe-thinker").exists()
     assert not (fake_home / ".codex/ahe-shared").exists()
     assert not (fake_home / ".codex/hooks").exists()
     config_content = config_path.read_text(encoding="utf-8")

@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-update/SKILL.md"
+SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-harness/SKILL.md"
 
 
 def test_skill_md_contains_tracking_sync_sections() -> None:

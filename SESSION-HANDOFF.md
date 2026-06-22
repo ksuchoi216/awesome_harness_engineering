@@ -2,11 +2,19 @@
 
 ## Current Product Context
 
-- Goal: Keep AHE's Codex skill surface small and focused while preserving the harness specification docs.
-- Current status: `feat-041 Configurable AHE Compression Thresholds` is complete.
-- Branch / commit: `develop`; AHE now uses `.codex/ahe-shared/config.yaml` to specify line limits for compression detection.
+- Goal: Keep AHE's Codex skill surface small and focused while making the internal routing model more logical and explicit.
+- Current status: `feat-042 AHE Logical Agent Network` is complete.
+- Branch / commit: `develop`; AHE now routes through `ahe-thinker`, `ahe-reviewer`, `ahe-conversator`, `ahe-harness`, and `ahe-solver`.
 
 ## Last Completed Work
+
+- [x] Replaced the old internal skill split with the centered `ahe-thinker` agent network.
+- [x] Added `.codex/skills/ahe-thinker`, `ahe-conversator`, `ahe-reviewer`, `ahe-harness`, and `ahe-solver`.
+- [x] Removed the old `ahe-thinking`, `ahe-conversation`, `ahe-spec`, and `ahe-update` skill contracts.
+- [x] Rewrote `.codex/hooks/ahe-hook.js` so exact `ahe` routes through `ahe-thinker`, exact `ahe init` routes through `$ahe-init`, and explicit `ahe <query>` is the only natural-language activation path.
+- [x] Reworked `ahe-harness` to own product/instruction updates, tracker sync, todo application, and the `ahe compress feature-list` flow including `ahe-conversator` fallback when Product.md does not imply a next feature.
+- [x] Updated `bin/ahe`, `README.md`, `docs/PRODUCT.md`, and the AHE contract tests for the new internal model.
+- [x] Verified with `./init.sh`, `pytest tests/ -x`, `node --check .codex/hooks/ahe-hook.js`, `bash -n bin/ahe`, `ruff check src/ tests/`, and `python3 -m json.tool feature-list.json`. `mypy src/ --strict` exits with code 2 because `src/` contains no Python files.
 
 - [x] Added packaged `.codex/ahe-shared/config.yaml` to configure per-file line thresholds for compression routing.
 - [x] Updated `scripts/check-harness-size.sh` to parse the config file and support environment variable overrides (`AHE_AGENT_MD_LIMIT`, etc.).
@@ -105,26 +113,27 @@
 
 ## Current Open Questions
 
-- Whether `ahe-update` should remove only the consumed `## TODO` entries or remove `docs/todo.md` entirely when the queue becomes empty.
+- Whether `ahe-harness` should keep an explicit sub-section for query-specific examples or stay purely responsibility-driven.
 
 ## Important Files
 
-- `docs/PRODUCT.md` - Canonical product specification and scope reference.
-- `.codex/skills/ahe-conversation/SKILL.md` - Internal recursive clarification, conversation state, and resume-aware workflow protocol used by interactive AHE skills.
-- `.codex/skills/ahe-thinking/SKILL.md` - Internal decision protocol that judges the current project, feature, or sub-feature and decides whether AHE should clarify or execute next.
+- `docs/PRODUCT.md` - Canonical product specification and scope reference for the new agent network.
+- `.codex/skills/ahe-conversator/SKILL.md` - Internal recursive clarification, conversation state, and resume-aware workflow protocol used by the worker agents.
+- `.codex/skills/ahe-thinker/SKILL.md` - Centered internal decision protocol that routes exact `ahe` and explicit `ahe <query>` through the AHE agent network.
+- `.codex/skills/ahe-harness/SKILL.md` - Harness-management workflow for product docs, tracker sync, todo application, and compression-aware maintenance.
+- `.codex/skills/ahe-reviewer/SKILL.md` - Review workflow for repo code, harness evidence, and CodeGraph context.
+- `.codex/skills/ahe-solver/SKILL.md` - Feature-solving workflow that divides and plans implementation work.
 - `.codex/skills/ahe-compression/SKILL.md` - Internal compression protocol that tells AHE how to compact oversized harness files safely.
 - `.codex/skills/ahe-compression/scripts/check-harness-size.sh` - Rule-based shell detector used before reading large harness files wholesale.
-- `.codex/skills/ahe-spec/SKILL.md` - Combined product, constraints, and architecture specification workflow.
-- `.codex/hooks/ahe-hook.js` - Exact `ahe`, exact `ahe init`, exact `ahe-init`, and exact `$ahe-init` command hook; the directives split new-start and progress routing while keeping adaptive CodeGraph preflight for progress.
-- `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, `tests/test_ahe_hook.py` - Contract coverage for scoped restart semantics and canonical product-spec placement.
+- `.codex/hooks/ahe-hook.js` - Exact `ahe`, exact `ahe init`, exact `ahe-init`, exact `$ahe-init`, and explicit `ahe <query>` command hook.
+- `tests/test_init_workflow.py`, `tests/test_spec_workflow.py`, `tests/test_specialized_workflows.py`, `tests/test_ahe_hook.py` - Contract coverage for the new harness and routing model.
 - `.ahe/backups/20260608-215651/AGENTS.md` - Clear-workflow backup of the current global instructions.
 - `.ahe/backups/20260608-215651/docs/` - Clear-workflow backup of the current docs folder.
 - `.ahe/backups/20260608-215651/PROGRESS.md` - Clear-workflow backup of the current progress log.
 - `.ahe/backups/20260608-215651/SESSION-HANDOFF.md` - Clear-workflow backup of the current handoff file.
 - `.ahe/backups/20260608-215651/init.sh` - Clear-workflow backup of the current startup script.
-- `.codex/skills/ahe-init/SKILL.md` - The only user-facing installed skill; it now covers first-time setup and scoped restart behavior for existing harnesses.
-- `tests/test_clarification_prompt.py` - Contract coverage for Codex UI-compatible clarification guidance, skill-specific clarification sections, and the internal `ahe-conversation` protocol.
-- `.codex/skills/ahe-update/SKILL.md` - Update workflow that now consumes `docs/todo.md` into `docs/PRODUCT.md`.
+- `.codex/skills/ahe-init/SKILL.md` - The only user-facing installed skill; it now hands setup into `ahe-harness`.
+- `tests/test_clarification_prompt.py` - Contract coverage for Codex UI-compatible clarification guidance and the new internal agent names.
 - `.codex/ahe-shared/` - Shared templates and schemas used by the split skills and installer.
 - `scripts/install.sh`, `scripts/uninstall.sh` - Helper scripts for global Codex install and uninstall under `${HOME}/.codex`.
 - `tests/test_specialized_workflows.py` - Contract coverage for `$ahe-init` and the remaining internal spec/update workflows.
@@ -141,18 +150,18 @@
 2. Read `feature-list.json` and `PROGRESS.md`.
 3. Review this handoff.
 4. Run `./init.sh` or the documented verification command before editing.
-5. If the internal orchestration changes again, update `ahe-thinking`, `ahe-conversation`, `ahe-init`, the remaining internal workflow skills, hook guidance, installer lists, product docs, and the markdown contract tests together.
+5. If the internal orchestration changes again, update `ahe-thinker`, `ahe-conversator`, `ahe-harness`, `ahe-reviewer`, `ahe-solver`, `ahe-init`, hook guidance, installer lists, product docs, and the markdown contract tests together.
 
 ## Verification Status
 
 | Check | Command | Result | Notes |
 |---|---|---|---|
 | Init sanity | `./init.sh` | Pass | Startup check still reports the expected Python-default environment guidance. |
-| Full tests | `pytest tests/ -x` | Pass | 55 passed. |
+| Full tests | `pytest tests/ -x` | Pass | 60 passed. |
 | Tests except blocked installer helper | `pytest tests/ -k 'not helper_scripts_target_global_codex_home'` | Not run this session | No longer needed because full pytest passed. |
 | Targeted tests | `pytest tests/test_project_setup.py -x` | Pass | 9 passed; covers direct install/uninstall and global helper cleanup of AHE-owned config entries. |
 | Lint | `ruff check src/ tests/` | Pass | Ruff reported all checks passed. |
-| Type check | `mypy src/ --strict`; `python3 -m mypy src/ --strict` | Blocked | `mypy` is not installed as a command or Python module in this workspace. |
+| Type check | `mypy src/ --strict` | Not applicable | `mypy` exits with code 2 because `src/` contains no Python files. |
 | LSP diagnostics | Changed Python test files | Pass | No diagnostics found for `tests/test_project_setup.py`. |
 | Hook syntax | `node --check .codex/hooks/ahe-hook.js` | Pass | Edited hook parses successfully. |
 | Shell syntax | `bash -n bin/ahe` and `sh -n .codex/skills/ahe-compression/scripts/check-harness-size.sh` | Pass | Installer and compression detector parse cleanly. |
