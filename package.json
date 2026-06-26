@@ -1,6 +1,6 @@
 {
   "name": "@ksuchoi216/ahe",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Codex chat workflow skill installer for Awesome Harness Engineering",
   "publishConfig": {
     "access": "public"
@@ -10,7 +10,8 @@
   },
   "scripts": {
     "test": "pytest tests/ -x",
-    "prepublishOnly": "npm run test"
+    "prepublishOnly": "npm run test",
+    "postinstall": "echo \"\" && echo \"Awesome Harness Engineering CLI installed!\" && echo \"To install the skills in your project, run: ahe install\" && echo \"\" && echo \"If you wish to uninstall later, run: npm uninstall -g @ksuchoi216/ahe\""
   },
   "repository": {
     "type": "git",

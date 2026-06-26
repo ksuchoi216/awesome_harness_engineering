@@ -23,11 +23,12 @@ readonly AHE_CONFIG_BLOCK_START="# BEGIN AHE MANAGED CONFIG"
 readonly AHE_CONFIG_BLOCK_END="# END AHE MANAGED CONFIG"
 readonly MANAGED_SKILLS=(
   "ahe-init"
-  "ahe-conversation"
   "ahe-compression"
-  "ahe-thinking"
-  "ahe-spec"
-  "ahe-update"
+  "ahe-conversator"
+  "ahe-harness"
+  "ahe-reviewer"
+  "ahe-solver"
+  "ahe-thinker"
 )
 
 usage() {
@@ -200,6 +201,7 @@ Next:
 1. Open Codex chat in this workspace.
 2. Use \`ahe init\` for a new start.
 3. Use exact \`ahe\` to continue existing harness work.
+4. Use \`ahe <query>\` for explicit AHE requests such as \`ahe compress feature-list\`.
 EOF
 }
 

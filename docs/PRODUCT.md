@@ -1,45 +1,50 @@
 # AHE Project Specification
 
-## 1. Project Name
+## 1. Product Definition
 
-AHE
+AHE is a Codex chat workflow package for building and maintaining harness files
+in a repository.
 
-## 2. Product Definition
-
-AHE is a Codex chat workflow package for building and maintaining harness files in a repository.
-
-The user works in Codex chat, not primarily in the terminal. The package installs multiple Codex skills so the user can invoke focused commands directly in chat:
+The user-facing chat commands are:
 
 - `$ahe-init`
+- exact `ahe init`
+- exact `ahe-init`
+- exact `ahe`
+- explicit `ahe <query>`
 
-Users should start new harness work with exact `ahe init`, exact `ahe-init`, or `$ahe-init`, and
-continue existing harness work with exact `ahe`.
+The internal skills are:
 
-The package also installs `ahe-thinking`, `ahe-compression`,
-`ahe-conversation`, `ahe-spec`, and `ahe-update` as internal workflow skills.
-They are not user-facing commands.
+- `ahe-thinker`
+- `ahe-reviewer`
+- `ahe-conversator`
+- `ahe-harness`
+- `ahe-solver`
+- `ahe-compression`
 
-## 3. Installed Layout
+Only `$ahe-init` is user-facing as an installed skill.
 
-The packaged install must create the following structure inside Codex home or the current workspace:
+## 2. Installed Layout
 
 ```text
 .codex/
   skills/
     ahe-init/
       SKILL.md
-    ahe-thinking/
+    ahe-thinker/
+      SKILL.md
+    ahe-reviewer/
+      SKILL.md
+    ahe-conversator/
+      SKILL.md
+    ahe-harness/
+      SKILL.md
+    ahe-solver/
       SKILL.md
     ahe-compression/
       SKILL.md
       scripts/
         check-harness-size.sh
-    ahe-conversation/
-      SKILL.md
-    ahe-spec/
-      SKILL.md
-    ahe-update/
-      SKILL.md
   ahe-shared/
     config.yaml
     templates/
@@ -57,32 +62,19 @@ The packaged install must create the following structure inside Codex home or th
     ahe-hook.js
 ```
 
-Only `$ahe-init` should be shown as a user-facing skill. Exact `ahe`, exact
-`ahe init`, and exact `ahe-init` are the user-facing chat commands. The installed `ahe-thinking`
-skill is the internal decision layer that judges what
-must be clarified, what can be executed, and which workflow should run next.
-The installed `ahe-conversation` skill is internal support for multi-turn
-clarification, stateful conversation, and resume-aware guidance after
-`ahe-thinking` identifies a missing decision. Shared templates and schemas must
-live outside `skills/`. Hooks provide exact-command routing support for users
-who type `ahe`.
-The installed `ahe-compression` skill is internal support for rule-based
-line-count detection and compression of oversized harness-engineering files
-before AHE spends context reading them.
+## 3. Agent Model
 
-## 4. Workspace Runtime State
+The centered internal model is:
 
-Workspace-specific state stays under `.ahe/`.
+`query -> ahe-thinker -> ahe-reviewer | ahe-conversator | ahe-harness | ahe-solver`
 
-```text
-.ahe/
-  process_status.json
-  backups/
-```
+- `ahe-thinker` is the central decision layer.
+- Worker agents may call each other directly when that is the logical next
+  action.
+- Direct handoffs must still provide a clear result back to the broader AHE
+  workflow.
 
-The installed skills must not store workspace runtime state under `.codex/`.
-
-## 5. Skill Responsibilities
+## 4. Responsibilities
 
 ### `$ahe-init`
 
@@ -90,171 +82,98 @@ The installed skills must not store workspace runtime state under `.codex/`.
 - If no AHE-managed harness files exist, start initialization normally without
   asking a restart-scope question.
 - If any AHE-managed harness file exists, read the existing files first,
-  summarize the current project purpose and product specification state, and
-  ask what restart scope the user wants before backing up, removing,
-  overwriting, or refreshing existing harness files.
-- Interpret restart scope from the user's free-form answer. For example,
-  `purpose` means restart the whole harness from the project purpose, while
-  `product` means preserve the project purpose in `AGENTS.md`, back up the
-  current product/specification files in scope, and restart product
-  specification work in `docs/PRODUCT.md`.
-- If `AGENTS.md` already exists, ask the user whether the current `AGENTS.md` is right.
-- If not, ask for the purpose of this project.
-- If `AGENTS.md` does not exist, copy it from the installed templates.
-- Update only the project-purpose portion of `AGENTS.md`.
+  summarize the current project purpose and product specification state, and ask
+  what restart scope the user wants before removing, overwriting, or refreshing
+  existing harness files.
+- Interpret restart scope from the user's free-form answer.
+- Do not create backup copies of replaced harness files during restart.
+- Summarize replaced harness history in the refreshed tracking artifacts instead
+  of writing backups.
 - Keep product behavior, requirements, scope, success criteria, and workflow
-  details out of `AGENTS.md`; these specification details belong in
-  `docs/PRODUCT.md` through `ahe-spec`.
-- Ask whether the project language is Python using a Codex-supported structured response request with meaningful options and custom input.
-- If the user answers "No", ask again: "Which language do you use?".
-- When exact `ahe init` is used for a user-scoped restart on an existing
-  harness, back up the affected current harness files under `.ahe/backups/`,
-  remove only the files in the chosen restart scope, and continue the
-  initialization flow.
-- Copy missing template-managed root files from `ahe-shared/templates`, excluding `PRODUCT.md`, and ask for explicit overwrite confirmation before replacing an existing file.
-- Execute the following three sequential steps:
-  1. complete init setup work
-  2. call "ahe-spec"
-  3. call "ahe-update"
-- Ensure that the process status (e.g., `current_step` in `.ahe/process_status.json`) tracks each step and indicates the active status of the three-step sequence: `"ahe-init"`, `"ahe-spec"`, and `"ahe-update"`.
+  details out of `AGENTS.md`.
+- Send product behavior, scope, requirements, success criteria, and workflow
+  details to `ahe-harness` so they are written in `docs/PRODUCT.md` first.
+- Generate an empty `feature-list.json` from a template only as a placeholder;
+  do not write concrete feature items until `docs/PRODUCT.md` is populated.
+- Track `ahe-init` then `ahe-harness` in `.ahe/process_status.json`.
 
-### `ahe-spec` (internal)
+### `ahe-harness`
 
-- Modify `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md`. `docs/ARCHITECTURE.md` is optional.
-- Treat `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` as the required harness contract. `docs/PRODUCT.md` is the canonical home for product specification
-  details collected during `ahe init`.
-- Ask recursively for product and instructions details until the affected specification areas are clear.
-- Update only the relevant docs among the specification files.
-
-### `ahe-update` (internal)
-
-- If the user is adding new work, append it into the last `## TODO` section of `docs/todo.md`, create that section when needed, and update `feature-list.json`.
-- Read `docs/todo.md` when it exists.
+- Modify `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md`.
+- Treat `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` as the required harness
+  contract.
+- If the user is adding new work, append it into the last `## TODO` section of
+  `docs/todo.md`, create that section when needed, and update
+  `feature-list.json`.
 - Apply queued todo content from `docs/todo.md` into `docs/PRODUCT.md`.
-- Remove the applied todo content from `docs/todo.md` because it is already reflected in `docs/PRODUCT.md`.
-- Update `feature-list.json`.
-- Update `PROGRESS.md`.
-- Update `SESSION-HANDOFF.md`.
-- Keep `.ahe/process_status.json` aligned with the active workflow.
+- Remove applied todo content from `docs/todo.md`.
+- Update `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and
+  `.ahe/process_status.json`.
+- For `ahe compress feature-list`, replace old completed feature entries with
+  one summarized done feature that keeps its own `id`, `name`, `description`,
+  `dependencies`, `status`, and short evidence.
+- Preserve unfinished, blocked, or active items in detail.
+- If no new feature can be derived from `docs/PRODUCT.md`, call
+  `ahe-conversator` to ask what next feature, product direction, or goal should
+  be tracked.
 
-### `ahe-compression` (internal)
-
-- Provide a shell-script line-count detector for AHE-managed harness files.
-- Read configurable thresholds from `.codex/ahe-shared/config.yaml` with fallback to built-in defaults.
-- Treat oversized `AGENTS.md`, `docs/PRODUCT.md`, `docs/INSTRUCTIONS.md`,
-  `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `docs/todo.md`
-  as candidates for compression.
-- Return a deterministic compression decision before `ahe-thinking` reads large
-  files wholesale.
-- Compress only stale, duplicated, or historical context while preserving active
-  requirements, current decisions, unfinished work, blockers, dependencies,
-  required headers, and valid JSON.
-
-## 6. Exact `ahe` Command Auto Operation
-
-When the user sends exactly `ahe` in Codex chat, the installed
-`UserPromptSubmit` hook must inject an AHE progress directive. When the user
-sends exactly `ahe init`, exact `ahe-init`, or exact `$ahe-init`, the hook must inject a new-start directive. Normal
-prompts that merely mention AHE, such as "explain ahe", must not activate the
-flow.
-
-The directive must tell Codex to:
-
-- Inspect harness state before choosing a workflow: `AGENTS.md`, `docs/PRODUCT.md`, `docs/INSTRUCTIONS.md`, `feature-list.json`, and `PROGRESS.md`.
-- Run CodeGraph preflight before harness status reporting: check `command -v codegraph`; if missing, report `NOT INSTALLATION of codegraph`, skip `codegraph init` and `codegraph sync`, and continue with normal repo inspection.
-- If the CodeGraph CLI exists and `.codegraph/` is missing, run `codegraph init` before reviewing code.
-- If the CodeGraph CLI exists and `.codegraph/` is present, run `codegraph sync` before reviewing code.
-- Review code through CodeGraph when available after preflight succeeds by preferring CodeGraph MCP or exploration behavior.
-- Make the first response a concise harness engineering status report table before proceeding to edits or workflow execution.
-- Use a stable Markdown table with `Item` and `Content` columns, covering `AGENTS.md`, `PRODUCT.md`, `INSTRUCTIONS.md`, `feature-list.json`, and `PROGRESS.md`.
-- Keep the table short and readable.
-- Do not include the next step inside the table.
-- Use `ahe-thinking` as the internal decision layer before choosing the next
-  action.
-- Use `ahe-compression` through `ahe-thinking` before reading full harness files
-  when rule-based line counts show oversized context.
-- Route to `$ahe-init` when no harness files exist.
-- Classify the harness into exactly one state after the table:
-  - `harness engineering not enough`
-  - `in the middle of building features`
-  - `completed all`
-- Continue harness engineering work when harness files exist but core harness
-  engineering is incomplete.
-- Repair or initialize harness state when `feature-list.json` is missing or invalid.
-- Continue the first unfinished feature in `feature-list.json` whose
-  dependencies are satisfied.
-- Ask the user for the next task when all features are `done` and no obvious
-  harness gap remains.
-- Continue automatically after classification instead of waiting for a separate
-  next-step confirmation.
-- Follow this loop while routing work: `thinking -> conversation if needed ->
-  execution -> thinking`.
-- Treat exact `ahe` as the progress path for continuing existing harness work.
-- Treat exact `ahe init`, exact `ahe-init`, and exact `$ahe-init` as the new-start path for beginning or reinitializing
-  harness work through `$ahe-init`.
-
-## 7. Thinking Protocol
-
-Each interactive AHE workflow must follow the internal `ahe-thinking` protocol
-before acting when the next safe step is not already obvious.
+### `ahe-thinker`
 
 - Inspect the current unit as `project`, `feature`, or `sub-feature`.
-- Before reading full harness files, run the `ahe-compression` size detector or
-  an equivalent rule-based `wc -l` check.
-- If compression is required, call `ahe-compression` before continuing normal
-  harness-state routing.
 - Judge the current unit against `Why`, `What`, and `How`.
-- For a `project`, require `Why`, `What`, and `How` by default.
-- For a `feature` or `sub-feature`, require only the minimum of `Why`, `What`,
-  and `How` needed to proceed safely.
-- If the current unit is already clear from the project context, do not ask all
-  three questions again.
-- If clarity is missing, call `ahe-conversation` with the exact missing
-  question type.
-- If clarity is sufficient, continue to the next skill or next unfinished
-  feature.
-- Reflect clarified project or feature intent into `docs/PRODUCT.md` and keep
-  `feature-list.json` focused on tracking the work itself.
+- Use `ahe-compression` before reading full harness files when the detector
+  returns `COMPRESSION_REQUIRED`.
+- Route to `ahe-reviewer`, `ahe-conversator`, `ahe-harness`, or `ahe-solver`
+  based on the missing need.
 
-## 8. Conversation Protocol
+### `ahe-reviewer`
 
-If a user response needs clarification or more detail, each interactive AHE skill must follow the internal `ahe-conversation` protocol and continue the conversation recursively using a Codex-supported structured response request.
+- Inspect code, harness files, progress evidence, and `.codegraph` / CodeGraph
+  context when available.
+- Report evidence to `ahe-thinker` or call `ahe-harness` directly when harness
+  drift is discovered.
 
-- Use `ahe-conversation` only after `ahe-thinking` identifies the missing
-  decision or missing `Why`, `What`, or `How`.
-- Ask a short question matched to the active skill.
-- Provide 2-3 meaningful mutually exclusive options when possible.
-- Allow custom input when predefined options are not enough.
-- Keep asking until the answer satisfies the skill's clarification criteria.
-- Treat vague, off-topic, contradictory, or incomplete answers as not clarified yet.
-- Persist the pending decision, missing field, and resume context when the conversation blocks workflow completion.
-- Do not expose `$ahe-conversation` as a command; it is only shared guidance for inner skills.
+### `ahe-conversator`
 
-## 9. Installation Behavior
+- Ask one focused question at a time.
+- Clarify missing purpose, requirements, scope, next feature, or workflow
+  direction.
+- Persist the blocked state in `.ahe/process_status.json` and update handoff
+  artifacts when necessary.
 
-- Local development install after cloning the repo:
-  - `npx --yes --package=file:. ahe install`
-- **Global Published Installation**
-  - `npx --package=@ksuchoi216/ahe ahe install` (or `npm install -g @ksuchoi216/ahe` then `ahe install`)
-- `ahe install` must remove stale AHE-owned entries from `.codex/config.toml`
-  before installing files. It must preserve unrelated plugin, hook, and agent
-  configuration.
-- `ahe uninstall` must remove installed AHE skills, shared assets, hooks, and
-  stale AHE-owned entries from `.codex/config.toml`. It must preserve unrelated
-  config entries.
-- Helper scripts:
-  - `scripts/install.sh` installs into `~/.codex`
-  - `scripts/uninstall.sh` removes the installed AHE skills, `.codex/ahe-shared`, `.codex/hooks`, and AHE-owned `.codex/config.toml` entries through the packaged uninstall command.
+### `ahe-solver`
 
-## 10. Success Criteria
+- Divide broad feature work into smaller problems when useful.
+- Plan each smaller problem before implementation.
+- Call `ahe-reviewer` for code understanding and `ahe-conversator` for missing
+  requirements.
 
-- Codex shows only `$ahe-init` as a user-facing skill instead of a broad AHE
-  command list.
-- Users can start new harness work with exact `ahe init`, exact `ahe-init`, or exact `$ahe-init` and continue existing
-  harness work with exact `ahe`.
-- Exact `ahe` prompts activate automatic status, CodeGraph, and next-workflow routing; ordinary mentions of AHE do not.
-- The installer copies all user-facing skill directories, the internal
-  `ahe-thinking`, `ahe-compression`, and `ahe-conversation` protocol skills,
-  shared assets, and hooks.
-- The uninstall script removes the installed AHE skills, shared assets, and hooks cleanly.
-- Tests validate the split-skill structure and expected workflow contracts.
+### `ahe-compression`
+
+- Provide a shell-script line-count detector for AHE-managed harness files.
+- Return a deterministic compression decision before `ahe-thinker` or
+  `ahe-harness` reads large files wholesale.
+- Compress only stale or noisy history while preserving active requirements,
+  current decisions, unfinished work, blockers, dependencies, required headers,
+  and valid JSON.
+
+## 5. Hook Behavior
+
+- Exact `ahe` activates the progress router.
+- Exact `ahe init`, exact `ahe-init`, and exact `$ahe-init` activate the new
+  start router.
+- Explicit `ahe <query>` activates the thinker-routed query path.
+- Broad non-prefixed prompts must not activate AHE.
+- The first response must include a concise status report table covering
+  `AGENTS.md`, `PRODUCT.md`, `INSTRUCTIONS.md`, `feature-list.json`, and
+  `PROGRESS.md`.
+
+## 6. Success Criteria
+
+- Codex shows only `$ahe-init` as a user-facing installed skill.
+- Exact `ahe`, exact `ahe init`, and explicit `ahe <query>` route into the new
+  internal model.
+- The installer copies the new internal skill set and no longer depends on
+  `ahe-spec`, `ahe-update`, `ahe-thinking`, or `ahe-conversation`.
+- Tests validate the new split-skill structure and explicit query-routing
+  contract.

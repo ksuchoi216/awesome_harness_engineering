@@ -6,8 +6,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILL_PATHS = (
     REPO_ROOT / ".codex/skills/ahe-init/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-spec/SKILL.md",
-    REPO_ROOT / ".codex/skills/ahe-update/SKILL.md",
+    REPO_ROOT / ".codex/skills/ahe-harness/SKILL.md",
+    REPO_ROOT / ".codex/skills/ahe-solver/SKILL.md",
 )
 
 
@@ -35,7 +35,14 @@ def test_skill_files_match_expected_command_names() -> None:
     init_content = (REPO_ROOT / ".codex/skills/ahe-init/SKILL.md").read_text(encoding="utf-8")
     assert "$ahe-init" in init_content
 
-    for skill_name in ("ahe-spec", "ahe-update"):
+    for skill_name in (
+        "ahe-thinker",
+        "ahe-reviewer",
+        "ahe-conversator",
+        "ahe-harness",
+        "ahe-solver",
+        "ahe-compression",
+    ):
         content = (REPO_ROOT / f".codex/skills/{skill_name}/SKILL.md").read_text(encoding="utf-8")
         assert "not a user-facing command" in content.lower()
 

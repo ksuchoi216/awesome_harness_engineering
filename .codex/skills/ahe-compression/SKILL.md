@@ -1,6 +1,6 @@
 ---
 name: ahe-compression
-description: Internal AHE compression workflow for detecting oversized harness-engineering files and compacting them before AHE thinking reads or routes large context. Use when AGENTS.md, docs/PRODUCT.md, docs/INSTRUCTIONS.md, feature-list.json, PROGRESS.md, SESSION-HANDOFF.md, docs/todo.md, or other AHE harness artifacts have too many lines or waste context.
+description: Internal AHE compression workflow for detecting oversized harness-engineering files and compacting them before AHE thinker or harness routing reads large context. Use when AGENTS.md, docs/PRODUCT.md, docs/INSTRUCTIONS.md, feature-list.json, PROGRESS.md, SESSION-HANDOFF.md, docs/todo.md, or other AHE harness artifacts have too many lines or waste context.
 ---
 
 # AHE Compression
@@ -8,7 +8,7 @@ description: Internal AHE compression workflow for detecting oversized harness-e
 This is an internal AHE workflow skill, not a user-facing command.
 
 Do not treat `$ahe-compression` as a user command.
-Use it after `ahe-thinking` decides that harness context is too large to read
+Use it after `ahe-thinker` or `ahe-harness` decides that harness context is too large to read
 efficiently.
 
 ## Size Detection
@@ -73,9 +73,10 @@ Exit code meanings:
   dependencies, and verification evidence.
 - Preserve required headers and file formats for `PROGRESS.md`,
   `SESSION-HANDOFF.md`, `feature-list.json`, and `AGENTS.md`.
-- Keep `feature-list.json` valid JSON. Shorten old completed-feature evidence,
-  but preserve each feature `id`, `name`, `description`, `dependencies`,
-  `status`, and current unfinished details.
+- Keep `feature-list.json` valid JSON. Replace stale completed-feature history
+  with one summarized done feature, preserve its `id`, `name`, `description`,
+  `dependencies`, `status`, and short evidence, and keep current unfinished
+  details as-is.
 - Keep `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` as the current harness
   contract. Remove duplicate historical wording only when the active contract
   remains clear.
@@ -83,9 +84,8 @@ Exit code meanings:
   decisions that still matter, blockers, and latest verification.
 - Keep `SESSION-HANDOFF.md` focused on the startup path for the next session,
   important files, open questions, and current verification status.
-- Back up material before deleting substantial historical context by moving it
-  under `.ahe/backups/compression-YYYYMMDD-HHMMSS/` when that context may still
-  be useful.
+- Do not create backup copies when compressing harness history. Preserve useful
+  context through concise summaries in the refreshed harness files instead.
 
 ## Completion
 

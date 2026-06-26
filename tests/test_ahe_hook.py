@@ -66,7 +66,7 @@ def test_exact_ahe_prompt_emits_auto_operation_context() -> None:
     assert "unfinished feature" in additional_context
     assert "ask the user" in additional_context
     assert "$ahe-init" in additional_context
-    assert "ahe-thinking" in additional_context
+    assert "ahe-thinker" in additional_context
 
 
 def test_auto_operation_requires_first_response_status_table() -> None:
@@ -92,7 +92,7 @@ def test_auto_operation_requires_first_response_status_table() -> None:
     )
 
 
-def test_auto_operation_requires_direct_next_step_confirmation() -> None:
+def test_auto_operation_routes_through_thinker_network() -> None:
     additional_context = additional_context_for_prompt("ahe")
 
     assert "After the table, classify the harness into exactly one state." in additional_context
@@ -102,7 +102,11 @@ def test_auto_operation_requires_direct_next_step_confirmation() -> None:
     assert "`completed all`" in additional_context
     assert "Do not include the next step inside the table." in additional_context
     assert "Continue automatically after classification." in additional_context
-    assert "thinking -> conversation if needed -> execution -> thinking" in additional_context
+    assert "ahe-thinker" in additional_context
+    assert "ahe-reviewer" in additional_context
+    assert "ahe-conversator" in additional_context
+    assert "ahe-harness" in additional_context
+    assert "ahe-solver" in additional_context
     assert "confirm the next step directly" not in additional_context
     assert "`start a new task`" not in additional_context
     assert "`resume existing harness work`" not in additional_context
@@ -137,8 +141,11 @@ def test_exact_ahe_init_prompt_emits_new_start_context() -> None:
     assert "If no AHE-managed harness files exist, start initialization normally." in additional_context
     assert "If any AHE-managed harness file exists, read the existing files" in additional_context
     assert "ask what restart scope the user wants" in additional_context
-    assert "Do not back up, remove, overwrite, or refresh existing harness files before the user answers" in additional_context
+    assert "Do not remove, overwrite, or refresh existing harness files before the user answers" in additional_context
+    assert "instead of creating backup copies" in additional_context
     assert "Product/instructions specification details belong in `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md`, not `AGENTS.md`." in additional_context
+    assert "ahe-harness" in additional_context
+    assert ".ahe/backups/" not in additional_context
 
 
 def test_exact_ahe_init_aliases_emit_new_start_context() -> None:
@@ -169,50 +176,38 @@ def test_non_user_prompt_submit_event_emits_nothing() -> None:
     assert run_hook(payload) == ""
 
 
-def test_broad_natural_language_ahe_intents() -> None:
+def test_explicit_ahe_query_routes_to_thinker() -> None:
     prompts = [
-        "new product will be added",
-        "I want to add features",
-        "add more instructions",
-        "we need a new requirement",
-        "update the product spec",
-        "track this as work",
-        "Please add a new feature for user login.",
-        "Let's update the product spec to include dark mode.",
-        "I need to track this bug fix as new work.",
-        "Can we add an instruction about writing clean code?",
-        "We have a new product requirement for the dashboard.",
+        "ahe compress feature-list",
+        "ahe update product spec",
+        "ahe add a new dashboard feature",
     ]
     for prompt in prompts:
         context = additional_context_for_prompt(prompt)
         assert context is not None
         assert "AHE automatic operation activated." in context
         assert f'Original prompt: "{prompt}"' in context
-        assert "adaptive workflow" in context
+        assert "ahe-thinker" in context
+        assert "explicit AHE query" in context
 
 
-def test_broad_natural_language_ignores_unrelated_prompts() -> None:
+def test_nonprefixed_natural_language_prompts_do_not_trigger() -> None:
     prompts = [
-        "what is a product feature?",
-        "how to fix the bug",
-        "add a new file for the product",
-        "can you explain the spec?",
-        "write some code for this feature",
-        "Can you show me where the instructions are?",
-        "Please explain the requirements to me.",
-        "How do I update the database schema?"
+        "I want to add features",
+        "update the product spec",
+        "track this as work",
+        "Can we add an instruction about writing clean code?",
     ]
     for prompt in prompts:
         assert hook_output_for_prompt(prompt) is None
 
 
-def test_adaptive_directive_contract() -> None:
-    context = additional_context_for_prompt("I want to add features")
+def test_query_directive_contract() -> None:
+    context = additional_context_for_prompt("ahe compress feature-list")
     assert context is not None
     assert "Inspect current harness state before choosing a workflow" in context
     assert "| AGENTS.md |" in context
-    assert "Use `ahe-thinking` as the internal decision layer" in context
-    assert "Decide the next AHE workflow with `ahe-thinking` based on the original prompt" in context
-    assert "ask exactly one detail question before editing" in context
-    assert "Call `ahe-conversation` for missing" in context
-    assert "create `docs/INSTRUCTIONS.md` from the template when needed" in context
+    assert "Use `ahe-thinker` as the internal decision layer" in context
+    assert "ahe-harness" in context
+    assert "replace old completed feature entries with one summarized done feature" in context
+    assert "If no new feature can be derived from `docs/PRODUCT.md`, call `ahe-conversator`" in context
