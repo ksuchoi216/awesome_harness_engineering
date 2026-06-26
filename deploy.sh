@@ -72,23 +72,10 @@ fi
 
 # Publish the package (this will automatically run the prepublishOnly test script)
 echo "Publishing package to npm..."
-read -p "Enter your NPM 2FA code (leave blank if not using 2FA): " npm_otp
-echo
-
-if [ -n "$npm_otp" ]; then
-    if npm publish --otp="$npm_otp"; then
-        echo "Successfully published to npm!"
-        echo "You can now install the package globally with: npm install -g @ksuchoi216/ahe"
-    else
-        echo "Failed to publish to npm. Check the error messages above."
-        exit 1
-    fi
+if npm publish; then
+    echo "Successfully published to npm!"
+    echo "You can now install the package globally with: npm install -g @ksuchoi216/ahe"
 else
-    if npm publish; then
-        echo "Successfully published to npm!"
-        echo "You can now install the package globally with: npm install -g @ksuchoi216/ahe"
-    else
-        echo "Failed to publish to npm. Check the error messages above."
-        exit 1
-    fi
+    echo "Failed to publish to npm. Check the error messages above."
+    exit 1
 fi
