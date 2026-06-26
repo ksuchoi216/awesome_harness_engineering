@@ -2,8 +2,8 @@
 
 ## 1. Product Definition
 
-AHE is a Codex chat workflow package for building and maintaining harness files
-in a repository.
+AHE is a global Codex chat workflow package for building and maintaining harness
+files in any active repository.
 
 The user-facing chat commands are:
 
@@ -13,16 +13,12 @@ The user-facing chat commands are:
 - exact `ahe`
 - explicit `ahe <query>`
 
-The internal skills are:
+The internal skills are `ahe-thinker`, `ahe-reviewer`, `ahe-conversator`,
+`ahe-harness`, `ahe-solver`, and `ahe-compression`.
 
-- `ahe-thinker`
-- `ahe-reviewer`
-- `ahe-conversator`
-- `ahe-harness`
-- `ahe-solver`
-- `ahe-compression`
-
-Only `$ahe-init` is user-facing as an installed skill.
+AHE always installs into the global Codex home (`$CODEX_HOME` when set,
+otherwise `~/.codex`). Installed skills, shared files, and hook files must not
+be copied into each target workspace.
 
 ## 2. Installed Layout
 
@@ -49,9 +45,9 @@ Only `$ahe-init` is user-facing as an installed skill.
     config.yaml
     templates/
       AGENTS.md
-      PRODUCT.md
-      PROGRESS.md
-      SESSION-HANDOFF.md
+      product.md
+      progress.md
+      session-handoff.md
       init.sh
       feature-list.json
     schemas/
@@ -78,7 +74,8 @@ The centered internal model is:
 
 ### `$ahe-init`
 
-- Initialize the harness in the current workspace.
+- Initialize the harness in the current workspace from the global AHE skill
+  installation.
 - If no AHE-managed harness files exist, start initialization normally without
   asking a restart-scope question.
 - If any AHE-managed harness file exists, read the existing files first,
@@ -92,28 +89,28 @@ The centered internal model is:
 - Keep product behavior, requirements, scope, success criteria, and workflow
   details out of `AGENTS.md`.
 - Send product behavior, scope, requirements, success criteria, and workflow
-  details to `ahe-harness` so they are written in `docs/PRODUCT.md` first.
+  details to `ahe-harness` so they are written in `docs/product.md` first.
 - Generate an empty `feature-list.json` from a template only as a placeholder;
-  do not write concrete feature items until `docs/PRODUCT.md` is populated.
+  do not write concrete feature items until `docs/product.md` is populated.
 - Track `ahe-init` then `ahe-harness` in `.ahe/process_status.json`.
 
 ### `ahe-harness`
 
-- Modify `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md`.
-- Treat `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` as the required harness
+- Modify `docs/product.md` and `docs/INSTRUCTIONS.md`.
+- Treat `docs/product.md` and `docs/INSTRUCTIONS.md` as the required harness
   contract.
 - If the user is adding new work, append it into the last `## TODO` section of
   `docs/todo.md`, create that section when needed, and update
   `feature-list.json`.
-- Apply queued todo content from `docs/todo.md` into `docs/PRODUCT.md`.
+- Apply queued todo content from `docs/todo.md` into `docs/product.md`.
 - Remove applied todo content from `docs/todo.md`.
-- Update `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and
+- Update `feature-list.json`, `progress.md`, `session-handoff.md`, and
   `.ahe/process_status.json`.
 - For `ahe compress feature-list`, replace old completed feature entries with
   one summarized done feature that keeps its own `id`, `name`, `description`,
   `dependencies`, `status`, and short evidence.
 - Preserve unfinished, blocked, or active items in detail.
-- If no new feature can be derived from `docs/PRODUCT.md`, call
+- If no new feature can be derived from `docs/product.md`, call
   `ahe-conversator` to ask what next feature, product direction, or goal should
   be tracked.
 
@@ -165,15 +162,16 @@ The centered internal model is:
 - Explicit `ahe <query>` activates the thinker-routed query path.
 - Broad non-prefixed prompts must not activate AHE.
 - The first response must include a concise status report table covering
-  `AGENTS.md`, `PRODUCT.md`, `INSTRUCTIONS.md`, `feature-list.json`, and
-  `PROGRESS.md`.
+  `AGENTS.md`, `product.md`, `INSTRUCTIONS.md`, `feature-list.json`, and
+  `progress.md`.
 
 ## 6. Success Criteria
 
-- Codex shows only `$ahe-init` as a user-facing installed skill.
+- AHE installs and runs from the global Codex home, not workspace-local
+  `.codex` skill directories.
 - Exact `ahe`, exact `ahe init`, and explicit `ahe <query>` route into the new
   internal model.
-- The installer copies the new internal skill set and no longer depends on
-  `ahe-spec`, `ahe-update`, `ahe-thinking`, or `ahe-conversation`.
+- The installer copies the new internal skill set into the global Codex home and
+  no longer depends on removed legacy skills.
 - Tests validate the new split-skill structure and explicit query-routing
   contract.

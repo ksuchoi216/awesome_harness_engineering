@@ -31,16 +31,16 @@ def test_detector_reports_no_compression_for_small_harness_file(tmp_path: Path) 
 
 
 def test_detector_requires_compression_for_oversized_file(tmp_path: Path) -> None:
-    harness_file = tmp_path / "PROGRESS.md"
+    harness_file = tmp_path / "progress.md"
     harness_file.write_text(
         "\n".join(f"- item {index}" for index in range(180)) + "\n",
         encoding="utf-8",
     )
 
-    completed_process = run_detector(tmp_path, "PROGRESS.md")
+    completed_process = run_detector(tmp_path, "progress.md")
 
     assert completed_process.returncode == 2
-    assert "COMPRESS\tPROGRESS.md\t180\tlimit=180" in completed_process.stdout
+    assert "COMPRESS\tprogress.md\t180\tlimit=180" in completed_process.stdout
     assert "COMPRESSION_REQUIRED" in completed_process.stdout
 
 
@@ -51,7 +51,7 @@ def test_product_docs_route_thinking_to_compression() -> None:
     harness_content = (
         REPO_ROOT / ".codex/skills/ahe-harness/SKILL.md"
     ).read_text(encoding="utf-8")
-    product_content = (REPO_ROOT / "docs/PRODUCT.md").read_text(encoding="utf-8")
+    product_content = (REPO_ROOT / "docs/product.md").read_text(encoding="utf-8")
     hook_content = (REPO_ROOT / ".codex/hooks/ahe-hook.js").read_text(encoding="utf-8")
     bin_content = (REPO_ROOT / "bin/ahe").read_text(encoding="utf-8")
 

@@ -26,4 +26,5 @@ Follow these rules:
 When modifying existing code, preserve behavior unless a change is explicitly requested.
 
 ## CAN CHANGE INSTRUCTIONS
+You can change only this section. except for this section, you MUST NOT change this file.
 

@@ -56,11 +56,11 @@ compression_required=0
 if [ "$#" -eq 0 ]; then
   set -- \
     "AGENTS.md" \
-    "docs/PRODUCT.md" \
+    "docs/product.md" \
     "docs/INSTRUCTIONS.md" \
     "feature-list.json" \
-    "PROGRESS.md" \
-    "SESSION-HANDOFF.md" \
+    "progress.md" \
+    "session-handoff.md" \
     "docs/todo.md"
 fi
 
@@ -77,11 +77,11 @@ for file_path in "$@"; do
   current_limit=180
   case "${file_path}" in
     "AGENTS.md") current_limit="${limit_agent_md}" ;;
-    "docs/PRODUCT.md") current_limit="${limit_product_md}" ;;
+    "docs/product.md") current_limit="${limit_product_md}" ;;
     "docs/INSTRUCTIONS.md") current_limit="${limit_instructions_md}" ;;
     "feature-list.json") current_limit="${limit_feature_list_json}" ;;
-    "PROGRESS.md") current_limit="${limit_progress_md}" ;;
-    "SESSION-HANDOFF.md") current_limit="${limit_session_handoff_md}" ;;
+    "progress.md") current_limit="${limit_progress_md}" ;;
+    "session-handoff.md") current_limit="${limit_session_handoff_md}" ;;
     "docs/todo.md") current_limit="${limit_todo_md}" ;;
     *) current_limit="${AHE_FILE_LINE_LIMIT:-180}" ;;
   esac

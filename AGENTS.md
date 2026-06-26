@@ -5,13 +5,13 @@ Automatically build harness by using the templates.
 user will use codex to use this skill in codex's conversation(chat), not in terminal.
 for local development after cloning the repo, install with `npx --yes --package=file:. ahe install`.
 after deployment, the target user command is `npx --package=@ksuchoi216/ahe ahe install` (or `npm install -g @ksuchoi216/ahe` then `ahe install`).
-templates folder is for initilizing, and for agent, product, constraint, init.sh, feature-list.json, PROGRESS.md, SESSION-HANDOFF.md, schemas, examples
+templates folder is for initilizing, and for agent, product, constraint, init.sh, feature-list.json, progress.md, session-handoff.md, schemas, examples
 don't modify the template.
 
 ## Global Rules
 - MUST NOT modify the AGENTS.md file except for PROJECT_PURPOSE.
-- MUST NOT modify the headers in PROGRESS.md and SESSION-HANDOFF.md like deletion of headers.
-- MUST FOLLOW THE FORMAT OF init.sh, feature-list.json, PROGRESS.md, SESSION-HANDOFF.md, AGENTS.md
+- MUST NOT modify the headers in progress.md and session-handoff.md like deletion of headers.
+- MUST FOLLOW THE FORMAT OF init.sh, feature-list.json, progress.md, session-handoff.md, AGENTS.md
 - MUST NOT READ OR MODIFY "ref" folder beacuse the codes are only for reference.
 
 ## Reference ONLY(DONT MODIFY)
@@ -23,12 +23,11 @@ Before writing code:
 
 1. **Confirm working directory** with `pwd`
 2. **Read this file** completely
-3. **Read project docs if present** (`docs/ARCHITECTURE.md`, `docs/PRODUCT.md`, `docs/CONSTRAINTS.md`, `docs/TODO.md`, README, or equivalent)
+3. **Read project docs if present** (`docs/architecture.md`, `docs/product.md`, `docs/constraints.md`, `docs/*.md`, README, or equivalent)
+   - especially, product.md and product{number}.md present explanation of what to do.
 4. **Run `./init.sh`** to verify environment is healthy
 5. **Read `feature_list.json`** to see current feature state
 6. **Review recent commits** with `git log --oneline -5`
-
-If baseline verification is failing, repair that first before adding new scope.
 
 ## Working Rules
 

@@ -31,10 +31,10 @@ def test_skill_md_contains_required_process_status_sync_rules() -> None:
 def test_skill_md_contains_required_progress_and_handoff_rules() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
     required_rules = [
-        "Update `PROGRESS.md` whenever the active feature, workflow status, blockers, or verification state changes",
-        "Update `SESSION-HANDOFF.md` whenever the current objective, completed work, important files, verification evidence, or recommended next step changes",
-        "PROGRESS.md must reflect the current active feature and latest completed work",
-        "SESSION-HANDOFF.md must leave the next Codex session with a concrete startup path",
+        "Update `progress.md` whenever the active feature, workflow status, blockers, or verification state changes",
+        "Update `session-handoff.md` whenever the current objective, completed work, important files, verification evidence, or recommended next step changes",
+        "progress.md must reflect the current active feature and latest completed work",
+        "session-handoff.md must leave the next Codex session with a concrete startup path",
     ]
     for required_rule in required_rules:
         assert required_rule in content, (

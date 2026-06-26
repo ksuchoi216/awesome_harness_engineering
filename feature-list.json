@@ -16,7 +16,27 @@
         "feat-001"
       ],
       "status": "done",
-      "evidence": "Updated `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-harness/SKILL.md`, `.codex/skills/ahe-compression/SKILL.md`, `.codex/hooks/ahe-hook.js`, `docs/PRODUCT.md`, `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, `tests/test_init_workflow.py`, `tests/test_ahe_hook.py`, and `tests/test_compression_workflow.py`. Verified with `./init.sh`, focused pytest for the updated contracts, `pytest tests/ -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, and the compression detector."
+      "evidence": "Updated `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-harness/SKILL.md`, `.codex/skills/ahe-compression/SKILL.md`, `.codex/hooks/ahe-hook.js`, `docs/product.md`, `feature-list.json`, `progress.md`, `session-handoff.md`, `tests/test_init_workflow.py`, `tests/test_ahe_hook.py`, and `tests/test_compression_workflow.py`. Verified with `./init.sh`, focused pytest for the updated contracts, `pytest tests/ -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, and the compression detector."
+    },
+    {
+      "id": "feat-044",
+      "name": "Global AHE Skill Installation and Docs Read Contract",
+      "description": "Make AHE install and run from the global Codex home, and update startup/harness guidance so every `docs/*.md` file is read as project context even when `AGENTS.md` does not name it directly.",
+      "dependencies": [
+        "feat-043"
+      ],
+      "status": "done",
+      "evidence": "Updated `bin/ahe`, `README.md`, `docs/product.md`, `AGENTS.md`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-harness/SKILL.md`, `.codex/skills/ahe-reviewer/SKILL.md`, `.codex/hooks/ahe-hook.js`, `package.json`, `tests/test_project_setup.py`, and `tests/test_init_workflow.py`. Verified with `./init.sh`, `pytest tests/test_project_setup.py tests/test_init_workflow.py tests/test_ahe_hook.py -x`, `pytest tests/ -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool package.json`, and `python3 -m json.tool feature-list.json`."
+    },
+    {
+      "id": "feat-045",
+      "name": "Lowercase Harness Artifact Filenames",
+      "description": "Rename product, progress, and session handoff artifacts to lowercase filenames while keeping `AGENTS.md` uppercase, and update AHE contracts, templates, tests, and compression detection to use the lowercase names.",
+      "dependencies": [
+        "feat-044"
+      ],
+      "status": "done",
+      "evidence": "Renamed `docs/product.md`, `progress.md`, `session-handoff.md`, `.codex/ahe-shared/templates/product.md`, `.codex/ahe-shared/templates/progress.md`, and `.codex/ahe-shared/templates/session-handoff.md`; updated skill, hook, docs, tests, and detector references. Verified with `pytest tests/ -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, `python3 -m json.tool package.json`, and `sh .codex/skills/ahe-compression/scripts/check-harness-size.sh`."
     }
   ]
 }

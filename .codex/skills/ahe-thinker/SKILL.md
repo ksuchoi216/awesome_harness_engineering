@@ -76,5 +76,5 @@ Use it as the central decision layer for AHE work.
 
 - Continue to the next skill or next unfinished feature until the active unit is
   resolved.
-- Keep `docs/PRODUCT.md` as the canonical contract and `feature-list.json` as a
+- Keep `docs/product.md` as the canonical contract and `feature-list.json` as a
   derived tracker.

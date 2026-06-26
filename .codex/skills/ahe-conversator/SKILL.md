@@ -33,7 +33,7 @@ missing `Why`, `What`, or `How`.
 
 - Update `.ahe/process_status.json` before pausing for user input.
 - Preserve the current command, current_step, workflow_complete, and files map.
-- Update `PROGRESS.md` and `SESSION-HANDOFF.md` when the pending question
+- Update `progress.md` and `session-handoff.md` when the pending question
   changes the workflow state.
 
 ## Resume Protocol

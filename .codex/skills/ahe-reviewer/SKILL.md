@@ -16,9 +16,11 @@ state before deciding what to do next.
 - Inspect repo code, harness files, verification history, and feature progress.
 - If `.codegraph/` exists, prefer `.codegraph` or CodeGraph-backed review
   context when available.
-- Check `AGENTS.md`, `docs/PRODUCT.md`, `docs/INSTRUCTIONS.md`,
-  `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and `docs/todo.md`
-  when the question is about harness state.
+- Check `AGENTS.md`, all existing `docs/*.md` files, `feature-list.json`,
+  `progress.md`, `session-handoff.md`, and `docs/todo.md` when the question is
+  about harness state.
+- Especially read `docs/product.md` and
+  `docs/product{number}.md` files when present because they explain what to do.
 
 ## Handoffs
 

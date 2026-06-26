@@ -52,7 +52,7 @@ def test_skill_md_contains_three_sequential_steps_and_status_tracking() -> None:
 def test_skill_md_absorbs_reset_behavior_without_backups_for_new_start() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
     required_behaviors = [
-        "Remove the previous `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md`",
+        "Remove the previous `docs/product.md` and `docs/INSTRUCTIONS.md`",
         "Remove the previous `feature-list.json`",
         "new start",
         "Do not create backup copies of the replaced harness files",
@@ -96,13 +96,30 @@ def test_skill_md_keeps_specification_details_out_of_agents_md() -> None:
     required_behaviors = [
         "Keep `AGENTS.md` limited to the project purpose and base agent settings.",
         "Do not put product specification details in `AGENTS.md`.",
-        "Send product behavior, scope, requirements, success criteria, and workflow details to `ahe-harness` so they are written in `docs/PRODUCT.md` first.",
-        "Generating an empty `feature-list.json` from a template is allowed, but do not write concrete feature items until `docs/PRODUCT.md` is populated.",
+        "Send product behavior, scope, requirements, success criteria, and workflow details to `ahe-harness` so they are written in `docs/product.md` first.",
+        "Generating an empty `feature-list.json` from a template is allowed, but do not write concrete feature items until `docs/product.md` is populated.",
     ]
     for required_behavior in required_behaviors:
         assert required_behavior in content, (
             f"Missing specification placement behavior '{required_behavior}' in ahe-init"
         )
+
+
+def test_startup_workflow_reads_all_docs_markdown() -> None:
+    agents_content = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
+    init_content = SKILL_MD_PATH.read_text(encoding="utf-8")
+
+    assert "Read project docs if present" in agents_content
+    assert "`docs/architecture.md`" in agents_content
+    assert "`docs/product.md`" in agents_content
+    assert "`docs/constraints.md`" in agents_content
+    assert "`docs/*.md`" in agents_content
+    assert (
+        "especially, product.md and product{number}.md present explanation of what to do."
+        in agents_content
+    )
+    assert "Read all `docs/*.md` files when they exist." in init_content
+    assert "`docs/product{number}.md` files when present" in init_content
 
 
 if __name__ == "__main__":
@@ -113,4 +130,5 @@ if __name__ == "__main__":
     test_skill_md_absorbs_reset_behavior_without_backups_for_new_start()
     test_skill_md_requires_restart_scope_before_resetting_existing_harness()
     test_skill_md_keeps_specification_details_out_of_agents_md()
+    test_startup_workflow_reads_all_docs_markdown()
     print("test_init_workflow.py passed!")

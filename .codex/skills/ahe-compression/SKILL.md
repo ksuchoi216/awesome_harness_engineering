@@ -1,6 +1,6 @@
 ---
 name: ahe-compression
-description: Internal AHE compression workflow for detecting oversized harness-engineering files and compacting them before AHE thinker or harness routing reads large context. Use when AGENTS.md, docs/PRODUCT.md, docs/INSTRUCTIONS.md, feature-list.json, PROGRESS.md, SESSION-HANDOFF.md, docs/todo.md, or other AHE harness artifacts have too many lines or waste context.
+description: Internal AHE compression workflow for detecting oversized harness-engineering files and compacting them before AHE thinker or harness routing reads large context. Use when AGENTS.md, docs/product.md, docs/INSTRUCTIONS.md, feature-list.json, progress.md, session-handoff.md, docs/todo.md, or other AHE harness artifacts have too many lines or waste context.
 ---
 
 # AHE Compression
@@ -22,11 +22,11 @@ sh .codex/skills/ahe-compression/scripts/check-harness-size.sh
 The script checks these AHE-managed files when they exist:
 
 - `AGENTS.md`
-- `docs/PRODUCT.md`
+- `docs/product.md`
 - `docs/INSTRUCTIONS.md`
 - `feature-list.json`
-- `PROGRESS.md`
-- `SESSION-HANDOFF.md`
+- `progress.md`
+- `session-handoff.md`
 - `docs/todo.md`
 
 Default thresholds are configured in `.codex/ahe-shared/config.yaml`:
@@ -71,18 +71,18 @@ Exit code meanings:
 
 - Preserve active requirements, current decisions, incomplete work, blockers,
   dependencies, and verification evidence.
-- Preserve required headers and file formats for `PROGRESS.md`,
-  `SESSION-HANDOFF.md`, `feature-list.json`, and `AGENTS.md`.
+- Preserve required headers and file formats for `progress.md`,
+  `session-handoff.md`, `feature-list.json`, and `AGENTS.md`.
 - Keep `feature-list.json` valid JSON. Replace stale completed-feature history
   with one summarized done feature, preserve its `id`, `name`, `description`,
   `dependencies`, `status`, and short evidence, and keep current unfinished
   details as-is.
-- Keep `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` as the current harness
+- Keep `docs/product.md` and `docs/INSTRUCTIONS.md` as the current harness
   contract. Remove duplicate historical wording only when the active contract
   remains clear.
-- Keep `PROGRESS.md` focused on current status, recent completed work,
+- Keep `progress.md` focused on current status, recent completed work,
   decisions that still matter, blockers, and latest verification.
-- Keep `SESSION-HANDOFF.md` focused on the startup path for the next session,
+- Keep `session-handoff.md` focused on the startup path for the next session,
   important files, open questions, and current verification status.
 - Do not create backup copies when compressing harness history. Preserve useful
   context through concise summaries in the refreshed harness files instead.
@@ -93,5 +93,5 @@ Exit code meanings:
 - Run JSON validation when `feature-list.json` changed.
 - Run the repository's normal harness verification command when compression
   changed tracked harness files.
-- Update `PROGRESS.md` and `SESSION-HANDOFF.md` with the compression evidence
+- Update `progress.md` and `session-handoff.md` with the compression evidence
   when they changed or when compression affects the active workflow.

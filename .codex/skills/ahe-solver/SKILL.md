@@ -13,8 +13,8 @@ feature.
 
 ## Command Workflow: ahe-solver
 
-- Read the active feature context from `docs/PRODUCT.md`, `feature-list.json`,
-  `PROGRESS.md`, and any relevant code files.
+- Read the active feature context from `docs/product.md`, `feature-list.json`,
+  `progress.md`, and any relevant code files.
 - Divide broad work into smaller problems when useful.
 - Plan each smaller problem before implementation.
 - Call `ahe-reviewer` when repo or code understanding is needed.

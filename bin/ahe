@@ -31,6 +31,15 @@ readonly MANAGED_SKILLS=(
   "ahe-thinker"
 )
 
+codex_home() {
+  if [ -n "${CODEX_HOME:-}" ]; then
+    printf '%s\n' "${CODEX_HOME}"
+    return 0
+  fi
+
+  printf '%s\n' "${HOME}/.codex"
+}
+
 usage() {
   cat <<'EOF'
 Usage:
@@ -125,11 +134,14 @@ install_skill() {
     exit 1
   fi
 
-  local target_skills_dir="${PWD}/.codex/skills"
-  local target_shared_dir="${PWD}/.codex/ahe-shared"
-  local target_hooks_dir="${PWD}/.codex/hooks"
-  local target_config_path="${PWD}/.codex/config.toml"
-  local backup_dir="${PWD}/.codex/_backups"
+  local target_codex_home
+  target_codex_home="$(codex_home)"
+
+  local target_skills_dir="${target_codex_home}/skills"
+  local target_shared_dir="${target_codex_home}/ahe-shared"
+  local target_hooks_dir="${target_codex_home}/hooks"
+  local target_config_path="${target_codex_home}/config.toml"
+  local backup_dir="${target_codex_home}/_backups"
   local skill_name=""
   local skill_target=""
 
@@ -193,12 +205,32 @@ EOF
   done
   cp -R "${SOURCE_SHARED_DIR}" "${target_shared_dir}"
   cp -R "${SOURCE_HOOKS_DIR}" "${target_hooks_dir}"
+  cat > "${target_hooks_dir}/hooks.json" <<EOF
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${target_hooks_dir}/ahe-hook.js\"",
+            "timeout": 5,
+            "statusMessage": "AHE: Checking Keyword Trigger"
+          }
+        ]
+      }
+    ]
+  }
+}
+EOF
 
  cat <<EOF
 AHE Codex skill installed.
+Global Codex home:
+  ${target_codex_home}
 
 Next:
-1. Open Codex chat in this workspace.
+1. Open Codex chat in any workspace.
 2. Use \`ahe init\` for a new start.
 3. Use exact \`ahe\` to continue existing harness work.
 4. Use \`ahe <query>\` for explicit AHE requests such as \`ahe compress feature-list\`.
@@ -206,9 +238,12 @@ EOF
 }
 
 doctor() {
-  local target_skills_dir="${PWD}/.codex/skills"
-  local target_shared_dir="${PWD}/.codex/ahe-shared"
-  local target_hooks_dir="${PWD}/.codex/hooks"
+  local target_codex_home
+  target_codex_home="$(codex_home)"
+
+  local target_skills_dir="${target_codex_home}/skills"
+  local target_shared_dir="${target_codex_home}/ahe-shared"
+  local target_hooks_dir="${target_codex_home}/hooks"
   local skill_name=""
 
   for skill_name in "${MANAGED_SKILLS[@]}"; do
@@ -242,13 +277,16 @@ doctor() {
 }
 
 uninstall_skill() {
-  local target_skills_dir="${PWD}/.codex/skills"
-  local target_shared_dir="${PWD}/.codex/ahe-shared"
-  local target_hooks_dir="${PWD}/.codex/hooks"
-  local target_config_path="${PWD}/.codex/config.toml"
+  local target_codex_home
+  target_codex_home="$(codex_home)"
+
+  local target_skills_dir="${target_codex_home}/skills"
+  local target_shared_dir="${target_codex_home}/ahe-shared"
+  local target_hooks_dir="${target_codex_home}/hooks"
+  local target_config_path="${target_codex_home}/config.toml"
   local skill_name=""
 
-  echo "Uninstalling AHE skills from ${PWD}/.codex..."
+  echo "Uninstalling AHE skills from ${target_codex_home}..."
 
   for skill_name in "${MANAGED_SKILLS[@]}"; do
     rm -rf "${target_skills_dir}/${skill_name}"

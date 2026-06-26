@@ -1,9 +1,9 @@
 # Awesome Harness Engineering (AHE)
 
-AHE installs Codex skills that manage harness files through chat. The public
-entrypoints stay small: use `ahe init` to start or reset harness work, `ahe` to
-continue existing work, and `ahe <query>` for explicit AHE requests such as
-`ahe compress feature-list`.
+AHE installs global Codex skills that manage harness files through chat. The
+public entrypoints stay small: use `ahe init` to start or reset harness work,
+`ahe` to continue existing work, and `ahe <query>` for explicit AHE requests
+such as `ahe compress feature-list`.
 
 ## Installed Skills
 

@@ -24,7 +24,7 @@ def test_skill_md_contains_init_workflow_details_absorbed_from_agent_and_copy() 
 def test_skill_md_contains_harness_workflow() -> None:
     content = HARNESS_SKILL_MD_PATH.read_text(encoding="utf-8")
     assert "## Command Workflow: ahe-harness" in content
-    assert "docs/PRODUCT.md" in content
+    assert "docs/product.md" in content
     assert "docs/INSTRUCTIONS.md" in content
 
 
@@ -33,12 +33,12 @@ def test_skill_md_contains_harness_tracking_workflow() -> None:
     assert "docs/todo.md" in content
     assert "feature-list.json" in content
     assert "append" in content.lower() or "capture" in content.lower()
-    assert "Apply the queued `docs/todo.md` content to `docs/PRODUCT.md`." in content
+    assert "Apply the queued `docs/todo.md` content to `docs/product.md`." in content
     assert "Remove the applied content from `docs/todo.md`" in content
-    assert "Update `feature-list.json` to derive the specific feature items from the updated `docs/PRODUCT.md`." in content
-    assert "Update `PROGRESS.md`." in content
-    assert "Update `SESSION-HANDOFF.md`." in content
-    assert "If no new feature can be derived from `docs/PRODUCT.md`, call `ahe-conversator`" in content
+    assert "Update `feature-list.json` to derive the specific feature items from the updated `docs/product.md`." in content
+    assert "Update `progress.md`." in content
+    assert "Update `session-handoff.md`." in content
+    assert "If no new feature can be derived from `docs/product.md`, call `ahe-conversator`" in content
 
 
 def test_internal_skills_are_no_longer_user_facing_commands() -> None:

@@ -1,4 +1,4 @@
-# PRODUCT.md
+# product.md
 
 ## Product Name
 

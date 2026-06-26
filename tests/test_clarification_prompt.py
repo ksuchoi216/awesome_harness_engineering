@@ -50,7 +50,7 @@ def test_skill_md_contains_representative_skill_specific_rules() -> None:
     spec_content = (
         REPO_ROOT / ".codex/skills/ahe-harness/SKILL.md"
     ).read_text(encoding="utf-8")
-    assert "docs/PRODUCT.md" in spec_content
+    assert "docs/product.md" in spec_content
     assert "docs/INSTRUCTIONS.md" in spec_content
     assert "success" in spec_content.lower()
     assert "feature-list.json" in spec_content
@@ -66,8 +66,8 @@ def test_ahe_conversation_defines_internal_protocol() -> None:
     assert "not a user-facing command" in content.lower()
     assert "Do not treat `$ahe-conversator` as a user command." in content
     assert ".ahe/process_status.json" in content
-    assert "PROGRESS.md" in content
-    assert "SESSION-HANDOFF.md" in content
+    assert "progress.md" in content
+    assert "session-handoff.md" in content
     assert "one question at a time" in content.lower()
     assert "conversation state" in content.lower()
     assert "Codex-supported structured response request" in content
@@ -100,7 +100,7 @@ def test_ahe_compression_defines_internal_protocol() -> None:
     assert "not a user-facing command" in content.lower()
     assert "check-harness-size.sh" in content
     assert "AGENTS.md" in content
-    assert "docs/PRODUCT.md" in content
+    assert "docs/product.md" in content
     assert "feature-list.json" in content
     assert "COMPRESSION_REQUIRED" in content
     assert "valid JSON" in content

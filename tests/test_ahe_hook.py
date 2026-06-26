@@ -57,7 +57,7 @@ def test_exact_ahe_prompt_emits_auto_operation_context() -> None:
 
     assert "AHE automatic operation activated." in additional_context
     assert "AGENTS.md" in additional_context
-    assert "docs/PRODUCT.md" in additional_context
+    assert "docs/product.md" in additional_context
     assert "product/specification source of truth" in additional_context
     assert "feature-list.json" in additional_context
     assert "derived tracker" in additional_context
@@ -76,15 +76,15 @@ def test_auto_operation_requires_first_response_status_table() -> None:
     assert "| Item | Content |" in additional_context
     assert "|---|---|" in additional_context
     assert "AGENTS.md" in additional_context
-    assert "PRODUCT.md" in additional_context
+    assert "product.md" in additional_context
     assert "INSTRUCTIONS.md" in additional_context
     assert "feature-list.json" in additional_context
-    assert "PROGRESS.md" in additional_context
+    assert "progress.md" in additional_context
     assert "| Next step |" not in additional_context
     assert "docs/constraints.md" not in additional_context
     assert "docs/achitecture.md" not in additional_context
     assert "docs/todo.md" not in additional_context
-    assert "SESSION-HANDOFF.md" not in additional_context
+    assert "session-handoff.md" not in additional_context
     assert ".ahe/process_status.json" not in additional_context
     assert "| CodeGraph |" not in additional_context
     assert additional_context.index("status report table") < additional_context.index(
@@ -96,7 +96,7 @@ def test_auto_operation_routes_through_thinker_network() -> None:
     additional_context = additional_context_for_prompt("ahe")
 
     assert "After the table, classify the harness into exactly one state." in additional_context
-    assert "If `docs/PRODUCT.md` or `docs/INSTRUCTIONS.md` is missing or empty, classify the state as `harness engineering not enough`" in additional_context
+    assert "If `docs/product.md` or `docs/INSTRUCTIONS.md` is missing or empty, classify the state as `harness engineering not enough`" in additional_context
     assert "`harness engineering not enough`" in additional_context
     assert "`in the middle of building features`" in additional_context
     assert "`completed all`" in additional_context
@@ -143,7 +143,7 @@ def test_exact_ahe_init_prompt_emits_new_start_context() -> None:
     assert "ask what restart scope the user wants" in additional_context
     assert "Do not remove, overwrite, or refresh existing harness files before the user answers" in additional_context
     assert "instead of creating backup copies" in additional_context
-    assert "Product/instructions specification details belong in `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md`, not `AGENTS.md`." in additional_context
+    assert "Product/instructions specification details belong in `docs/product.md` and `docs/INSTRUCTIONS.md`, not `AGENTS.md`." in additional_context
     assert "ahe-harness" in additional_context
     assert ".ahe/backups/" not in additional_context
 
@@ -210,4 +210,4 @@ def test_query_directive_contract() -> None:
     assert "Use `ahe-thinker` as the internal decision layer" in context
     assert "ahe-harness" in context
     assert "replace old completed feature entries with one summarized done feature" in context
-    assert "If no new feature can be derived from `docs/PRODUCT.md`, call `ahe-conversator`" in context
+    assert "If no new feature can be derived from `docs/product.md`, call `ahe-conversator`" in context

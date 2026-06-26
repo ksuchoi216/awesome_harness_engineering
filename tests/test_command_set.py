@@ -47,12 +47,12 @@ def test_split_skill_set_covers_required_context_docs() -> None:
         for skill_path in sorted(SKILL_DIR.glob("*/SKILL.md"))
     )
     for required_file in (
-        "docs/PRODUCT.md",
+        "docs/product.md",
         "docs/INSTRUCTIONS.md",
         "docs/todo.md",
         "feature-list.json",
-        "PROGRESS.md",
-        "SESSION-HANDOFF.md",
+        "progress.md",
+        "session-handoff.md",
     ):
         assert required_file in combined_content, f"Missing file reference '{required_file}'"
 
