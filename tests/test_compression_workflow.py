@@ -57,10 +57,12 @@ def test_product_docs_route_thinking_to_compression() -> None:
 
     assert "check-harness-size.sh" in thinking_content
     assert "COMPRESSION_REQUIRED" in thinking_content
-    assert "compress completed feature items" in harness_content
+    assert "replace old completed feature entries with one summarized done feature" in harness_content
+    assert "Do not create backup copies when compressing harness history." in harness_content
     assert "ahe-compression" in product_content
     assert "ahe-compression" in hook_content
     assert '"ahe-compression"' in bin_content
+    assert ".ahe/backups" not in harness_content
 
 
 def test_config_yaml_overrides_thresholds(tmp_path: Path) -> None:

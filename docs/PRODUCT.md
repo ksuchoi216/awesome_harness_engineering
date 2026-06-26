@@ -83,9 +83,12 @@ The centered internal model is:
   asking a restart-scope question.
 - If any AHE-managed harness file exists, read the existing files first,
   summarize the current project purpose and product specification state, and ask
-  what restart scope the user wants before backing up, removing, overwriting, or
-  refreshing existing harness files.
+  what restart scope the user wants before removing, overwriting, or refreshing
+  existing harness files.
 - Interpret restart scope from the user's free-form answer.
+- Do not create backup copies of replaced harness files during restart.
+- Summarize replaced harness history in the refreshed tracking artifacts instead
+  of writing backups.
 - Keep product behavior, requirements, scope, success criteria, and workflow
   details out of `AGENTS.md`.
 - Send product behavior, scope, requirements, success criteria, and workflow
@@ -106,9 +109,9 @@ The centered internal model is:
 - Remove applied todo content from `docs/todo.md`.
 - Update `feature-list.json`, `PROGRESS.md`, `SESSION-HANDOFF.md`, and
   `.ahe/process_status.json`.
-- For `ahe compress feature-list`, compress completed feature items while
-  preserving `id`, `name`, `description`, `dependencies`, `status`, and short
-  evidence.
+- For `ahe compress feature-list`, replace old completed feature entries with
+  one summarized done feature that keeps its own `id`, `name`, `description`,
+  `dependencies`, `status`, and short evidence.
 - Preserve unfinished, blocked, or active items in detail.
 - If no new feature can be derived from `docs/PRODUCT.md`, call
   `ahe-conversator` to ask what next feature, product direction, or goal should

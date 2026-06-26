@@ -72,12 +72,13 @@ const AHE_INIT_DIRECTIVE = [
   "1. Route to `$ahe-init` first.",
   "2. If no AHE-managed harness files exist, start initialization normally.",
   "3. If any AHE-managed harness file exists, read the existing files, summarize the current project purpose and product specification state, and ask what restart scope the user wants.",
-  "4. Do not back up, remove, overwrite, or refresh existing harness files before the user answers the restart-scope question.",
-  "5. Interpret the restart scope from the user's free-form answer; examples like `purpose` and `product` are not a closed list.",
-  "6. Product/instructions specification details belong in `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md`, not `AGENTS.md`.",
-  "7. After setup, call `ahe-harness` to build the initial product, instructions, and tracking state.",
-  "8. Use `ahe-thinker` before clarification when the next setup step is uncertain.",
-  "9. If clarification is needed, call `ahe-conversator` for the exact missing detail.",
+  "4. Do not remove, overwrite, or refresh existing harness files before the user answers the restart-scope question.",
+  "5. If the chosen restart scope replaces prior harness history, summarize that replaced state in the refreshed tracking artifacts instead of creating backup copies.",
+  "6. Interpret the restart scope from the user's free-form answer; examples like `purpose` and `product` are not a closed list.",
+  "7. Product/instructions specification details belong in `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md`, not `AGENTS.md`.",
+  "8. After setup, call `ahe-harness` to build the initial product, instructions, and tracking state.",
+  "9. Use `ahe-thinker` before clarification when the next setup step is uncertain.",
+  "10. If clarification is needed, call `ahe-conversator` for the exact missing detail.",
 ].join("\n");
 
 function getQueryDirective(prompt) {
@@ -94,7 +95,7 @@ function getQueryDirective(prompt) {
     "5. Decide the next AHE workflow with `ahe-thinker` based on the original prompt:",
     "   - Use `ahe-reviewer` for code or harness review work.",
     "   - Use `ahe-harness` for product, instructions, progress, feature-list, todo, or compression maintenance.",
-    "   - For `ahe compress feature-list`, compress completed feature items, preserve unfinished details, and reconcile `feature-list.json` against `docs/PRODUCT.md`.",
+    "   - For `ahe compress feature-list`, replace old completed feature entries with one summarized done feature, preserve unfinished details, and reconcile `feature-list.json` against `docs/PRODUCT.md`.",
     "   - If no new feature can be derived from `docs/PRODUCT.md`, call `ahe-conversator` to ask what next feature, product direction, or goal should be tracked.",
     "   - Use `ahe-solver` for feature-solving work.",
     "   - If multiple plausible next steps remain, use `ahe-conversator` to ask the minimum question needed.",

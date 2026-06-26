@@ -49,19 +49,27 @@ def test_skill_md_contains_three_sequential_steps_and_status_tracking() -> None:
         assert status in content, f"Missing progress status '{status}' in ahe-init workflow definition"
 
 
-def test_skill_md_absorbs_reset_and_backup_behavior_for_new_start() -> None:
+def test_skill_md_absorbs_reset_behavior_without_backups_for_new_start() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
     required_behaviors = [
-        ".ahe/backups/",
-        "Copy `AGENTS.md` into the backup directory",
-        "Copy the current `docs/PRODUCT.md` into the backup directory",
         "Remove the previous `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md`",
         "Remove the previous `feature-list.json`",
         "new start",
+        "Do not create backup copies of the replaced harness files",
     ]
     for required_behavior in required_behaviors:
         assert required_behavior in content, (
             f"Missing absorbed reset behavior '{required_behavior}' in ahe-init"
+        )
+
+    forbidden_behaviors = [
+        ".ahe/backups/",
+        "backup directory",
+        "back up the current product/specification files",
+    ]
+    for forbidden_behavior in forbidden_behaviors:
+        assert forbidden_behavior not in content, (
+            f"Unexpected backup behavior '{forbidden_behavior}' still present in ahe-init"
         )
 
 
@@ -71,10 +79,11 @@ def test_skill_md_requires_restart_scope_before_resetting_existing_harness() -> 
         "If no AHE-managed harness files exist, start initialization normally without asking a restart-scope question.",
         "If any AHE-managed harness file already exists, read the existing files first.",
         "summarize the current project purpose and product specification state",
-        "ask what restart scope the user wants before backing up, removing, overwriting, or refreshing existing harness files",
+        "ask what restart scope the user wants before removing, overwriting, or refreshing existing harness files",
         "Interpret the restart scope from the user's free-form answer",
         "`purpose` means restart the whole harness from the project purpose",
         "`product` means preserve the project purpose in `AGENTS.md`",
+        "summarize the replaced harness history in the refreshed tracking artifacts instead of creating backups",
     ]
     for required_behavior in required_behaviors:
         assert required_behavior in content, (
@@ -101,7 +110,7 @@ if __name__ == "__main__":
     test_skill_md_contains_all_required_inputs()
     test_skill_md_contains_generated_files()
     test_skill_md_contains_three_sequential_steps_and_status_tracking()
-    test_skill_md_absorbs_reset_and_backup_behavior_for_new_start()
+    test_skill_md_absorbs_reset_behavior_without_backups_for_new_start()
     test_skill_md_requires_restart_scope_before_resetting_existing_harness()
     test_skill_md_keeps_specification_details_out_of_agents_md()
     print("test_init_workflow.py passed!")

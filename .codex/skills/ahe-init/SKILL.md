@@ -23,12 +23,12 @@ Use this skill when the user invokes `$ahe-init`.
 - Treat exact `ahe init` as a possible new start request.
 - If no AHE-managed harness files exist, start initialization normally without asking a restart-scope question.
 - If any AHE-managed harness file already exists, read the existing files first.
-- When existing harness files are present, summarize the current project purpose and product specification state, then ask what restart scope the user wants before backing up, removing, overwriting, or refreshing existing harness files.
-- Do not back up, remove, overwrite, or refresh existing harness files until the restart scope is clear.
+- When existing harness files are present, summarize the current project purpose and product specification state, then ask what restart scope the user wants before removing, overwriting, or refreshing existing harness files.
+- Do not remove, overwrite, or refresh existing harness files until the restart scope is clear.
 - Interpret the restart scope from the user's free-form answer; examples are guidance only and must not limit valid answers.
 - If the answer says `purpose`, full restart, or equivalent, `purpose` means restart the whole harness from the project purpose.
-- If the answer says `product`, product spec, or equivalent, `product` means preserve the project purpose in `AGENTS.md`, back up the current product/specification files in scope, and restart product specification work in `docs/PRODUCT.md`.
-- If the answer names a narrower custom scope, preserve unrelated harness files and restart only the named scope after backing up the affected files.
+- If the answer says `product`, product spec, or equivalent, `product` means preserve the project purpose in `AGENTS.md` and restart product specification work in `docs/PRODUCT.md`.
+- If the answer names a narrower custom scope, preserve unrelated harness files and restart only the named scope.
 - If `AGENTS.md` already exists, ask the user whether the current `AGENTS.md` is right.
 - If the current `AGENTS.md` is not right or does not exist, ask for the purpose of this project.
 - If `AGENTS.md` does not exist, copy `AGENTS.md` from `.codex/ahe-shared/templates/`.
@@ -39,19 +39,13 @@ Use this skill when the user invokes `$ahe-init`.
 - Generating an empty `feature-list.json` from a template is allowed, but do not write concrete feature items until `docs/PRODUCT.md` is populated.
 - Ask whether the project language is Python using a Codex-supported structured response request with meaningful options and custom input.
 - If the user answers that the project language is not Python, ask again: "Which language do you use?".
-- If the workspace already has active harness files and the user chooses a restart scope, create a timestamped backup directory under `.ahe/backups/`.
-- Copy `AGENTS.md` into the backup directory when it exists.
-- Copy the current `docs/PRODUCT.md` into the backup directory when it exists.
-- Copy the current `PROGRESS.md` into the backup directory when it exists.
-- Copy the current `SESSION-HANDOFF.md` into the backup directory when it exists.
-- Copy the current `feature-list.json` into the backup directory when it exists.
-- Copy `init.sh` into the backup directory when it exists.
-- Copy the `docs/` folder into the backup directory when it exists.
-- Remove the previous `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` when the chosen restart scope includes product specification after backup.
-- Remove the previous `PROGRESS.md` when the chosen restart scope includes progress tracking after backup.
-- Remove the previous `SESSION-HANDOFF.md` when the chosen restart scope includes session handoff after backup.
-- Remove the previous `feature-list.json` when the chosen restart scope includes feature tracking after backup.
-- After backup, remove only the files included in the chosen restart scope before continuing the new start flow.
+- Do not create backup copies of the replaced harness files.
+- When a restart scope replaces prior harness history, summarize the replaced harness history in the refreshed tracking artifacts instead of creating backups.
+- Remove the previous `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md` when the chosen restart scope includes product specification.
+- Remove the previous `PROGRESS.md` when the chosen restart scope includes progress tracking.
+- Remove the previous `SESSION-HANDOFF.md` when the chosen restart scope includes session handoff.
+- Remove the previous `feature-list.json` when the chosen restart scope includes feature tracking.
+- Remove only the files included in the chosen restart scope before continuing the new start flow.
 - Find all template files under `.codex/ahe-shared/templates/`.
 - Ignore `AGENTS.md` and `PRODUCT.md` when copying template files.
 - Before copying a template file into the workspace root, check whether the target file already exists and ask for explicit overwrite confirmation when needed.
@@ -90,7 +84,7 @@ When the next setup step is not clear, follow the `ahe-thinker` protocol first. 
 - The answer must be specific enough to update `PROJECT_PURPOSE`.
 - The answer must make it clear whether initialization should continue with the current `AGENTS.md` or with a new purpose.
 - The answer must clearly identify whether Python guidance applies.
-- The answer must make the restart scope clear when existing harness files must be backed up or replaced.
+- The answer must make the restart scope clear when existing harness files must be replaced.
 - The answer must make overwrite intent explicit for existing template targets.
 - The answer must resolve any setup choice that blocks the next workflow step.
 

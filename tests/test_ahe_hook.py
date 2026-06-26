@@ -141,9 +141,11 @@ def test_exact_ahe_init_prompt_emits_new_start_context() -> None:
     assert "If no AHE-managed harness files exist, start initialization normally." in additional_context
     assert "If any AHE-managed harness file exists, read the existing files" in additional_context
     assert "ask what restart scope the user wants" in additional_context
-    assert "Do not back up, remove, overwrite, or refresh existing harness files before the user answers" in additional_context
+    assert "Do not remove, overwrite, or refresh existing harness files before the user answers" in additional_context
+    assert "instead of creating backup copies" in additional_context
     assert "Product/instructions specification details belong in `docs/PRODUCT.md` and `docs/INSTRUCTIONS.md`, not `AGENTS.md`." in additional_context
     assert "ahe-harness" in additional_context
+    assert ".ahe/backups/" not in additional_context
 
 
 def test_exact_ahe_init_aliases_emit_new_start_context() -> None:
@@ -207,5 +209,5 @@ def test_query_directive_contract() -> None:
     assert "| AGENTS.md |" in context
     assert "Use `ahe-thinker` as the internal decision layer" in context
     assert "ahe-harness" in context
-    assert "compress completed feature items" in context
+    assert "replace old completed feature entries with one summarized done feature" in context
     assert "If no new feature can be derived from `docs/PRODUCT.md`, call `ahe-conversator`" in context

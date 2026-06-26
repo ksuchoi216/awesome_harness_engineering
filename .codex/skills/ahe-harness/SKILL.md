@@ -45,9 +45,10 @@ be created, updated, reconciled, or compressed.
 - Update `feature-list.json` to derive the specific feature items from the updated `docs/PRODUCT.md`.
 - Update `PROGRESS.md`.
 - Update `SESSION-HANDOFF.md`.
-- For `ahe compress feature-list`, compress completed feature items by
-  preserving each feature `id`, `name`, `description`, `dependencies`, `status`,
-  and short evidence.
+- For `ahe compress feature-list`, replace old completed feature entries with one summarized done feature.
+- Keep the summarized feature valid for the existing schema by preserving its
+  own `id`, `name`, `description`, `dependencies`, `status`, and short
+  evidence.
 - Preserve unfinished, blocked, or active feature items in full detail.
 - Reconcile `feature-list.json` against `docs/PRODUCT.md` after compression.
 - If no new feature can be derived from `docs/PRODUCT.md`, call `ahe-conversator` to ask what next feature, product direction, or goal should be tracked.
@@ -57,6 +58,7 @@ be created, updated, reconciled, or compressed.
 ### Harness Completion
 
 - Keep `feature-list.json` valid JSON.
+- Do not create backup copies when compressing harness history.
 - Keep `PROGRESS.md` focused on current work, decisions that still matter,
   blockers, and recent verification evidence.
 - Keep `SESSION-HANDOFF.md` focused on the next-session startup path.
