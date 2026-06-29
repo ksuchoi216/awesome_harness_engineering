@@ -14,6 +14,7 @@ done
 readonly SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${SCRIPT_PATH}")" && pwd)"
 readonly PACKAGE_ROOT="$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)"
 readonly SOURCE_SKILLS_DIR="${PACKAGE_ROOT}/skills"
+readonly AGY_MODEL="Gemini 3.1 Pro (High)"
 
 usage() {
   cat <<'EOF'
@@ -21,7 +22,6 @@ Usage:
   ahe-antigravity install [--force]
   ahe-antigravity uninstall
   ahe-antigravity doctor
-  ahe-antigravity ahe-ship <plan-path>
 EOF
 }
 
@@ -47,53 +47,6 @@ resolve_plan_path() {
   printf '%s/%s\n' "${plan_dir}" "$(basename -- "${plan_path}")"
 }
 
-ahe_ship_plan() {
-  local plan_path
-  plan_path="$(resolve_plan_path "${1:-}")"
-
-  if ! command -v agy >/dev/null 2>&1; then
-    printf 'Missing required executable: agy\n' >&2
-    exit 1
-  fi
-
-  local stdout_path
-  local stderr_path
-  stdout_path="$(mktemp)"
-  stderr_path="$(mktemp)"
-
-  local status=0
-  if agy < "${plan_path}" >"${stdout_path}" 2>"${stderr_path}"; then
-    status=0
-  else
-    status=$?
-  fi
-
-  cat "${stdout_path}"
-  cat "${stderr_path}" >&2
-
-  local combined_output
-  combined_output="$(cat "${stdout_path}")"$'\n'"$(cat "${stderr_path}")"
-  rm -f "${stdout_path}" "${stderr_path}"
-
-  if [ "${status}" -ne 0 ]; then
-    printf 'agy execution failed for %s\n' "${plan_path}" >&2
-    exit "${status}"
-  fi
-
-  case "${combined_output}" in
-    *AHE_PLAN_COMPLETE*)
-      ;;
-    *)
-      printf 'agy completed without required marker AHE_PLAN_COMPLETE for %s\n' "${plan_path}" >&2
-      exit 1
-      ;;
-  esac
-
-  rm -f "${plan_path}" || {
-    printf 'Verified completion but failed to remove plan file: %s\n' "${plan_path}" >&2
-    exit 1
-  }
-}
 
 install_skill() {
   local force="false"
@@ -151,15 +104,30 @@ EOF
 }
 
 doctor() {
+  printf '=== antigravity ===\n'
+
   local target_skills_dir="${HOME}/.gemini/config/skills"
   local skill_name="ahe-ship"
+  local skill_md="${target_skills_dir}/${skill_name}/SKILL.md"
+  local errors=0
 
-  if [ ! -f "${target_skills_dir}/${skill_name}/SKILL.md" ]; then
-    printf 'Missing: %s/%s/SKILL.md\n' "${target_skills_dir}" "${skill_name}" >&2
-    exit 1
+  if [ ! -f "${skill_md}" ]; then
+    printf 'Missing: %s\n' "${skill_md}" >&2
+    errors=$((errors + 1))
   fi
 
-  printf 'AHE Antigravity skill installation looks healthy.\n'
+  if ! command -v agy >/dev/null 2>&1; then
+    printf 'Missing required executable: agy\n' >&2
+    errors=$((errors + 1))
+  fi
+
+  if [ "${errors}" -gt 0 ]; then
+    printf 'AHE Antigravity skill installation is unhealthy (%d errors).\n' "${errors}" >&2
+    exit 1
+  fi
+  printf 'AHE Antigravity skill installation looks healthy.\n\n'
+
+
 }
 
 uninstall_skill() {
@@ -190,9 +158,6 @@ main() {
       ;;
     doctor)
       doctor
-      ;;
-    ahe-ship)
-      ahe_ship_plan "$@"
       ;;
     -h|--help|help)
       usage

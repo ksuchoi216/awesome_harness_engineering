@@ -10,7 +10,7 @@
 # 2. Run directly:
 #      uv run write_plan.py --root "$PWD" --plan-name "Plan Title" < /tmp/ahe-plan.md
 # 3. Or with Python when dependencies are already available:
-#      python3 write_plan.py --root "$PWD" --plan-name "Plan Title" < /tmp/ahe-plan.md
+#      python write_plan.py --root "$PWD" --plan-name "Plan Title" < /tmp/ahe-plan.md
 
 from __future__ import annotations
 
@@ -54,21 +54,20 @@ def parse_args(argv: list[str]) -> WritePlanArgs:
 
     while index < len(argv):
         argument = argv[index]
-        match argument:
-            case "--root":
-                index += 1
-                if index >= len(argv):
-                    raise ArgumentError("--root requires a value")
-                root = Path(argv[index])
-            case "--plan-name":
-                index += 1
-                if index >= len(argv):
-                    raise ArgumentError("--plan-name requires a value")
-                plan_name = argv[index]
-            case "--overwrite":
-                overwrite = True
-            case _:
-                raise ArgumentError(f"unknown argument: {argument}")
+        if argument == "--root":
+            index += 1
+            if index >= len(argv):
+                raise ArgumentError("--root requires a value")
+            root = Path(argv[index])
+        elif argument == "--plan-name":
+            index += 1
+            if index >= len(argv):
+                raise ArgumentError("--plan-name requires a value")
+            plan_name = argv[index]
+        elif argument == "--overwrite":
+            overwrite = True
+        else:
+            raise ArgumentError(f"unknown argument: {argument}")
         index += 1
 
     if root is None:

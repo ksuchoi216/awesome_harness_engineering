@@ -1,5 +1,5 @@
 ---
-name: review
+name: ahe-review
 description: Internal AHE review workflow for understanding repo code, harness files, and CodeGraph context before another agent acts.
 ---
 

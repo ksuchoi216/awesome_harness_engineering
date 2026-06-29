@@ -1,5 +1,5 @@
 ---
-name: new
+name: ahe-new
 description: Initialize AHE in the current workspace and create the base harness files.
 ---
 

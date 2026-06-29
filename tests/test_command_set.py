@@ -5,6 +5,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILL_DIR = REPO_ROOT / "packages/ahe-codex/.codex/skills"
+SOLVER_SKILL_MD_PATH = SKILL_DIR / "solve/SKILL.md"
 
 
 def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
@@ -80,6 +81,25 @@ def test_split_skill_set_covers_required_context_docs() -> None:
         assert required_skill_name in combined_content, (
             f"Missing internal agent reference '{required_skill_name}'"
         )
+
+def test_internal_skills_are_no_longer_user_facing_commands() -> None:
+    for skill_path in (
+        REPO_ROOT / "packages/ahe-codex/.codex/skills/harness/SKILL.md",
+        REPO_ROOT / "packages/ahe-codex/.codex/skills/solve/SKILL.md",
+    ):
+        content = skill_path.read_text(encoding="utf-8")
+        assert "not a user-facing command" in content.lower()
+
+
+
+def test_solver_skill_describes_divide_and_plan_behavior() -> None:
+    content = SOLVER_SKILL_MD_PATH.read_text(encoding="utf-8")
+    assert "divide" in content.lower()
+    assert "plan" in content.lower()
+    assert "review" in content
+    assert "converse" in content
+
+
 
 
 if __name__ == "__main__":

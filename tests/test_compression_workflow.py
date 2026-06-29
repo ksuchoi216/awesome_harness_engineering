@@ -93,6 +93,12 @@ def test_product_docs_route_thinking_to_compression() -> None:
 
     assert "check-harness-size.sh" in thinking_content
     assert "COMPRESSION_REQUIRED" in thinking_content
+    assert "detect_stale_tests.py" in thinking_content
+    assert "must not delete tests directly" in thinking_content
+    assert "Run both compression detectors before choosing the next compression step." in thinking_content
+    assert "stale overlapping tests" in product_content
+    assert "TEST_COMPRESSION_REQUIRED" in product_content
+    assert "For `ahe compress`, run both the harness-size detector and the stale-test detector." in product_content
     assert "replace old completed feature entries with one summarized done feature" in harness_content
     assert "Do not create backup copies when compressing harness history." in harness_content
     assert "compress" in product_content

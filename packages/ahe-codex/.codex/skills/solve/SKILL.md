@@ -1,5 +1,5 @@
 ---
-name: solve
+name: ahe-solve
 description: Internal AHE feature-solving workflow for dividing, planning, and solving feature work after the active goal is clear enough.
 ---
 

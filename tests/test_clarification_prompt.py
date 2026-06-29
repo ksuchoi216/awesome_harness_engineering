@@ -13,6 +13,8 @@ THINKING_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/think/SKI
 COMPRESSION_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/compress/SKILL.md"
 REVIEWER_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/review/SKILL.md"
 SOLVER_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/solve/SKILL.md"
+SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/harness/SKILL.md"
+HARNESS_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/harness/SKILL.md"
 
 
 def test_skill_md_contains_clarification_prompt_rule() -> None:
@@ -61,7 +63,7 @@ def test_skill_md_contains_representative_skill_specific_rules() -> None:
 def test_ahe_conversation_defines_internal_protocol() -> None:
     content = CONVERSATION_SKILL_MD_PATH.read_text(encoding="utf-8")
 
-    assert "name: converse" in content
+    assert "name: ahe-converse" in content
     assert "internal" in content.lower()
     assert "not a user-facing command" in content.lower()
     assert "Do not treat `$converse` as a user command." in content
@@ -77,7 +79,7 @@ def test_ahe_conversation_defines_internal_protocol() -> None:
 def test_ahe_thinking_defines_internal_orchestration_protocol() -> None:
     content = THINKING_SKILL_MD_PATH.read_text(encoding="utf-8")
 
-    assert "name: think" in content
+    assert "name: ahe-think" in content
     assert "internal" in content.lower()
     assert "not a user-facing command" in content.lower()
     assert "Do not treat `$think` as a user command." in content
@@ -95,7 +97,7 @@ def test_ahe_thinking_defines_internal_orchestration_protocol() -> None:
 def test_ahe_compression_defines_internal_protocol() -> None:
     content = COMPRESSION_SKILL_MD_PATH.read_text(encoding="utf-8")
 
-    assert "name: compress" in content
+    assert "name: ahe-compress" in content
     assert "internal" in content.lower()
     assert "not a user-facing command" in content.lower()
     assert "check-harness-size.sh" in content
@@ -127,6 +129,68 @@ def test_reviewer_and_solver_reference_network_handoffs() -> None:
     assert "converse" in solver_content
     assert "divide" in solver_content.lower()
     assert "plan" in solver_content.lower()
+
+def test_skill_md_contains_spec_workflow_sections() -> None:
+    content = SKILL_MD_PATH.read_text(encoding="utf-8")
+    assert "## Command Workflow: harness" in content
+    assert "Harness Inspection" in content
+    assert "Harness Decision Paths" in content
+    assert "Harness Completion" in content
+
+
+
+def test_skill_md_contains_expected_spec_conversation_contract() -> None:
+    content = SKILL_MD_PATH.read_text(encoding="utf-8")
+    required_inputs = [
+        "Clarify product goal, scope, and success criteria",
+        "Clarify project instructions",
+        "Clarify what next feature or goal should be tracked",
+        "Update only the relevant docs",
+    ]
+    for required_input in required_inputs:
+        assert required_input in content, (
+            f"Missing required input '{required_input}' in harness workflow definition"
+        )
+
+
+
+def test_skill_md_targets_all_spec_docs_and_tracking_files() -> None:
+    content = SKILL_MD_PATH.read_text(encoding="utf-8")
+    required_updates = [
+        "docs/product.md",
+        "docs/INSTRUCTIONS.md",
+        "status.json",
+        "progress.md",
+        "session-handoff.md",
+    ]
+    for required_update in required_updates:
+        assert required_update in content, (
+            f"Missing required update target '{required_update}' in ahe-spec workflow definition"
+        )
+
+
+
+def test_skill_md_contains_harness_workflow() -> None:
+    content = HARNESS_SKILL_MD_PATH.read_text(encoding="utf-8")
+    assert "## Command Workflow: harness" in content
+    assert "docs/product.md" in content
+    assert "docs/INSTRUCTIONS.md" in content
+
+
+
+def test_skill_md_contains_harness_tracking_workflow() -> None:
+    content = HARNESS_SKILL_MD_PATH.read_text(encoding="utf-8")
+    assert "docs/todo.md" in content
+    assert "feature-list.json" in content
+    assert "append" in content.lower() or "capture" in content.lower()
+    assert "Apply the queued `docs/todo.md` content to `docs/product.md`." in content
+    assert "Remove the applied content from `docs/todo.md`" in content
+    assert "Update `feature-list.json` to derive the specific feature items from the updated `docs/product.md`." in content
+    assert "Update `progress.md`." in content
+    assert "Update `session-handoff.md`." in content
+    assert "If no new feature can be derived from `docs/product.md`, call `converse`" in content
+
+
 
 
 if __name__ == "__main__":

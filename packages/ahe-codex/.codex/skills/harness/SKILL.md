@@ -1,5 +1,5 @@
 ---
-name: harness
+name: ahe-harness
 description: Internal AHE harness workflow for managing product docs, instructions, feature tracking, session artifacts, todo sync, and compression-aware maintenance.
 ---
 
@@ -9,7 +9,7 @@ This is an internal AHE workflow skill, not a user-facing command.
 
 Do not treat `$harness` as a user command.
 Use it when `think` or another worker decides that harness artifacts must
-be created, updated, reconciled, or compressed.
+be created, updated, reconciled, or compressed. It remains responsible for tracker compression, while test-suite cleanup is routed by `think` through `review` first and then `solve` or `harness` as needed.
 
 ## Command Workflow: harness
 
@@ -55,7 +55,7 @@ be created, updated, reconciled, or compressed.
 - Update `feature-list.json` to derive the specific feature items from the updated `docs/product.md`.
 - Update `progress.md`.
 - Update `session-handoff.md`.
-- For `ahe compress feature-list`, replace old completed feature entries with one summarized done feature.
+- For `ahe compress`, if the harness-size detector signals compression pressure, replace old completed feature entries with one summarized done feature.
 - Keep the summarized feature valid for the existing schema by preserving its
   own `id`, `name`, `description`, `dependencies`, `status`, and short
   evidence.

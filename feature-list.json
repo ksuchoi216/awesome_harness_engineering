@@ -16,7 +16,7 @@
         "feat-001"
       ],
       "status": "done",
-      "evidence": "Updated `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-harness/SKILL.md`, `.codex/skills/ahe-compression/SKILL.md`, `.codex/hooks/ahe-hook.js`, `docs/product.md`, `feature-list.json`, `progress.md`, `session-handoff.md`, `tests/test_init_workflow.py`, `tests/test_ahe_hook.py`, and `tests/test_compression_workflow.py`. Verified with `./init.sh`, focused pytest for the updated contracts, `pytest tests/ -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, and the compression detector."
+      "evidence": "Updated `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-harness/SKILL.md`, `.codex/skills/ahe-compress/SKILL.md`, `.codex/hooks/ahe-hook.js`, `docs/product.md`, `feature-list.json`, `progress.md`, `session-handoff.md`, `tests/test_init_workflow.py`, `tests/test_ahe_hook.py`, and `tests/test_compression_workflow.py`. Verified with `./init.sh`, focused pytest for the updated contracts, `pytest tests/ -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, and the compression detector."
     },
     {
       "id": "feat-044",
@@ -26,7 +26,7 @@
         "feat-043"
       ],
       "status": "done",
-      "evidence": "Updated `bin/ahe`, `README.md`, `docs/product.md`, `AGENTS.md`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-harness/SKILL.md`, `.codex/skills/ahe-reviewer/SKILL.md`, `.codex/hooks/ahe-hook.js`, `package.json`, `tests/test_project_setup.py`, and `tests/test_init_workflow.py`. Verified with `./init.sh`, `pytest tests/test_project_setup.py tests/test_init_workflow.py tests/test_ahe_hook.py -x`, `pytest tests/ -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool package.json`, and `python3 -m json.tool feature-list.json`."
+      "evidence": "Updated `bin/ahe`, `README.md`, `docs/product.md`, `AGENTS.md`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-harness/SKILL.md`, `.codex/skills/ahe-review/SKILL.md`, `.codex/hooks/ahe-hook.js`, `package.json`, `tests/test_project_setup.py`, and `tests/test_init_workflow.py`. Verified with `./init.sh`, `pytest tests/test_project_setup.py tests/test_init_workflow.py tests/test_ahe_hook.py -x`, `pytest tests/ -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool package.json`, and `python3 -m json.tool feature-list.json`."
     },
     {
       "id": "feat-045",
@@ -36,7 +36,7 @@
         "feat-044"
       ],
       "status": "done",
-      "evidence": "Renamed `docs/product.md`, `progress.md`, `session-handoff.md`, `.codex/ahe-shared/templates/product.md`, `.codex/ahe-shared/templates/progress.md`, and `.codex/ahe-shared/templates/session-handoff.md`; updated skill, hook, docs, tests, and detector references. Verified with `pytest tests/ -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, `python3 -m json.tool package.json`, and `sh .codex/skills/ahe-compression/scripts/check-harness-size.sh`."
+      "evidence": "Renamed `docs/product.md`, `progress.md`, `session-handoff.md`, `.codex/ahe-shared/templates/product.md`, `.codex/ahe-shared/templates/progress.md`, and `.codex/ahe-shared/templates/session-handoff.md`; updated skill, hook, docs, tests, and detector references. Verified with `pytest tests/ -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, `python3 -m json.tool package.json`, and `sh .codex/skills/ahe-compress/scripts/check-harness-size.sh`."
     },
     {
       "id": "feat-046",
@@ -56,7 +56,7 @@
         "feat-046"
       ],
       "status": "done",
-      "evidence": "Updated `.codex/hooks/ahe-hook.js`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-harness/SKILL.md`, `.codex/skills/ahe-thinker/SKILL.md`, `.codex/skills/ahe-reviewer/SKILL.md`, `.codex/skills/ahe-solver/SKILL.md`, `.codex/skills/ahe-compression/SKILL.md`, `.codex/skills/ahe-compression/scripts/check-harness-size.sh`, `docs/product.md`, and focused tests. The contract now derives features only from the active numeric product stage, keeps future stages as context, ignores non-numeric product docs for stage ordering, and advances only after current-stage feature-list items are `done`. Also aligned shared template filenames with the existing lowercase contract. Verified with focused staged-doc tests, `pytest tests/ -x`, `./init.sh`, `node --check .codex/hooks/ahe-hook.js`, `bash -n bin/ahe`, `python3 -m json.tool feature-list.json`, and the compression detector."
+      "evidence": "Updated `.codex/hooks/ahe-hook.js`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-harness/SKILL.md`, `.codex/skills/ahe-think/SKILL.md`, `.codex/skills/ahe-review/SKILL.md`, `.codex/skills/ahe-solve/SKILL.md`, `.codex/skills/ahe-compress/SKILL.md`, `.codex/skills/ahe-compress/scripts/check-harness-size.sh`, `docs/product.md`, and focused tests. The contract now derives features only from the active numeric product stage, keeps future stages as context, ignores non-numeric product docs for stage ordering, and advances only after current-stage feature-list items are `done`. Also aligned shared template filenames with the existing lowercase contract. Verified with focused staged-doc tests, `pytest tests/ -x`, `./init.sh`, `node --check .codex/hooks/ahe-hook.js`, `bash -n bin/ahe`, `python3 -m json.tool feature-list.json`, and the compression detector."
     },
     {
       "id": "feat-048",
@@ -66,7 +66,7 @@
         "feat-047"
       ],
       "status": "done",
-      "evidence": "Added `.codex/skills/ahe-fix/SKILL.md` and `.codex/skills/ahe-fix/scripts/write_fix_plan.py`; updated `.codex/hooks/ahe-hook.js`, `bin/ahe`, `README.md`, `docs/PRODUCT.md`, and focused tests. Verified with `pytest tests/ -x`, `ruff check src/ tests/`, `node --check .codex/hooks/ahe-hook.js`, `bash -n bin/ahe`, `PYTHONPYCACHEPREFIX=/tmp/ahe-fix-pycache python3 -m py_compile .codex/skills/ahe-fix/scripts/write_fix_plan.py`, `./init.sh`, `python3 -m json.tool feature-list.json`, `python3 -m json.tool package.json`, `sh .codex/skills/ahe-compression/scripts/check-harness-size.sh`, hook smoke for `ahe fix`, and writer smoke to `/tmp/ahe-fix-smoke/.plans/fix-smoke.md`. `make check` is unavailable because no Makefile target exists; `mypy src/ --strict` is unavailable because `mypy` is not installed."
+      "evidence": "Added `.codex/skills/ahe-fix/SKILL.md` and `.codex/skills/ahe-fix/scripts/write_fix_plan.py`; updated `.codex/hooks/ahe-hook.js`, `bin/ahe`, `README.md`, `docs/PRODUCT.md`, and focused tests. Verified with `pytest tests/ -x`, `ruff check src/ tests/`, `node --check .codex/hooks/ahe-hook.js`, `bash -n bin/ahe`, `PYTHONPYCACHEPREFIX=/tmp/ahe-fix-pycache python3 -m py_compile .codex/skills/ahe-fix/scripts/write_fix_plan.py`, `./init.sh`, `python3 -m json.tool feature-list.json`, `python3 -m json.tool package.json`, `sh .codex/skills/ahe-compress/scripts/check-harness-size.sh`, hook smoke for `ahe fix`, and writer smoke to `/tmp/ahe-fix-smoke/.plans/fix-smoke.md`. `make check` is unavailable because no Makefile target exists; `mypy src/ --strict` is unavailable because `mypy` is not installed."
     },
     {
       "id": "feat-049",
@@ -97,6 +97,59 @@
       ],
       "status": "done",
       "evidence": "Updated `packages/ahe-codex/.codex/skills/new/SKILL.md`, `packages/ahe-codex/.codex/skills/harness/SKILL.md`, `packages/ahe-codex/.codex/skills/converse/SKILL.md`, `docs/PRODUCT.md`, `src/templates/agents.md`, and focused tests `test_new_workflow.py`, `test_spec_workflow.py`, `test_session_tracking_handoff.py`, `test_clarification_prompt.py`, and `test_ahe_hook.py`. Verified with focused pytest and full suite passing."
+    },
+    {
+      "id": "feat-052",
+      "name": "AHE Ship Writer Uses Active Python Environment",
+      "description": "Make the ship writer and its contract checks use the active Python environment so `ahe ship` works reliably from the `main` Conda environment instead of leaking to the system Python.",
+      "dependencies": [
+        "feat-050"
+      ],
+      "status": "done",
+      "evidence": "Updated `packages/ahe-codex/.codex/skills/ship/scripts/write_plan.py`, `packages/ahe-codex/.codex/skills/ship/SKILL.md`, and `tests/test_ahe_ship_writer.py`. Replaced the Python 3.11-only `match` parsing with straightforward conditionals, changed the ship skill example to `python`, and changed the writer test to invoke `sys.executable` instead of hardcoded `python3`. Verified with `conda run -n main pytest tests/test_ahe_antigravity_ship.py tests/test_ahe_ship_writer.py tests/test_ahe_hook.py -k 'ship or ahe_ship' -x`, `conda run -n main python -m py_compile packages/ahe-codex/.codex/skills/ship/scripts/write_plan.py tests/test_ahe_ship_writer.py`, and `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`."
+    },
+    {
+      "id": "feat-053",
+      "name": "AHE Ship Uses Gemini 3.1 Pro High In Antigravity",
+      "description": "Make Antigravity execute saved `ahe ship` plans with the `Gemini 3.1 Pro (High)` model instead of relying on the CLI default model.",
+      "dependencies": [
+        "feat-050"
+      ],
+      "status": "done",
+      "evidence": "Updated `packages/ahe-antigravity/bin/ahe-antigravity`, `packages/ahe-antigravity/skills/ahe-ship/SKILL.md`, `packages/ahe-codex/.codex/skills/ship/SKILL.md`, `README.md`, and `docs/PRODUCT.md`. Added `tests/test_ahe_antigravity_ship.py::test_ahe_ship_runs_agy_with_gemini_model` to lock the `agy --model 'Gemini 3.1 Pro (High)'` contract. Verified with `pytest tests/test_ahe_antigravity_ship.py -x`, `pytest tests/test_ahe_hook.py -k ship -x`, `bash -n packages/ahe-antigravity/bin/ahe-antigravity`, and `python3 -m json.tool feature-list.json`."
+    },
+    {
+      "id": "feat-054",
+      "name": "AHE Doctor Expansion Plan",
+      "description": "Expand ahe doctor to comprehensively diagnose Codex and Antigravity installations alongside a dynamic execution smoke test.",
+      "dependencies": [
+        "feat-050"
+      ],
+      "status": "done",
+      "evidence": "Updated `bin/ahe`, `packages/ahe-codex/bin/ahe-codex`, and `packages/ahe-antigravity/bin/ahe-antigravity` to expand `doctor` with static checks and dynamic smoke test for Antigravity ship execution. Added isolated tests in `tests/test_ahe_doctor.py`. Verified with `pytest tests/ -x`, `bash -n` checks, and `./init.sh`."
+    },
+    {
+      "id": "feat-055",
+      "name": "Simplify AHE Compress To One User Command",
+      "description": "Replace the separate `ahe compress feature-list` and `ahe compress tests` command wording with a single `ahe compress` contract that checks both harness-file pressure and stale overlapping tests.",
+      "dependencies": [
+        "feat-043",
+        "feat-047"
+      ],
+      "status": "done",
+      "evidence": "Updated `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `packages/ahe-codex/.codex/skills/compress/SKILL.md`, `packages/ahe-codex/.codex/skills/think/SKILL.md`, `packages/ahe-codex/.codex/skills/harness/SKILL.md`, `packages/ahe-codex/bin/ahe-codex`, `README.md`, `docs/PRODUCT.md`, `tests/test_ahe_hook.py`, and `tests/test_compression_workflow.py` so `ahe compress` now runs both detectors and routes follow-up work from one entrypoint. Verified with `pytest tests/test_ahe_hook.py tests/test_compression_workflow.py -x`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, `bash -n packages/ahe-codex/bin/ahe-codex`, and `python3 -m json.tool feature-list.json`. `tests/test_command_set.py` still has an unrelated pre-existing `SOLVER_SKILL_MD_PATH` NameError."
+    },
+    {
+      "id": "feat-056",
+      "name": "Revert AHE Ship To Save-Only",
+      "description": "Change the Codex-side `ahe ship` contract so it only writes `.plans/{plan_name}.md` and stops there, removing automatic Antigravity execution and cleanup.",
+      "dependencies": [
+        "feat-050",
+        "feat-053",
+        "feat-054"
+      ],
+      "status": "done",
+      "evidence": "Updated `packages/ahe-codex/.codex/skills/ship/SKILL.md`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `README.md`, `docs/PRODUCT.md`, `packages/ahe-codex/bin/ahe-codex`, and `packages/ahe-antigravity/bin/ahe-antigravity` to remove execution semantics. Removed tests matching the old behavior. Verified via passing test suite."
     }
   ]
 }

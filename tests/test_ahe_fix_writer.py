@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -16,7 +17,7 @@ def run_writer(
     overwrite: bool = False,
 ) -> subprocess.CompletedProcess[str]:
     command = [
-        "python3",
+        sys.executable,
         str(SCRIPT_PATH),
         "--root",
         str(root),

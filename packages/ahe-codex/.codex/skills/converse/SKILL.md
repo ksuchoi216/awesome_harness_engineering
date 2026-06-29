@@ -1,5 +1,5 @@
 ---
-name: converse
+name: ahe-converse
 description: Internal AHE conversation protocol for recursive clarification, conversation state, and resume-aware workflow guidance.
 ---
 

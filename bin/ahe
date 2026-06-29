@@ -34,19 +34,34 @@ dispatch() {
   local codex_bin="${PACKAGE_ROOT}/packages/ahe-codex/bin/ahe-codex"
   local antigravity_bin="${PACKAGE_ROOT}/packages/ahe-antigravity/bin/ahe-antigravity"
 
-  echo "=== Dispatching to ahe-codex ==="
+  local codex_status=0
+  local antigravity_status=0
+
+  if [ "${command}" != "doctor" ]; then
+    echo "=== Dispatching to ahe-codex ==="
+  fi
   if [ -x "${codex_bin}" ]; then
-    "${codex_bin}" "${command}" "$@"
+    "${codex_bin}" "${command}" "$@" || codex_status=$?
   else
     echo "Warning: ahe-codex script not found or not executable at ${codex_bin}"
+    codex_status=1
   fi
 
-  echo ""
-  echo "=== Dispatching to ahe-antigravity ==="
+  if [ "${command}" != "doctor" ]; then
+    echo ""
+    echo "=== Dispatching to ahe-antigravity ==="
+  else
+    echo ""
+  fi
   if [ -x "${antigravity_bin}" ]; then
-    "${antigravity_bin}" "${command}" "$@"
+    "${antigravity_bin}" "${command}" "$@" || antigravity_status=$?
   else
     echo "Warning: ahe-antigravity script not found or not executable at ${antigravity_bin}"
+    antigravity_status=1
+  fi
+
+  if [ "${codex_status}" -ne 0 ] || [ "${antigravity_status}" -ne 0 ]; then
+    return 1
   fi
 }
 

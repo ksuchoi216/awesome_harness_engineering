@@ -1,5 +1,5 @@
 ---
-name: fix
+name: ahe-fix
 description: Create a concrete `.plans/{plan_name}.md` fix plan for errors, bugs, or user-intent changes. Use when the user explicitly invokes `$fix`, `fix`, or `ahe fix`, and call `converse` when the plan needs clarification.
 ---
 

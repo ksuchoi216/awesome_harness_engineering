@@ -235,13 +235,15 @@ Next:
 1. Open Codex chat in any workspace.
 2. Use \`ahe new\` for a new start.
 3. Use exact \`ahe\` to continue existing harness work.
-4. Use \`ahe ship\` after Plan Mode to write the latest plan to .plans and run it through Antigravity.
+4. Use \`ahe ship\` after Plan Mode to write the latest plan to .plans.
 5. Use \`ahe fix\` to create a .plans fix plan for errors or changed intent.
-6. Use \`ahe <query>\` for explicit AHE requests such as \`ahe compress feature-list\`.
+6. Use \`ahe <query>\` for explicit AHE requests such as \`ahe compress\`.
 EOF
 }
 
 doctor() {
+  printf '=== codex ===\n'
+
   local target_codex_home
   target_codex_home="$(codex_home)"
 
@@ -249,35 +251,61 @@ doctor() {
   local target_shared_dir="${target_codex_home}/ahe-shared"
   local target_hooks_dir="${target_codex_home}/hooks"
   local skill_name=""
+  local errors=0
 
   for skill_name in "${MANAGED_SKILLS[@]}"; do
     if [ ! -f "${target_skills_dir}/${skill_name}/SKILL.md" ]; then
       printf 'Missing: %s/%s/SKILL.md\n' "${target_skills_dir}" "${skill_name}" >&2
-      exit 1
+      errors=$((errors + 1))
     fi
   done
 
   if [ ! -f "${target_shared_dir}/config.yaml" ]; then
     printf 'Missing: %s/config.yaml\n' "${target_shared_dir}" >&2
-    exit 1
+    errors=$((errors + 1))
   fi
 
   if [ ! -d "${target_shared_dir}/templates" ]; then
     printf 'Missing: %s/templates\n' "${target_shared_dir}" >&2
-    exit 1
+    errors=$((errors + 1))
   fi
 
   if [ ! -d "${target_shared_dir}/schemas" ]; then
     printf 'Missing: %s/schemas\n' "${target_shared_dir}" >&2
-    exit 1
+    errors=$((errors + 1))
   fi
 
   if [ ! -f "${target_hooks_dir}/hooks.json" ]; then
     printf 'Missing: %s/hooks.json\n' "${target_hooks_dir}" >&2
+    errors=$((errors + 1))
+  else
+    if ! TARGET_HOOKS_DIR="${target_hooks_dir}" node -e "
+      try {
+        const h = require(process.env.TARGET_HOOKS_DIR + '/hooks.json');
+        const cmd = h.hooks.UserPromptSubmit[0].hooks[0].command;
+        if (!cmd.includes(process.env.TARGET_HOOKS_DIR + '/ahe-hook.js')) {
+          process.exit(1);
+        }
+      } catch (e) {
+        process.exit(1);
+      }
+    " 2>/dev/null; then
+      printf 'Invalid hook command: %s/hooks.json does not point to %s/ahe-hook.js\n' "${target_hooks_dir}" "${target_hooks_dir}" >&2
+      errors=$((errors + 1))
+    fi
+  fi
+
+  if [ ! -f "${target_hooks_dir}/ahe-hook.js" ]; then
+    printf 'Missing: %s/ahe-hook.js\n' "${target_hooks_dir}" >&2
+    errors=$((errors + 1))
+  fi
+
+  if [ "${errors}" -gt 0 ]; then
+    printf 'AHE Codex skill installation is unhealthy (%d errors).\n' "${errors}" >&2
     exit 1
   fi
 
-  printf 'AHE skill installation looks healthy.\n'
+  printf 'AHE Codex skill installation looks healthy.\n'
 }
 
 uninstall_skill() {

@@ -176,10 +176,11 @@ def test_exact_ahe_ship_aliases_emit_independent_ship_context() -> None:
 
         assert "AHE plan export activated." in additional_context
         assert "$ship" in additional_context
+        assert "Detect if the current conversation is still in Plan Mode." in additional_context
+        assert "If Plan Mode is active, exit Plan Mode first before continuing." in additional_context
         assert "most recent `<proposed_plan>`" in additional_context
         assert ".plans/{plan_name}.md" in additional_context
-        assert "ahe-antigravity ahe-ship" in additional_context
-        assert "AHE_PLAN_COMPLETE" in additional_context
+        assert "write the final markdown and stop" in additional_context
         assert "Do not route through `think`" in additional_context
         assert "status report table" not in additional_context
         assert "explicit AHE query" not in additional_context
@@ -220,7 +221,7 @@ def test_non_user_prompt_submit_event_emits_nothing() -> None:
 
 def test_explicit_ahe_query_routes_to_thinker() -> None:
     prompts = [
-        "ahe compress feature-list",
+        "ahe compress",
         "ahe update product spec",
         "ahe add a new dashboard feature",
     ]
@@ -245,12 +246,14 @@ def test_nonprefixed_natural_language_prompts_do_not_trigger() -> None:
 
 
 def test_query_directive_contract() -> None:
-    context = additional_context_for_prompt("ahe compress feature-list")
+    context = additional_context_for_prompt("ahe compress")
     assert context is not None
     assert "Inspect current harness state before choosing a workflow" in context
     assert "| AGENTS.md |" in context
     assert "Use `think` as the internal decision layer" in context
     assert "harness" in context
-    assert "replace old completed feature entries with one summarized done feature" in context
+    assert "For `ahe compress`, run both compression detectors before choosing the next action." in context
+    assert "If the harness-size detector signals compression pressure, replace old completed feature entries with one summarized done feature" in context
+    assert "If the stale-test detector signals overlap, call `review` for stale-test confirmation and keeper selection" in context
     assert "If no new feature can be derived from `docs/product.md`, call `converse`" in context
     assert "derive features from only the active product stage" in context

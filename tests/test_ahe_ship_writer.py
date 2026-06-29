@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -19,7 +20,7 @@ class WriterCall:
 
 def run_writer(writer_call: WriterCall) -> subprocess.CompletedProcess[str]:
     command = [
-        "python3",
+        sys.executable,
         str(SCRIPT_PATH),
         "--root",
         str(writer_call.root),

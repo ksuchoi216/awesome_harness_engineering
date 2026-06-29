@@ -1,6 +1,6 @@
 ---
-name: compress
-description: Internal AHE compression workflow for detecting oversized harness-engineering files and compacting them before AHE thinker or harness routing reads large context. Use when AGENTS.md, docs/product.md, docs/product{number}.md, docs/INSTRUCTIONS.md, feature-list.json, progress.md, session-handoff.md, docs/todo.md, or other AHE harness artifacts have too many lines or waste context.
+name: ahe-compress
+description: Internal AHE compression workflow for detecting oversized harness-engineering files or stale overlapping tests, and compacting them before AHE thinker or harness routing reads large context. Use when AGENTS.md, docs/product.md, docs/product{number}.md, docs/INSTRUCTIONS.md, feature-list.json, progress.md, session-handoff.md, docs/todo.md, or other AHE harness artifacts have too many lines or waste context. It also covers stale overlapping tests.
 ---
 
 # AHE Compression
@@ -9,7 +9,22 @@ This is an internal AHE workflow skill, not a user-facing command.
 
 Do not treat `$compress` as a user command.
 Use it after `think` or `harness` decides that harness context is too large to read
-efficiently.
+efficiently, or when test-suite cleanup is needed. When the user explicitly asks
+for `ahe compress`, this skill must check both harness-file size pressure and
+stale overlapping tests before deciding the next action.
+
+## Test Overlap Detection
+
+Run the deterministic test-overlap detector script:
+
+```bash
+python .codex/skills/compress/scripts/detect_stale_tests.py
+```
+
+The script checks for legacy tests already covered by newer canonical files and prints `REVIEW_TEST\t<legacy-file>\tcovered_by=<keeper-files>`.
+It exits with code `2` and prints `TEST_COMPRESSION_REQUIRED` when stale candidates exist.
+
+Note: `compress` must not directly delete tests; it only signals compression pressure. The actual test consolidation must be routed by `think` through `review` first and then `solve` or `harness` as needed.
 
 ## Size Detection
 
@@ -57,7 +72,10 @@ Exit code meanings:
 
 ## Compression Decision
 
+- Run both compression detectors before choosing the next compression step.
 - If the detector exits `2`, compress before normal AHE routing continues.
+- If the harness-size detector exits `2`, compact harness files first.
+- If the stale-test detector exits `2`, route through `review` before any test cleanup.
 - If only one file exceeds the per-file threshold, compress that file first.
 - If total harness context exceeds the total threshold, compress the largest
   AHE-managed files until the total is under the threshold.

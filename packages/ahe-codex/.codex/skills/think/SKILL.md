@@ -1,5 +1,5 @@
 ---
-name: think
+name: ahe-think
 description: Internal AHE orchestration protocol for routing exact `ahe` and explicit `ahe <query>` requests through the AHE agent network.
 ---
 
@@ -27,14 +27,27 @@ Use it as the central decision layer for AHE work.
 - Explicit `ahe <query>` means route the query through `think`.
 - Broad non-prefixed prompts must not activate AHE.
 
-## Size Preflight
+## Size and Stale-Test Preflight
 
 - Before reading full harness files, run
   `sh .codex/skills/compress/scripts/check-harness-size.sh`.
-- If the detector exits with `COMPRESSION_REQUIRED` or code `2`, call
-  `compress` before normal routing.
+- Run the test-overlap detector `python .codex/skills/compress/scripts/detect_stale_tests.py`
+  when the user's explicit AHE query is compression-oriented (e.g., `ahe compress`).
+- Run both compression detectors before choosing the next compression step.
+- If either detector exits with `COMPRESSION_REQUIRED` or code `2`, call
+  `compress` before normal routing. However, `compress` must not delete tests directly;
+  for test compression, `think` must decide whether the next step is `harness` for
+  harness-file compaction, `review` for stale-test confirmation and keeper selection,
+  or both in sequence.
 - Do not read oversized harness files wholesale before compression routing is
   settled.
+
+## Startup Contract
+
+- Check whether the copied harness files are correct before reading their contents.
+- Read files strictly in this order:
+  `AGENTS.md` -> `docs/product.md` plus `docs/product{n}.md` -> `docs/architecture.md` -> `docs/instructions.md` -> `init.sh` -> `feature-list.json` -> `status.json` -> `progress.md` -> `session-handoff.md`
+- `think` explicitly owns the "what to do next" decisions for Codex-side AHE work.
 
 ## Decision Rules
 

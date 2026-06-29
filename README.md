@@ -2,35 +2,35 @@
 
 AHE installs global Codex and Antigravity skills that manage harness files through chat. The repository uses a one-package, two-internal-packages layout (`packages/ahe-codex` and `packages/ahe-antigravity`) shipped as a single npm package. The
 public entrypoints stay small: use `ahe new` to start or reset harness work,
-`ahe` to continue existing work, `ahe ship` to save and ahe-ship a finished plan,
+`ahe` to continue existing work, `ahe ship` to save the latest plan,
 `ahe fix` to create a `.plans` fix plan, and
-`ahe <query>` for explicit AHE requests such as `ahe compress feature-list`.
+`ahe <query>` for explicit AHE requests such as `ahe compress`.
 
 ## Installed Skills
 
 | Skill | Role |
 | --- | --- |
 | `ahe-new` | New-start workflow that prepares the workspace and hands product/tracking work to `ahe-harness`. |
-| `ahe-thinker` | Centered internal router that judges what is missing and chooses the next agent. |
-| `ahe-reviewer` | Review agent for repo code, harness state, and CodeGraph context. |
-| `ahe-conversator` | Clarification agent for recursive user conversation. |
+| `ahe-think` | Centered internal router that judges what is missing and chooses the next agent. |
+| `ahe-review` | Review agent for repo code, harness state, and CodeGraph context. |
+| `ahe-converse` | Clarification agent for recursive user conversation. |
 | `ahe-harness` | Harness-management agent for product docs, instructions, feature tracking, todo sync, and compression-aware maintenance. |
 | `ahe-fix` | Independent fix planner that writes `.plans/{plan_name}.md` for errors or changed user intent. |
-| `ahe-solver` | Feature-solving agent that divides and plans implementation work. |
-| `ahe-compression` | Internal helper that detects oversized harness files before broad reads. |
-| `ahe-ship` | Independent exporter that writes the latest Codex Plan Mode plan to `.plans/*.md`, runs it through Antigravity, and deletes it only after verified completion. |
+| `ahe-solve` | Feature-solving agent that divides and plans implementation work. |
+| `ahe-compress` | Internal helper that detects oversized harness files before broad reads. |
+| `ahe-ship` | Independent exporter that writes the latest Codex Plan Mode plan to `.plans/*.md` and stops there. |
 
 ## Routing Model
 
 The internal model is centered but flexible:
 
-`query -> ahe-thinker -> ahe-reviewer | ahe-conversator | ahe-harness | ahe-solver`
+`query -> ahe-think -> ahe-review | ahe-converse | ahe-harness | ahe-solve`
 
-- `ahe-thinker` is the center of judgment.
+- `ahe-think` is the center of judgment.
 - Worker agents can call each other directly when that is the logical next
   action.
-- Typical direct handoffs are `ahe-harness -> ahe-conversator`,
-  `ahe-solver -> ahe-reviewer`, and `ahe-reviewer -> ahe-harness`.
+- Typical direct handoffs are `ahe-harness -> ahe-converse`,
+  `ahe-solve -> ahe-review`, and `ahe-review -> ahe-harness`.
 
 ## Query Examples
 
@@ -38,7 +38,7 @@ The internal model is centered but flexible:
 - `ahe new`
 - `ahe ship`
 - `ahe fix`
-- `ahe compress feature-list`
+- `ahe compress`
 - `ahe update product spec`
 - `ahe add dashboard export feature`
 
