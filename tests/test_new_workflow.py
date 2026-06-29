@@ -28,7 +28,7 @@ def test_skill_md_contains_generated_files() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
     required_files = [
         "AGENTS.md",
-        ".ahe/process_status.json",
+        "status.json",
     ]
     for required_file in required_files:
         assert required_file in content, f"Missing required output file '{required_file}' in new workflow definition"

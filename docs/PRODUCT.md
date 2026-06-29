@@ -107,7 +107,7 @@ The centered internal model is:
   flow from `docs/product.md`.
 - Apply queued `docs/todo.md` content into the active product source, then
   update `feature-list.json`, `progress.md`, `session-handoff.md`, and
-  `.ahe/process_status.json`.
+  `status.json`.
 - For `ahe compress feature-list`, replace old completed feature entries with
   one summarized done feature and preserve unfinished, blocked, or active items
   in detail.

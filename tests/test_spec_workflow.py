@@ -34,7 +34,7 @@ def test_skill_md_targets_all_spec_docs_and_tracking_files() -> None:
     required_updates = [
         "docs/product.md",
         "docs/INSTRUCTIONS.md",
-        ".ahe/process_status.json",
+        "status.json",
         "progress.md",
         "session-handoff.md",
     ]

@@ -16,8 +16,8 @@ def test_skill_md_contains_tracking_sync_sections() -> None:
 def test_skill_md_contains_required_process_status_sync_rules() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
     required_rules = [
-        "Update `.ahe/process_status.json` at workflow start",
-        "Update `.ahe/process_status.json` after every answered question",
+        "Update `status.json` at workflow start",
+        "Update `status.json` after every answered question",
         "Refresh `updated_at` every time workflow state changes",
         "Keep `current_command`, `current_step`, and `workflow_complete` aligned with the active workflow state",
         "Keep the `files` status map aligned with the actual workspace files",

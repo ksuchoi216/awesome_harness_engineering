@@ -48,7 +48,7 @@ Before writing code:
 - `session-handoff.md`: End-of-session handoff notes.
 - `feature-list.json`: Feature state tracker.
 - `init.sh`: Standard startup and verification path.
-- `.ahe/process_status.json`: AHE workflow state.
+- `status.json`: AHE workflow state.
 
 ## Required Artifacts
 

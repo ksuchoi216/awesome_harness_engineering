@@ -21,7 +21,7 @@ be created, updated, reconciled, or compressed.
   `docs/product{number}.md` files when present because they explain what to do.
 - Read `AGENTS.md`, `feature-list.json`, `progress.md`, `session-handoff.md`,
   and `docs/todo.md` when they exist.
-- Read `.ahe/process_status.json` when it exists.
+- Read `status.json` when it exists.
 - Treat `docs/product.md` as the canonical source of truth and
   `feature-list.json` as a derived tracker.
 - Treat `docs/product.md` as overview context even when a numbered product stage is active.
@@ -75,7 +75,7 @@ be created, updated, reconciled, or compressed.
 - Keep `progress.md` focused on current work, decisions that still matter,
   blockers, and recent verification evidence.
 - Keep `session-handoff.md` focused on the next-session startup path.
-- Keep `.ahe/process_status.json` aligned with the active workflow.
+- Keep `status.json` aligned with the active workflow.
 
 ## Clarification Rule
 
@@ -114,8 +114,8 @@ when possible, and allow custom input when predefined options are not enough.
 
 ### Tracking Update Rules
 
-- Update `.ahe/process_status.json` at workflow start.
-- Update `.ahe/process_status.json` after every answered question.
+- Update `status.json` at workflow start.
+- Update `status.json` after every answered question.
 - Refresh `updated_at` every time workflow state changes.
 - Keep `current_command`, `current_step`, and `workflow_complete` aligned with the active workflow state.
 - Keep the `files` status map aligned with the actual workspace files.

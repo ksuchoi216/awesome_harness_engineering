@@ -21,8 +21,8 @@ Use this skill when the user invokes `$new`.
 - Ignore non-numeric product docs such as `docs/product-alpha.md` for stage
   ordering.
 - Read existing workspace-root harness files that may be copied from templates, including `progress.md`, `session-handoff.md`, `feature-list.json`, and `init.sh`.
-- Read `.ahe/process_status.json` when it exists.
-- Treat `AGENTS.md`, `docs/product.md`, `docs/INSTRUCTIONS.md`, `progress.md`, `session-handoff.md`, `feature-list.json`, `init.sh`, and `.ahe/process_status.json` as AHE-managed harness files for restart-scope decisions.
+- Read `status.json` when it exists.
+- Treat `AGENTS.md`, `docs/product.md`, `docs/INSTRUCTIONS.md`, `progress.md`, `session-handoff.md`, `feature-list.json`, `init.sh`, and `status.json` as AHE-managed harness files for restart-scope decisions.
 
 ### Sequential Conversation Flow
 
@@ -59,7 +59,7 @@ Use this skill when the user invokes `$new`.
 - Find all template files under `.codex/ahe-shared/templates/`.
 - Ignore `AGENTS.md` and `product.md` when copying template files.
 - Before copying a template file into the workspace root, check whether the target file already exists and ask for explicit overwrite confirmation when needed.
-- Execute the following two steps sequentially, updating the progress status (`current_step` in `.ahe/process_status.json`):
+- Execute the following two steps sequentially, updating the progress status (`current_step` in `status.json`):
   1. complete the embedded init setup work (status: "new")
   2. call "harness" (status: "harness")
 
@@ -67,7 +67,7 @@ Use this skill when the user invokes `$new`.
 
 - Create or refresh `AGENTS.md`.
 - Create or refresh missing workspace-root harness files from `.codex/ahe-shared/templates/`, converting markdown filenames to uppercase when needed.
-- Create `.ahe/process_status.json` and update it at each step to indicate the active status from the three-step sequence.
+- Create `status.json` and update it at each step to indicate the active status from the three-step sequence.
 - Create missing harness files from `.codex/ahe-shared/templates/`.
 - Keep the generated files aligned with the installed shared templates.
 - Only allow additions/removals/edits to `docs/INSTRUCTIONS.md` inside `## CAN CHANGE INSTRUCTIONS`; preserve `## MUST NOT CHANGE INSTRUCTIONS`.

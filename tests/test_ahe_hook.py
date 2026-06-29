@@ -85,7 +85,7 @@ def test_auto_operation_requires_first_response_status_table() -> None:
     assert "docs/achitecture.md" not in additional_context
     assert "docs/todo.md" not in additional_context
     assert "session-handoff.md" not in additional_context
-    assert ".ahe/process_status.json" not in additional_context
+    assert "status.json" not in additional_context
     assert "| CodeGraph |" not in additional_context
     assert additional_context.index("status report table") < additional_context.index(
         "Decide the next AHE workflow"

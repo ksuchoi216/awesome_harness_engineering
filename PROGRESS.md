@@ -18,6 +18,7 @@
 - [x] Implemented `feat-047 Staged Product Docs` by treating `docs/product.md` as overview context and optional numbered docs like `docs/product1.md` and `docs/product2.md` as ordered product stages.
 - [x] Implemented `feat-048 Independent AHE Fix Plan Export` by adding the standalone `ahe-fix` skill, direct `ahe fix` hook route, deterministic `.plans/{plan_name}.md` fix-plan writer, installer allowlist entry, docs, and focused tests.
 - [x] Implemented `feat-050 AHE Ship Executes Saved Plans Through Antigravity` by updating `ahe ship` to write `.plans/{plan_name}.md`, run `ahe-antigravity execute` through `agy`, and delete the plan only after `AHE_PLAN_COMPLETE` verifies full completion.
+- [x] Implemented `feat-051 Remove .ahe Directory From AHE Contract` by removing `.ahe` as an AHE-managed workspace concept and transitioning the workflow-state artifact to root `status.json`.
 
 ## In Progress
 
@@ -42,6 +43,7 @@ Blockers: None.
 - **Product docs can be staged**: `docs/product.md` is overview context; `docs/product1.md`, `docs/product2.md`, and later numeric docs run in order; non-numeric product docs do not affect stage order.
 - **AHE fix stays independent**: `ahe fix`, `ahe-fix`, and `$ahe-fix` create a concrete `.plans/{plan_name}.md` fix plan for errors or changed user intent without entering the normal `ahe-thinker` workflow.
 - **AHE ship now executes saved plans**: `ahe ship`, `ship`, and `$ship` write `.plans/{plan_name}.md`, call `ahe-antigravity execute`, and delete the plan only after `agy` exits cleanly and emits `AHE_PLAN_COMPLETE`.
+- **AHE state tracking uses root status.json**: The workflow state tracking now uses `status.json` instead of `.ahe/process_status.json`, removing `.ahe` as a workspace concept.
 
 ## Change Log
 
@@ -56,3 +58,4 @@ Blockers: None.
 - `.codex/skills/ahe-fix/*`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `README.md`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_ahe_fix_writer.py`, `tests/test_ahe_hook.py`, `tests/test_command_set.py`, `tests/test_project_setup.py`, `tests/test_chat_command_routing.py` - Added independent fix-plan export workflow for `.plans/{plan_name}.md`.
 - `.codex/skills/ahe-new/*`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `README.md`, `docs/PRODUCT.md`, `tests/*` - Renamed `ahe-init` to `ahe-new` and restructured tests around `tests/test_ahe_new.py`.
 - `packages/ahe-antigravity/bin/ahe-antigravity`, `packages/ahe-antigravity/skills/execute/SKILL.md`, `packages/ahe-codex/.codex/skills/ship/SKILL.md`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-codex/.codex/skills/harness/SKILL.md`, `README.md`, `docs/PRODUCT.md`, `tests/test_ahe_antigravity_execute.py`, and packaged-path test updates - Added the ship-and-execute workflow with verified completion cleanup.
+- `packages/ahe-codex/.codex/skills/new/SKILL.md`, `packages/ahe-codex/.codex/skills/harness/SKILL.md`, `packages/ahe-codex/.codex/skills/converse/SKILL.md`, `docs/PRODUCT.md`, `src/templates/agents.md`, `tests/*` - Replaced `.ahe/process_status.json` references with root `status.json` and removed `.ahe` directory references.

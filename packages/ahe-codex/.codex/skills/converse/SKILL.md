@@ -31,14 +31,14 @@ missing `Why`, `What`, or `How`.
 
 ## State Persistence
 
-- Update `.ahe/process_status.json` before pausing for user input.
+- Update `status.json` before pausing for user input.
 - Preserve the current command, current_step, workflow_complete, and files map.
 - Update `progress.md` and `session-handoff.md` when the pending question
   changes the workflow state.
 
 ## Resume Protocol
 
-- Read `.ahe/process_status.json` and the relevant workflow artifacts.
+- Read `status.json` and the relevant workflow artifacts.
 - Summarize the current state briefly.
 - Ask the next focused question or return control to the caller when the answer
   resolves the missing detail.

@@ -100,7 +100,7 @@ const AHE_SHIP_DIRECTIVE = [
   "3. Derive `plan_name` from the plan title and create `.plans/{plan_name}.md`.",
   "4. Add compact handoff context for Antigravity or another LLM platform.",
   "5. Use `.codex/skills/ship/scripts/write_plan.py` to write the final markdown.",
-  "6. Run `ahe-antigravity execute .plans/{plan_name}.md` from the active repository.",
+  "6. Run `ahe-antigravity ahe-ship .plans/{plan_name}.md` from the active repository.",
   "7. Treat execution as verified success only when Antigravity emits `AHE_PLAN_COMPLETE`.",
   "8. If execution is not fully verified, keep `.plans/{plan_name}.md` in place.",
   "",

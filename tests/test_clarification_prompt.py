@@ -65,7 +65,7 @@ def test_ahe_conversation_defines_internal_protocol() -> None:
     assert "internal" in content.lower()
     assert "not a user-facing command" in content.lower()
     assert "Do not treat `$converse` as a user command." in content
-    assert ".ahe/process_status.json" in content
+    assert "status.json" in content
     assert "progress.md" in content
     assert "session-handoff.md" in content
     assert "one question at a time" in content.lower()
