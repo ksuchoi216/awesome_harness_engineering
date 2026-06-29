@@ -200,8 +200,22 @@ def test_exact_ahe_fix_aliases_emit_fix_plan_context() -> None:
         assert "explicit AHE query" not in additional_context
 
 
-def test_ahe_mention_inside_normal_prompt_does_not_trigger() -> None:
-    assert hook_output_for_prompt("please explain ahe") is None
+def test_ahe_fix_query_forms_emit_fix_plan_context() -> None:
+    prompts = [
+        "ahe fix stale tests",
+        "stale tests ahe fix",
+    ]
+    for prompt in prompts:
+        additional_context = additional_context_for_prompt(prompt)
+
+        assert "AHE fix planning activated." in additional_context
+        assert ".plans/{plan_name}.md" in additional_context
+        assert "Do not route through `think`" in additional_context
+        assert "status report table" not in additional_context
+
+
+def test_middle_ahe_mention_does_not_trigger() -> None:
+    assert hook_output_for_prompt("please explain ahe commands today") is None
 
 
 def test_malformed_json_emits_nothing() -> None:
@@ -222,6 +236,8 @@ def test_non_user_prompt_submit_event_emits_nothing() -> None:
 def test_explicit_ahe_query_routes_to_thinker() -> None:
     prompts = [
         "ahe compress",
+        "compress ahe",
+        "please explain ahe",
         "ahe update product spec",
         "ahe add a new dashboard feature",
     ]

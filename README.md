@@ -4,7 +4,8 @@ AHE installs global Codex and Antigravity skills that manage harness files throu
 public entrypoints stay small: use `ahe new` to start or reset harness work,
 `ahe` to continue existing work, `ahe ship` to save the latest plan,
 `ahe fix` to create a `.plans` fix plan, and
-`ahe <query>` for explicit AHE requests such as `ahe compress`.
+`ahe <query>` or `<query> ahe` for explicit AHE requests such as `ahe compress`
+or `compress ahe`.
 
 ## Installed Skills
 
@@ -22,9 +23,13 @@ public entrypoints stay small: use `ahe new` to start or reset harness work,
 
 ## Routing Model
 
-The internal model is centered but flexible:
+The Codex-side model is centered but flexible:
 
-`query -> ahe-think -> ahe-review | ahe-converse | ahe-harness | ahe-solve`
+- exact `ahe` -> `ahe-think` -> `ahe-review | ahe-converse | ahe-harness | ahe-solve`
+- `ahe <query>` or `<query> ahe` -> `ahe-think` -> `ahe-review | ahe-converse | ahe-harness | ahe-solve`
+- exact `ahe new` -> dedicated new-start workflow first, then `ahe-harness`
+- exact `ahe ship` -> independent plan-export workflow
+- exact `ahe fix`, `ahe fix <query>`, or `<query> ahe fix` -> independent fix-plan workflow
 
 - `ahe-think` is the center of judgment.
 - Worker agents can call each other directly when that is the logical next
@@ -38,11 +43,15 @@ The internal model is centered but flexible:
 - `ahe new`
 - `ahe ship`
 - `ahe fix`
+- `ahe fix stale tests`
+- `stale tests ahe fix`
 - `ahe compress`
+- `compress ahe`
 - `ahe update product spec`
 - `ahe add dashboard export feature`
 
 Only exact `ahe`, exact `ahe new`, exact `ahe-new`, exact `$ahe-new`, and
 exact `ahe ship`, exact `ahe-ship`, exact `$ahe-ship`, exact `ahe fix`, exact
-`ahe-fix`, exact `$ahe-fix`, and explicit `ahe <query>` activate the hook.
-Broad non-prefixed prompts do not.
+`ahe-fix`, exact `$ahe-fix`, `ahe fix <query>`, `<query> ahe fix`,
+`ahe <query>`, and `<query> ahe` activate the hook.
+Middle mentions that do not fit those command shapes do not.

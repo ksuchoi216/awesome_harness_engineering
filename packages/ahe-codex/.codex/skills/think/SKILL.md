@@ -1,6 +1,6 @@
 ---
 name: ahe-think
-description: Internal AHE orchestration protocol for routing exact `ahe` and explicit `ahe <query>` requests through the AHE agent network.
+description: Internal AHE orchestration protocol for routing exact `ahe`, `ahe <query>`, and `<query> ahe` requests through the AHE agent network.
 ---
 
 # AHE Thinker
@@ -24,7 +24,7 @@ Use it as the central decision layer for AHE work.
 - Exact `ahe` means continue existing harness work.
 - Exact `ahe init`, exact `new`, and exact `$new` stay on the
   `$new` path.
-- Explicit `ahe <query>` means route the query through `think`.
+- `ahe <query>` and `<query> ahe` mean route the query through `think`.
 - Broad non-prefixed prompts must not activate AHE.
 
 ## Size and Stale-Test Preflight

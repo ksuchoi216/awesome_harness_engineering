@@ -18,7 +18,10 @@ User-facing chat commands:
 - exact `ahe fix`
 - exact `ahe-fix`
 - exact `$ahe-fix`
-- explicit `ahe <query>` (e.g. `ahe compress`)
+- `ahe fix <query>`
+- `<query> ahe fix`
+- `ahe <query>` (e.g. `ahe compress`)
+- `<query> ahe` (e.g. `compress ahe`)
 
 Internal workflow skills:
 
@@ -37,7 +40,8 @@ It must not route through the internal AHE agent network.
 The independent user-facing fix planner is `ahe-fix`. It writes a concrete
 fix plan into `.plans/{plan_name}.md` for fixing errors or following the
 user's current intention when that intention differs from the previous AHE
-flow. It may call `ahe-converse` when clarification is needed.
+flow. It may call `ahe-converse` when clarification is needed. It must not
+route through `ahe-think`.
 
 AHE always installs into the global Codex home (`$CODEX_HOME` when set,
 otherwise `~/.codex`). Installed skills, shared files, and hook files must not
@@ -60,9 +64,13 @@ The global Antigravity installation (`ahe-antigravity`) installs the `ahe-ship` 
 
 ## 3. Agent Model
 
-The centered internal model is:
+The Codex-side model is:
 
-`query -> ahe-think -> ahe-review | ahe-converse | ahe-harness | ahe-solve`
+- exact `ahe` -> `ahe-think` -> `ahe-review | ahe-converse | ahe-harness | ahe-solve`
+- `ahe <query>` or `<query> ahe` -> `ahe-think` -> `ahe-review | ahe-converse | ahe-harness | ahe-solve`
+- exact `ahe new` -> dedicated new-start workflow first, then `ahe-harness`
+- exact `ahe ship` -> independent plan export workflow
+- exact `ahe fix`, `ahe fix <query>`, or `<query> ahe fix` -> independent fix-plan workflow
 
 - `ahe-think` is the central decision layer.
 - Worker agents may call each other directly when that is the logical next
@@ -170,8 +178,9 @@ The centered internal model is:
   independent plan export workflow.
 - Exact `ahe fix`, exact `ahe-fix`, and exact `$ahe-fix` activate the
   independent fix-plan workflow.
-- Explicit `ahe <query>` activates the thinker-routed query path.
-- Broad non-prefixed prompts must not activate AHE.
+- `ahe fix <query>` and `<query> ahe fix` activate the independent fix-plan workflow.
+- `ahe <query>` and `<query> ahe` activate the thinker-routed query path.
+- Prompts that mention `ahe` in the middle without matching one of those command shapes must not activate AHE.
 - The first response must include a concise status table covering `AGENTS.md`,
   `product.md`, `INSTRUCTIONS.md`, `feature-list.json`, and `progress.md`.
 - Product routing must inspect all `docs/*.md` files, treat `docs/product.md`
@@ -183,7 +192,8 @@ The centered internal model is:
 - AHE installs and runs from the global Codex home, not workspace-local
   `.codex` skill directories.
 - Exact `ahe`, exact `ahe new`, exact `ahe ship`, exact `ahe fix`, and
-  explicit `ahe <query>` route to their expected workflows.
+  the query forms `ahe <query>`, `<query> ahe`, `ahe fix <query>`, and
+  `<query> ahe fix` route to their expected workflows.
 - The installer copies the current skill set into the global Codex home and no
   longer depends on removed legacy skills.
 - Tests validate the split-skill structure, staged product-doc contract, and

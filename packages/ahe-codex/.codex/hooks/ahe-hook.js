@@ -153,7 +153,30 @@ function getQueryDirective(prompt) {
 }
 
 function normalizePrompt(prompt) {
-  return prompt.trim().toLowerCase();
+  return prompt.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function extractBoundedCommandQuery(prompt, commandPhrase) {
+  const normalizedPrompt = normalizePrompt(prompt);
+  const escapedCommandPhrase = commandPhrase.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&"
+  );
+  const prefixMatch = normalizedPrompt.match(
+    new RegExp(`^${escapedCommandPhrase}\\s+(.+)$`)
+  );
+  if (prefixMatch) {
+    return prefixMatch[1].trim();
+  }
+
+  const suffixMatch = normalizedPrompt.match(
+    new RegExp(`^(.+?)\\s+${escapedCommandPhrase}$`)
+  );
+  if (suffixMatch) {
+    return suffixMatch[1].trim();
+  }
+
+  return null;
 }
 
 function isExactAheCommand(prompt) {
@@ -187,17 +210,26 @@ function isExactAheFixCommand(prompt) {
   );
 }
 
+function isAheFixQueryCommand(prompt) {
+  if (isExactAheFixCommand(prompt)) {
+    return false;
+  }
+
+  return extractBoundedCommandQuery(prompt, "ahe fix") !== null;
+}
+
 function isExplicitAheQuery(prompt) {
-  const normalizedPrompt = normalizePrompt(prompt);
   if (
     isExactAheCommand(prompt) ||
     isExactAheNewCommand(prompt) ||
     isExactAheShipCommand(prompt) ||
-    isExactAheFixCommand(prompt)
+    isExactAheFixCommand(prompt) ||
+    isAheFixQueryCommand(prompt)
   ) {
     return false;
   }
-  return normalizedPrompt.startsWith("ahe ");
+
+  return extractBoundedCommandQuery(prompt, "ahe") !== null;
 }
 
 async function main() {
@@ -260,6 +292,18 @@ async function main() {
     }
 
     if (isExactAheFixCommand(parsed.prompt)) {
+      process.stdout.write(
+        JSON.stringify({
+          hookSpecificOutput: {
+            hookEventName: "UserPromptSubmit",
+            additionalContext: AHE_FIX_DIRECTIVE,
+          },
+        }) + "\n"
+      );
+      return;
+    }
+
+    if (isAheFixQueryCommand(parsed.prompt)) {
       process.stdout.write(
         JSON.stringify({
           hookSpecificOutput: {

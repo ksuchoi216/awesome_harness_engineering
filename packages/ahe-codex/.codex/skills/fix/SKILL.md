@@ -1,12 +1,13 @@
 ---
 name: ahe-fix
-description: Create a concrete `.plans/{plan_name}.md` fix plan for errors, bugs, or user-intent changes. Use when the user explicitly invokes `$fix`, `fix`, or `ahe fix`, and call `converse` when the plan needs clarification.
+description: Create a concrete `.plans/{plan_name}.md` fix plan for errors, bugs, or user-intent changes. Use when the user explicitly invokes `$fix`, `fix`, `ahe fix`, `ahe fix <query>`, or `<query> ahe fix`, and call `converse` when the plan needs clarification.
 ---
 
 # AHE Fix
 
 `fix` is a user-facing AHE command for creating a fix plan. It is separate
-from the normal `ahe` continuation workflow.
+from the normal `ahe` continuation workflow, including the thinker-routed
+`ahe <query>` and `<query> ahe` forms.
 
 Use this skill when the user wants a plan for fixing errors or following their
 current intention when it differs from the previous AHE flow.

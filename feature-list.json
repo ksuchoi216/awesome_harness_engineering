@@ -150,6 +150,28 @@
       ],
       "status": "done",
       "evidence": "Updated `packages/ahe-codex/.codex/skills/ship/SKILL.md`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `README.md`, `docs/PRODUCT.md`, `packages/ahe-codex/bin/ahe-codex`, and `packages/ahe-antigravity/bin/ahe-antigravity` to remove execution semantics. Removed tests matching the old behavior. Verified via passing test suite."
+    },
+    {
+      "id": "feat-057",
+      "name": "Bidirectional AHE Query Command Matching",
+      "description": "Allow thinker-routed AHE queries in both `ahe <query>` and `<query> ahe` forms, and allow independent fix-plan routing in both `ahe fix <query>` and `<query> ahe fix` forms without routing fix queries through `ahe-think`.",
+      "dependencies": [
+        "feat-048",
+        "feat-049",
+        "feat-056"
+      ],
+      "status": "done",
+      "evidence": "Updated `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `packages/ahe-codex/.codex/skills/think/SKILL.md`, `packages/ahe-codex/.codex/skills/fix/SKILL.md`, `README.md`, `docs/PRODUCT.md`, and `tests/test_ahe_hook.py` so the hook now accepts `ahe <query>`, `<query> ahe`, `ahe fix <query>`, and `<query> ahe fix` with word-boundary command matching. Verified with `pytest tests/test_ahe_hook.py -x`, `pytest tests/test_command_set.py -x`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, and `./init.sh`."
+    },
+    {
+      "id": "feat-058",
+      "name": "Align AHE Startup Contract With Think-Led Read Order",
+      "description": "Align AHE's Codex-side startup contract so `think` is the explicit decision-maker, copied harness files are checked before reading, and the startup read order follows the user's required file sequence.",
+      "dependencies": [
+        "feat-057"
+      ],
+      "status": "done",
+      "evidence": "Canonicalized artifact names around `AGENTS.md`, `docs/product.md`, `docs/product{n}.md`, `docs/architecture.md`, `docs/instructions.md`, `init.sh`, `feature-list.json`, `status.json`, `progress.md`, and `session-handoff.md`. Updated `PROGRESS.md`, `SESSION-HANDOFF.md`, and `docs/PRODUCT.md` to lowercase in previous steps, and verified test suite completion via `./init.sh && pytest tests/ -x`."
     }
   ]
 }

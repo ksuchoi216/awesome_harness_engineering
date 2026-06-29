@@ -16,12 +16,33 @@ readonly PACKAGE_ROOT="$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)"
 readonly SOURCE_SKILLS_DIR="${PACKAGE_ROOT}/skills"
 readonly AGY_MODEL="Gemini 3.1 Pro (High)"
 
+build_execution_prompt() {
+  local plan_markdown="$1"
+
+  printf '%s\n' "Execute this saved AHE plan exactly as written."
+  printf '\n'
+  printf '%s\n' "# Saved Plan"
+  printf '%s' "${plan_markdown}"
+
+  case "${plan_markdown}" in
+    *$'\n')
+      ;;
+    *)
+      printf '\n'
+      ;;
+  esac
+  printf '\n'
+
+  printf '%s\n' "When every requirement is fully complete and verified, print the exact line AHE_PLAN_COMPLETE."
+}
+
 usage() {
   cat <<'EOF'
 Usage:
   ahe-antigravity install [--force]
   ahe-antigravity uninstall
   ahe-antigravity doctor
+  ahe-antigravity ahe-ship <plan-path>
 EOF
 }
 
@@ -45,6 +66,63 @@ resolve_plan_path() {
   local plan_dir
   plan_dir="$(CDPATH= cd -- "$(dirname -- "${plan_path}")" && pwd)"
   printf '%s/%s\n' "${plan_dir}" "$(basename -- "${plan_path}")"
+}
+
+read_plan_markdown() {
+  local plan_path="$1"
+  cat "${plan_path}"
+}
+
+
+ahe_ship_plan() {
+  local plan_path
+  plan_path="$(resolve_plan_path "${1:-}")"
+
+  if ! command -v agy >/dev/null 2>&1; then
+    printf 'Missing required executable: agy\n' >&2
+    exit 1
+  fi
+
+  local execution_prompt
+  execution_prompt="$(build_execution_prompt "$(read_plan_markdown "${plan_path}")")"
+
+  local stdout_path
+  local stderr_path
+  stdout_path="$(mktemp)"
+  stderr_path="$(mktemp)"
+
+  local status=0
+  if printf '%s\n' "${execution_prompt}" | agy --model "${AGY_MODEL}" >"${stdout_path}" 2>"${stderr_path}"; then
+    status=0
+  else
+    status=$?
+  fi
+
+  cat "${stdout_path}"
+  cat "${stderr_path}" >&2
+
+  local combined_output
+  combined_output="$(cat "${stdout_path}")"$'\n'"$(cat "${stderr_path}")"
+  rm -f "${stdout_path}" "${stderr_path}"
+
+  if [ "${status}" -ne 0 ]; then
+    printf 'agy execution failed for %s\n' "${plan_path}" >&2
+    exit "${status}"
+  fi
+
+  case "${combined_output}" in
+    *AHE_PLAN_COMPLETE*)
+      ;;
+    *)
+      printf 'agy completed without required marker AHE_PLAN_COMPLETE for %s\n' "${plan_path}" >&2
+      exit 1
+      ;;
+  esac
+
+  rm -f "${plan_path}" || {
+    printf 'Verified completion but failed to remove plan file: %s\n' "${plan_path}" >&2
+    exit 1
+  }
 }
 
 
@@ -126,8 +204,6 @@ doctor() {
     exit 1
   fi
   printf 'AHE Antigravity skill installation looks healthy.\n\n'
-
-
 }
 
 uninstall_skill() {
@@ -158,6 +234,9 @@ main() {
       ;;
     doctor)
       doctor
+      ;;
+    ahe-ship)
+      ahe_ship_plan "$@"
       ;;
     -h|--help|help)
       usage
