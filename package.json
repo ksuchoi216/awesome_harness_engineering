@@ -5,13 +5,16 @@
   "publishConfig": {
     "access": "public"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "bin": {
     "ahe": "./bin/ahe"
   },
   "scripts": {
     "test": "pytest tests/ -x",
     "prepublishOnly": "npm run test",
-    "postinstall": "echo \"\" && echo \"Awesome Harness Engineering CLI installed!\" && echo \"To install the global Codex skills, run: ahe install\" && echo \"\" && echo \"If you wish to uninstall later, run: npm uninstall -g @ksuchoi216/ahe\""
+    "postinstall": "echo \"\" && echo \"Awesome Harness Engineering CLI installed!\" && echo \"To install the skills, run: ahe install\" && echo \"\" && echo \"If you wish to uninstall later, run: npm uninstall -g @ksuchoi216/ahe\""
   },
   "repository": {
     "type": "git",
@@ -28,7 +31,7 @@
   "author": "ksuchoi216",
   "files": [
     "bin/",
-    ".codex/"
+    "packages/"
   ],
   "license": "MIT"
 }

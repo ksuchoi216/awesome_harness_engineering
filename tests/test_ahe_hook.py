@@ -65,7 +65,7 @@ def test_exact_ahe_prompt_emits_auto_operation_context() -> None:
     assert ".codegraph/" in additional_context
     assert "unfinished feature" in additional_context
     assert "ask the user" in additional_context
-    assert "$ahe-init" in additional_context
+    assert "$ahe-new" in additional_context
     assert "ahe-thinker" in additional_context
 
 
@@ -112,6 +112,19 @@ def test_auto_operation_routes_through_thinker_network() -> None:
     assert "`resume existing harness work`" not in additional_context
 
 
+def test_auto_operation_describes_staged_product_docs() -> None:
+    additional_context = additional_context_for_prompt("ahe")
+
+    assert "docs/product1.md" in additional_context
+    assert "docs/product2.md" in additional_context
+    assert "numeric suffix order" in additional_context
+    assert "derive features from only the active product stage" in additional_context
+    assert "docs/product-alpha.md" in additional_context
+    assert additional_context.index("docs/product1.md") < additional_context.index(
+        "docs/product2.md"
+    )
+
+
 def test_auto_operation_requires_codegraph_preflight_before_status_checks() -> None:
     additional_context = additional_context_for_prompt("ahe")
 
@@ -133,10 +146,10 @@ def test_uppercase_ahe_prompt_emits_auto_operation_context() -> None:
 
 
 def test_exact_ahe_init_prompt_emits_new_start_context() -> None:
-    additional_context = additional_context_for_prompt("ahe init")
+    additional_context = additional_context_for_prompt("ahe new")
 
     assert "AHE automatic operation activated." in additional_context
-    assert "$ahe-init" in additional_context
+    assert "$ahe-new" in additional_context
     assert "new start" in additional_context.lower() or "initialize" in additional_context.lower()
     assert "If no AHE-managed harness files exist, start initialization normally." in additional_context
     assert "If any AHE-managed harness file exists, read the existing files" in additional_context
@@ -149,12 +162,39 @@ def test_exact_ahe_init_prompt_emits_new_start_context() -> None:
 
 
 def test_exact_ahe_init_aliases_emit_new_start_context() -> None:
-    for prompt in ("ahe-init", "$ahe-init"):
+    for prompt in ("ahe-new", "$ahe-new"):
         additional_context = additional_context_for_prompt(prompt)
 
         assert "AHE automatic operation activated." in additional_context
-        assert "$ahe-init" in additional_context
+        assert "$ahe-new" in additional_context
         assert "new start" in additional_context.lower()
+
+
+def test_exact_ahe_ship_aliases_emit_independent_ship_context() -> None:
+    for prompt in ("ahe ship", "ahe-ship", "$ahe-ship"):
+        additional_context = additional_context_for_prompt(prompt)
+
+        assert "AHE plan export activated." in additional_context
+        assert "$ahe-ship" in additional_context
+        assert "most recent `<proposed_plan>`" in additional_context
+        assert ".plans/{plan_name}.md" in additional_context
+        assert "Do not route through `ahe-thinker`" in additional_context
+        assert "status report table" not in additional_context
+        assert "explicit AHE query" not in additional_context
+
+
+def test_exact_ahe_fix_aliases_emit_fix_plan_context() -> None:
+    for prompt in ("ahe fix", "ahe-fix", "$ahe-fix"):
+        additional_context = additional_context_for_prompt(prompt)
+
+        assert "AHE fix planning activated." in additional_context
+        assert "$ahe-fix" in additional_context
+        assert ".plans/{plan_name}.md" in additional_context
+        assert "fixing errors or following the user's intention" in additional_context
+        assert "ahe-conversator" in additional_context
+        assert "Do not route through `ahe-thinker`" in additional_context
+        assert "status report table" not in additional_context
+        assert "explicit AHE query" not in additional_context
 
 
 def test_ahe_mention_inside_normal_prompt_does_not_trigger() -> None:
@@ -211,3 +251,4 @@ def test_query_directive_contract() -> None:
     assert "ahe-harness" in context
     assert "replace old completed feature entries with one summarized done feature" in context
     assert "If no new feature can be derived from `docs/product.md`, call `ahe-conversator`" in context
+    assert "derive features from only the active product stage" in context

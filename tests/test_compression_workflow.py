@@ -44,6 +44,38 @@ def test_detector_requires_compression_for_oversized_file(tmp_path: Path) -> Non
     assert "COMPRESSION_REQUIRED" in completed_process.stdout
 
 
+def test_detector_checks_numbered_product_stage_docs(tmp_path: Path) -> None:
+    docs_dir = tmp_path / "docs"
+    docs_dir.mkdir()
+    stage_file = docs_dir / "product1.md"
+    stage_file.write_text(
+        "\n".join(f"- stage item {index}" for index in range(180)) + "\n",
+        encoding="utf-8",
+    )
+
+    completed_process = run_detector(tmp_path)
+
+    assert completed_process.returncode == 2
+    assert "COMPRESS\tdocs/product1.md\t180\tlimit=180" in completed_process.stdout
+    assert "COMPRESSION_REQUIRED" in completed_process.stdout
+
+
+def test_detector_ignores_non_numeric_product_docs_by_default(tmp_path: Path) -> None:
+    docs_dir = tmp_path / "docs"
+    docs_dir.mkdir()
+    stage_file = docs_dir / "product-alpha.md"
+    stage_file.write_text(
+        "\n".join(f"- ignored item {index}" for index in range(180)) + "\n",
+        encoding="utf-8",
+    )
+
+    completed_process = run_detector(tmp_path)
+
+    assert completed_process.returncode == 0
+    assert "docs/product-alpha.md" not in completed_process.stdout
+    assert "COMPRESSION_NOT_REQUIRED" in completed_process.stdout
+
+
 def test_product_docs_route_thinking_to_compression() -> None:
     thinking_content = (
         REPO_ROOT / ".codex/skills/ahe-thinker/SKILL.md"

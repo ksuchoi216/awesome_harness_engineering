@@ -4,14 +4,14 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-INIT_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-init/SKILL.md"
+INIT_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-new/SKILL.md"
 HARNESS_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-harness/SKILL.md"
 SOLVER_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-solver/SKILL.md"
 
 
 def test_skill_md_contains_init_workflow_details_absorbed_from_agent_and_copy() -> None:
     content = INIT_SKILL_MD_PATH.read_text(encoding="utf-8")
-    assert "## Command Workflow: ahe-init" in content
+    assert "## Command Workflow: ahe-new" in content
     assert "Update only the `PROJECT_PURPOSE` portion of `AGENTS.md`." in content
     assert "project language is Python" in content
     assert "Which language do you use?" in content
@@ -58,10 +58,19 @@ def test_solver_skill_describes_divide_and_plan_behavior() -> None:
     assert "ahe-conversator" in content
 
 
+def test_solver_reads_active_product_stage_context() -> None:
+    content = SOLVER_SKILL_MD_PATH.read_text(encoding="utf-8")
+    assert "docs/product.md" in content
+    assert "active product stage" in content
+    assert "docs/product1.md" in content
+    assert "future product stages" in content
+
+
 if __name__ == "__main__":
     test_skill_md_contains_init_workflow_details_absorbed_from_agent_and_copy()
     test_skill_md_contains_harness_workflow()
     test_skill_md_contains_harness_tracking_workflow()
     test_internal_skills_are_no_longer_user_facing_commands()
     test_solver_skill_describes_divide_and_plan_behavior()
+    test_solver_reads_active_product_stage_context()
     print("test_specialized_workflows.py passed!")

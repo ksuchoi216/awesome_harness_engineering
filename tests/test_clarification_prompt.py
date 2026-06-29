@@ -5,7 +5,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILL_MD_PATHS = (
-    REPO_ROOT / ".codex/skills/ahe-init/SKILL.md",
+    REPO_ROOT / ".codex/skills/ahe-new/SKILL.md",
     REPO_ROOT / ".codex/skills/ahe-harness/SKILL.md",
 )
 CONVERSATION_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-conversator/SKILL.md"
@@ -42,7 +42,7 @@ def test_skill_md_contains_clarification_judgment_sections() -> None:
 
 def test_skill_md_contains_representative_skill_specific_rules() -> None:
     init_content = (
-        REPO_ROOT / ".codex/skills/ahe-init/SKILL.md"
+        REPO_ROOT / ".codex/skills/ahe-new/SKILL.md"
     ).read_text(encoding="utf-8")
     assert "PROJECT_PURPOSE" in init_content
     assert "Which language do you use?" in init_content

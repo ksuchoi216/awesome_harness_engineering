@@ -37,6 +37,46 @@
       ],
       "status": "done",
       "evidence": "Renamed `docs/product.md`, `progress.md`, `session-handoff.md`, `.codex/ahe-shared/templates/product.md`, `.codex/ahe-shared/templates/progress.md`, and `.codex/ahe-shared/templates/session-handoff.md`; updated skill, hook, docs, tests, and detector references. Verified with `pytest tests/ -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, `python3 -m json.tool package.json`, and `sh .codex/skills/ahe-compression/scripts/check-harness-size.sh`."
+    },
+    {
+      "id": "feat-046",
+      "name": "Independent AHE Ship Plan Export",
+      "description": "Add `ahe-ship` as an independent shipped skill and route exact `ahe ship`, `ahe-ship`, and `$ahe-ship` to export the latest Codex Plan Mode plan into `.plans/{plan_name}.md` for another LLM platform.",
+      "dependencies": [
+        "feat-045"
+      ],
+      "status": "done",
+      "evidence": "Added `.codex/skills/ahe-ship/SKILL.md`, `agents/openai.yaml`, and `scripts/write_plan.py`; updated `.codex/hooks/ahe-hook.js`, `bin/ahe`, `README.md`, `docs/PRODUCT.md`, and focused tests. Verified the feature with `pytest tests/test_ahe_ship_writer.py tests/test_ahe_hook.py -k 'ship or ahe_ship' -x`, `PYTHONPYCACHEPREFIX=/tmp/ahe-ship-pycache python3 -m py_compile .codex/skills/ahe-ship/scripts/write_plan.py`, `node --check .codex/hooks/ahe-hook.js`, `bash -n bin/ahe`, `ruff check src/ tests/`, `python3 -m json.tool feature-list.json`, `python3 -m json.tool package.json`, and `./init.sh`. Broader command-set and full-suite verification now pass with the staged product-doc work present."
+    },
+    {
+      "id": "feat-047",
+      "name": "Staged Product Docs",
+      "description": "Treat `docs/product.md` as the overview product spec and optional `docs/product1.md`, `docs/product2.md`, and later numeric files as ordered product stages.",
+      "dependencies": [
+        "feat-046"
+      ],
+      "status": "done",
+      "evidence": "Updated `.codex/hooks/ahe-hook.js`, `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-harness/SKILL.md`, `.codex/skills/ahe-thinker/SKILL.md`, `.codex/skills/ahe-reviewer/SKILL.md`, `.codex/skills/ahe-solver/SKILL.md`, `.codex/skills/ahe-compression/SKILL.md`, `.codex/skills/ahe-compression/scripts/check-harness-size.sh`, `docs/product.md`, and focused tests. The contract now derives features only from the active numeric product stage, keeps future stages as context, ignores non-numeric product docs for stage ordering, and advances only after current-stage feature-list items are `done`. Also aligned shared template filenames with the existing lowercase contract. Verified with focused staged-doc tests, `pytest tests/ -x`, `./init.sh`, `node --check .codex/hooks/ahe-hook.js`, `bash -n bin/ahe`, `python3 -m json.tool feature-list.json`, and the compression detector."
+    },
+    {
+      "id": "feat-048",
+      "name": "Independent AHE Fix Plan Export",
+      "description": "Add `ahe-fix` as an independent user-facing skill and route exact `ahe fix`, `ahe-fix`, and `$ahe-fix` to create a concrete `.plans/{plan_name}.md` fix plan for errors or changed user intent.",
+      "dependencies": [
+        "feat-047"
+      ],
+      "status": "done",
+      "evidence": "Added `.codex/skills/ahe-fix/SKILL.md` and `.codex/skills/ahe-fix/scripts/write_fix_plan.py`; updated `.codex/hooks/ahe-hook.js`, `bin/ahe`, `README.md`, `docs/PRODUCT.md`, and focused tests. Verified with `pytest tests/ -x`, `ruff check src/ tests/`, `node --check .codex/hooks/ahe-hook.js`, `bash -n bin/ahe`, `PYTHONPYCACHEPREFIX=/tmp/ahe-fix-pycache python3 -m py_compile .codex/skills/ahe-fix/scripts/write_fix_plan.py`, `./init.sh`, `python3 -m json.tool feature-list.json`, `python3 -m json.tool package.json`, `sh .codex/skills/ahe-compression/scripts/check-harness-size.sh`, hook smoke for `ahe fix`, and writer smoke to `/tmp/ahe-fix-smoke/.plans/fix-smoke.md`. `make check` is unavailable because no Makefile target exists; `mypy src/ --strict` is unavailable because `mypy` is not installed."
+    },
+    {
+      "id": "feat-049",
+      "name": "Rename ahe-init to ahe-new and expand staged tests",
+      "description": "Rename the new-start workflow from ahe-init to ahe-new, replacing the old command contract and skill directory. Restructure tests into stages centered on test_ahe_new.py.",
+      "dependencies": [
+        "feat-048"
+      ],
+      "status": "done",
+      "evidence": "Renamed .codex/skills/ahe-init to ahe-new and updated its SKILL.md. Updated ahe-hook.js, bin/ahe, README.md, and docs/PRODUCT.md for the ahe-new contract. Renamed test_init_workflow.py to test_new_workflow.py and updated all relevant test files. Verified with pytest tests/ -x, bash -n bin/ahe, node --check .codex/hooks/ahe-hook.js, and ./init.sh."
     }
   ]
 }

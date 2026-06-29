@@ -13,9 +13,11 @@ def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
         [
             "ahe-compression",
             "ahe-conversator",
+            "ahe-fix",
             "ahe-harness",
-            "ahe-init",
+            "ahe-new",
             "ahe-reviewer",
+            "ahe-ship",
             "ahe-solver",
             "ahe-thinker",
         ]
@@ -23,9 +25,21 @@ def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
     assert actual_skill_names == expected_skill_names
 
 
-def test_only_init_is_user_facing_command() -> None:
-    init_content = (SKILL_DIR / "ahe-init/SKILL.md").read_text(encoding="utf-8")
-    assert "$ahe-init" in init_content
+def test_public_command_skills_are_user_facing_commands() -> None:
+    init_content = (SKILL_DIR / "ahe-new/SKILL.md").read_text(encoding="utf-8")
+    assert "$ahe-new" in init_content
+
+    ship_content = (SKILL_DIR / "ahe-ship/SKILL.md").read_text(encoding="utf-8")
+    assert "$ahe-ship" in ship_content
+    assert "ahe ship" in ship_content
+    assert "ahe-thinker" in ship_content
+    assert "must not call" in ship_content.lower()
+
+    fix_content = (SKILL_DIR / "ahe-fix/SKILL.md").read_text(encoding="utf-8")
+    assert "$ahe-fix" in fix_content
+    assert "ahe fix" in fix_content
+    assert ".plans/{plan_name}.md" in fix_content
+    assert "ahe-conversator" in fix_content
 
     internal_skill_names = (
         "ahe-compression",

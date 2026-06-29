@@ -7,5 +7,7 @@ cd "${SCRIPT_DIR}"
 echo "Installing awesome_harness_engineering globally..."
 sudo npm install -g .
 
+echo "Installing Codex and Antigravity skills..."
+./bin/ahe install --force
+
 echo "Installation complete!"
-echo "You can now run 'ahe install' to install the Codex skills."
