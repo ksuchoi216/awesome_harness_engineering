@@ -4,50 +4,50 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SKILL_DIR = REPO_ROOT / ".codex/skills"
+SKILL_DIR = REPO_ROOT / "packages/ahe-codex/.codex/skills"
 
 
 def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
     actual_skill_names = sorted(path.parent.name for path in SKILL_DIR.glob("*/SKILL.md"))
     expected_skill_names = sorted(
         [
-            "ahe-compression",
-            "ahe-conversator",
-            "ahe-fix",
-            "ahe-harness",
-            "ahe-new",
-            "ahe-reviewer",
-            "ahe-ship",
-            "ahe-solver",
-            "ahe-thinker",
+            "compress",
+            "converse",
+            "fix",
+            "harness",
+            "new",
+            "review",
+            "ship",
+            "solve",
+            "think",
         ]
     )
     assert actual_skill_names == expected_skill_names
 
 
 def test_public_command_skills_are_user_facing_commands() -> None:
-    init_content = (SKILL_DIR / "ahe-new/SKILL.md").read_text(encoding="utf-8")
-    assert "$ahe-new" in init_content
+    init_content = (SKILL_DIR / "new/SKILL.md").read_text(encoding="utf-8")
+    assert "$new" in init_content
 
-    ship_content = (SKILL_DIR / "ahe-ship/SKILL.md").read_text(encoding="utf-8")
-    assert "$ahe-ship" in ship_content
+    ship_content = (SKILL_DIR / "ship/SKILL.md").read_text(encoding="utf-8")
+    assert "$ship" in ship_content
     assert "ahe ship" in ship_content
-    assert "ahe-thinker" in ship_content
+    assert "think" in ship_content
     assert "must not call" in ship_content.lower()
 
-    fix_content = (SKILL_DIR / "ahe-fix/SKILL.md").read_text(encoding="utf-8")
-    assert "$ahe-fix" in fix_content
+    fix_content = (SKILL_DIR / "fix/SKILL.md").read_text(encoding="utf-8")
+    assert "$fix" in fix_content
     assert "ahe fix" in fix_content
     assert ".plans/{plan_name}.md" in fix_content
-    assert "ahe-conversator" in fix_content
+    assert "converse" in fix_content
 
     internal_skill_names = (
-        "ahe-compression",
-        "ahe-conversator",
-        "ahe-harness",
-        "ahe-reviewer",
-        "ahe-solver",
-        "ahe-thinker",
+        "compress",
+        "converse",
+        "harness",
+        "review",
+        "solve",
+        "think",
     )
 
     for skill_name in internal_skill_names:
@@ -71,11 +71,11 @@ def test_split_skill_set_covers_required_context_docs() -> None:
         assert required_file in combined_content, f"Missing file reference '{required_file}'"
 
     for required_skill_name in (
-        "ahe-thinker",
-        "ahe-reviewer",
-        "ahe-conversator",
-        "ahe-harness",
-        "ahe-solver",
+        "think",
+        "review",
+        "converse",
+        "harness",
+        "solve",
     ):
         assert required_skill_name in combined_content, (
             f"Missing internal agent reference '{required_skill_name}'"

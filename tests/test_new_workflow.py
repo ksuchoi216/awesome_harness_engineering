@@ -3,11 +3,11 @@ from __future__ import annotations
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-new/SKILL.md"
+SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/new/SKILL.md"
 
 def test_skill_md_contains_init_workflow_sections() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
-    assert "## Command Workflow: ahe-new" in content, "Missing '## Command Workflow: ahe-new' section"
+    assert "## Command Workflow: new" in content, "Missing '## Command Workflow: new' section"
     assert "Workspace Inspection" in content, "Missing Workspace Inspection step description"
     assert "Sequential Conversation Flow" in content, "Missing Sequential Conversation Flow description"
     assert "Harness Generation" in content, "Missing Harness Generation step description"
@@ -22,7 +22,7 @@ def test_skill_md_contains_all_required_inputs() -> None:
         "Which language do you use?",
     ]
     for required_input in required_inputs:
-        assert required_input in content, f"Missing required input '{required_input}' in ahe-new workflow definition"
+        assert required_input in content, f"Missing required input '{required_input}' in new workflow definition"
 
 def test_skill_md_contains_generated_files() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
@@ -31,22 +31,22 @@ def test_skill_md_contains_generated_files() -> None:
         ".ahe/process_status.json",
     ]
     for required_file in required_files:
-        assert required_file in content, f"Missing required output file '{required_file}' in ahe-new workflow definition"
+        assert required_file in content, f"Missing required output file '{required_file}' in new workflow definition"
 
 def test_skill_md_contains_three_sequential_steps_and_status_tracking() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
     expected_steps = [
-        'call "ahe-harness"',
+        'call "harness"',
     ]
     for step in expected_steps:
-        assert step in content, f"Missing step '{step}' in ahe-new workflow definition"
+        assert step in content, f"Missing step '{step}' in new workflow definition"
 
     expected_statuses = [
-        'ahe-new',
-        'ahe-harness',
+        'new',
+        'harness',
     ]
     for status in expected_statuses:
-        assert status in content, f"Missing progress status '{status}' in ahe-new workflow definition"
+        assert status in content, f"Missing progress status '{status}' in new workflow definition"
 
 
 def test_skill_md_absorbs_reset_behavior_without_backups_for_new_start() -> None:
@@ -59,7 +59,7 @@ def test_skill_md_absorbs_reset_behavior_without_backups_for_new_start() -> None
     ]
     for required_behavior in required_behaviors:
         assert required_behavior in content, (
-            f"Missing absorbed reset behavior '{required_behavior}' in ahe-new"
+            f"Missing absorbed reset behavior '{required_behavior}' in new"
         )
 
     forbidden_behaviors = [
@@ -69,7 +69,7 @@ def test_skill_md_absorbs_reset_behavior_without_backups_for_new_start() -> None
     ]
     for forbidden_behavior in forbidden_behaviors:
         assert forbidden_behavior not in content, (
-            f"Unexpected backup behavior '{forbidden_behavior}' still present in ahe-new"
+            f"Unexpected backup behavior '{forbidden_behavior}' still present in new"
         )
 
 
@@ -87,7 +87,7 @@ def test_skill_md_requires_restart_scope_before_resetting_existing_harness() -> 
     ]
     for required_behavior in required_behaviors:
         assert required_behavior in content, (
-            f"Missing restart-scope behavior '{required_behavior}' in ahe-new"
+            f"Missing restart-scope behavior '{required_behavior}' in new"
         )
 
 
@@ -96,12 +96,12 @@ def test_skill_md_keeps_specification_details_out_of_agents_md() -> None:
     required_behaviors = [
         "Keep `AGENTS.md` limited to the project purpose and base agent settings.",
         "Do not put product specification details in `AGENTS.md`.",
-        "Send product behavior, scope, requirements, success criteria, and workflow details to `ahe-harness` so they are written in `docs/product.md` first.",
+        "Send product behavior, scope, requirements, success criteria, and workflow details to `harness` so they are written in `docs/product.md` first.",
         "Generating an empty `feature-list.json` from a template is allowed, but do not write concrete feature items until `docs/product.md` is populated.",
     ]
     for required_behavior in required_behaviors:
         assert required_behavior in content, (
-            f"Missing specification placement behavior '{required_behavior}' in ahe-new"
+            f"Missing specification placement behavior '{required_behavior}' in new"
         )
 
 

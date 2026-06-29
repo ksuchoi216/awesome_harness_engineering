@@ -2,8 +2,8 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-29 13:00 +0900
-**Session ID:** feat-048-independent-ahe-fix-plan-export
+**Last Updated:** 2026-06-29 14:35 +0900
+**Session ID:** feat-050-ahe-ship-antigravity-execute
 **Active Feature:** None
 
 ## Completed
@@ -17,12 +17,13 @@
 - [x] Implemented `feat-046 Independent AHE Ship Plan Export` by adding the standalone `ahe-ship` skill, direct `ahe ship` hook route, deterministic `.plans/{plan_name}.md` writer, installer allowlist entry, docs, and focused tests.
 - [x] Implemented `feat-047 Staged Product Docs` by treating `docs/product.md` as overview context and optional numbered docs like `docs/product1.md` and `docs/product2.md` as ordered product stages.
 - [x] Implemented `feat-048 Independent AHE Fix Plan Export` by adding the standalone `ahe-fix` skill, direct `ahe fix` hook route, deterministic `.plans/{plan_name}.md` fix-plan writer, installer allowlist entry, docs, and focused tests.
+- [x] Implemented `feat-050 AHE Ship Executes Saved Plans Through Antigravity` by updating `ahe ship` to write `.plans/{plan_name}.md`, run `ahe-antigravity execute` through `agy`, and delete the plan only after `AHE_PLAN_COMPLETE` verifies full completion.
 
 ## In Progress
 
 - [ ] No active implementation in progress.
-Details: `feat-048 Independent AHE Fix Plan Export` is complete.
-Latest: AHE now routes exact `ahe fix`, `ahe-fix`, and `$ahe-fix` to a dedicated fix-plan workflow that can call `ahe-conversator` when clarification is needed and writes `.plans/{plan_name}.md`.
+Details: `feat-050 AHE Ship Executes Saved Plans Through Antigravity` is complete.
+Latest: AHE now routes exact `ahe ship`, `ship`, and `$ship` to a flow that writes a saved plan, runs it through `ahe-antigravity execute`, and keeps or removes the plan file based on verified completion.
 Blockers: None.
 
 ## Blocked
@@ -40,6 +41,7 @@ Blockers: None.
 - **AHE ship stays independent**: `ahe ship`, `ahe-ship`, and `$ahe-ship` export the latest Codex Plan Mode `<proposed_plan>` to `.plans/{plan_name}.md` without entering the `ahe-thinker` routed AHE agent network.
 - **Product docs can be staged**: `docs/product.md` is overview context; `docs/product1.md`, `docs/product2.md`, and later numeric docs run in order; non-numeric product docs do not affect stage order.
 - **AHE fix stays independent**: `ahe fix`, `ahe-fix`, and `$ahe-fix` create a concrete `.plans/{plan_name}.md` fix plan for errors or changed user intent without entering the normal `ahe-thinker` workflow.
+- **AHE ship now executes saved plans**: `ahe ship`, `ship`, and `$ship` write `.plans/{plan_name}.md`, call `ahe-antigravity execute`, and delete the plan only after `agy` exits cleanly and emits `AHE_PLAN_COMPLETE`.
 
 ## Change Log
 
@@ -53,3 +55,4 @@ Blockers: None.
 - `.codex/hooks/ahe-hook.js`, `.codex/skills/ahe-*`, `.codex/skills/ahe-compression/scripts/check-harness-size.sh`, `docs/product.md`, `feature-list.json`, `tests/test_ahe_hook.py`, `tests/test_spec_workflow.py`, `tests/test_specialized_workflows.py`, `tests/test_compression_workflow.py` - Added staged product-doc routing, active-stage feature derivation, and numeric product-stage compression detection.
 - `.codex/skills/ahe-fix/*`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `README.md`, `docs/PRODUCT.md`, `feature-list.json`, `tests/test_ahe_fix_writer.py`, `tests/test_ahe_hook.py`, `tests/test_command_set.py`, `tests/test_project_setup.py`, `tests/test_chat_command_routing.py` - Added independent fix-plan export workflow for `.plans/{plan_name}.md`.
 - `.codex/skills/ahe-new/*`, `.codex/hooks/ahe-hook.js`, `bin/ahe`, `README.md`, `docs/PRODUCT.md`, `tests/*` - Renamed `ahe-init` to `ahe-new` and restructured tests around `tests/test_ahe_new.py`.
+- `packages/ahe-antigravity/bin/ahe-antigravity`, `packages/ahe-antigravity/skills/execute/SKILL.md`, `packages/ahe-codex/.codex/skills/ship/SKILL.md`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-codex/.codex/skills/harness/SKILL.md`, `README.md`, `docs/PRODUCT.md`, `tests/test_ahe_antigravity_execute.py`, and packaged-path test updates - Added the ship-and-execute workflow with verified completion cleanup.

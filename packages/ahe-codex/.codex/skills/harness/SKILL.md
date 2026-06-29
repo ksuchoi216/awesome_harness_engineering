@@ -1,5 +1,5 @@
 ---
-name: ahe-harness
+name: harness
 description: Internal AHE harness workflow for managing product docs, instructions, feature tracking, session artifacts, todo sync, and compression-aware maintenance.
 ---
 
@@ -7,11 +7,11 @@ description: Internal AHE harness workflow for managing product docs, instructio
 
 This is an internal AHE workflow skill, not a user-facing command.
 
-Do not treat `$ahe-harness` as a user command.
-Use it when `ahe-thinker` or another worker decides that harness artifacts must
+Do not treat `$harness` as a user command.
+Use it when `think` or another worker decides that harness artifacts must
 be created, updated, reconciled, or compressed.
 
-## Command Workflow: ahe-harness
+## Command Workflow: harness
 
 ### Harness Inspection
 
@@ -37,7 +37,7 @@ be created, updated, reconciled, or compressed.
 - Clarify project instructions when `docs/INSTRUCTIONS.md` needs to change.
 - Clarify what next feature or goal should be tracked when the next work item is
   unclear.
-- `docs/product.md` is the canonical home for product specification details collected during `ahe init`.
+- `docs/product.md` is the canonical home for product specification details collected during `ahe new`.
 - Write product behavior, scope, requirements, success criteria, and workflow details into `docs/product.md`.
 - `docs/product.md` is the canonical source of truth. Concrete feature items for `feature-list.json` must be derived from it only after it has been populated.
 - Derive concrete feature items from only the active product stage, not future stages.
@@ -61,11 +61,11 @@ be created, updated, reconciled, or compressed.
   evidence.
 - Preserve unfinished, blocked, or active feature items in full detail.
 - Reconcile `feature-list.json` against `docs/product.md` after compression.
-- If no new feature can be derived from `docs/product.md`, call `ahe-conversator` to ask what next feature, product direction, or goal should be tracked.
+- If no new feature can be derived from `docs/product.md`, call `converse` to ask what next feature, product direction, or goal should be tracked.
 - If a numbered product stage is active and no new feature can be derived from
-  that active product stage, call `ahe-conversator` with the same clarification
+  that active product stage, call `converse` with the same clarification
   target.
-- Call `ahe-reviewer` directly when code or progress evidence must be checked
+- Call `review` directly when code or progress evidence must be checked
   before updating harness files.
 
 ### Harness Completion
@@ -79,7 +79,7 @@ be created, updated, reconciled, or compressed.
 
 ## Clarification Rule
 
-When the next harness step is not clear, follow the `ahe-thinker` protocol first. If `ahe-thinker` finds missing information, follow the `ahe-conversator` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options
+When the next harness step is not clear, follow the `think` protocol first. If `think` finds missing information, follow the `converse` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options
 when possible, and allow custom input when predefined options are not enough.
 
 ### User Response Target

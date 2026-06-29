@@ -30,8 +30,9 @@ Internal workflow skills:
 - `ahe-compression`
 
 The independent user-facing exporter is `ahe-ship`. It writes the latest Codex
-Plan Mode `<proposed_plan>` into `.plans/{plan_name}.md` for another LLM
-platform and must not route through the internal AHE agent network.
+Plan Mode `<proposed_plan>` into `.plans/{plan_name}.md`, triggers Antigravity
+execution for that plan, and removes the file only after verified completion.
+It must not route through the internal AHE agent network.
 
 The independent user-facing fix planner is `ahe-fix`. It writes a concrete
 fix plan into `.plans/{plan_name}.md` for fixing errors or following the
@@ -55,7 +56,7 @@ The global Codex installation (`ahe-codex`) contains:
 - schemas: `process_status.schema.json` and `feature-list-schema.json`
 - hooks: `hooks.json` and `ahe-hook.js`
 
-The global Antigravity installation (`ahe-antigravity`) installs the `ahe-executor` skill to `~/.gemini/config/skills/ahe-executor`.
+The global Antigravity installation (`ahe-antigravity`) installs the `ahe-ship` skill to `~/.gemini/config/skills/ahe-ship` and provides `ahe-antigravity ahe-ship <plan-path>` for running a saved plan through `agy`.
 
 ## 3. Agent Model
 
@@ -141,6 +142,11 @@ The centered internal model is:
   the current conversation.
 - Create `.plans/{plan_name}.md` in the active repository with compact handoff
   context for Antigravity or another LLM platform.
+- Run `ahe-antigravity ahe-ship .plans/{plan_name}.md` after writing the plan.
+- Remove the plan file only when Antigravity exits successfully and emits the
+  exact marker `AHE_PLAN_COMPLETE`.
+- Keep the plan file when execution fails, is partial, or cannot verify full
+  completion.
 - Stay independent from `ahe-thinker`, `ahe-harness`, `ahe-solver`, and the
   normal AHE status workflow.
 

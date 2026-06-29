@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SKILL_DIR = REPO_ROOT / ".codex/skills/ahe-compression"
+SKILL_DIR = REPO_ROOT / "packages/ahe-codex/.codex/skills/compress"
 SCRIPT_PATH = SKILL_DIR / "scripts/check-harness-size.sh"
 
 
@@ -78,22 +78,26 @@ def test_detector_ignores_non_numeric_product_docs_by_default(tmp_path: Path) ->
 
 def test_product_docs_route_thinking_to_compression() -> None:
     thinking_content = (
-        REPO_ROOT / ".codex/skills/ahe-thinker/SKILL.md"
+        REPO_ROOT / "packages/ahe-codex/.codex/skills/think/SKILL.md"
     ).read_text(encoding="utf-8")
     harness_content = (
-        REPO_ROOT / ".codex/skills/ahe-harness/SKILL.md"
+        REPO_ROOT / "packages/ahe-codex/.codex/skills/harness/SKILL.md"
     ).read_text(encoding="utf-8")
     product_content = (REPO_ROOT / "docs/product.md").read_text(encoding="utf-8")
-    hook_content = (REPO_ROOT / ".codex/hooks/ahe-hook.js").read_text(encoding="utf-8")
-    bin_content = (REPO_ROOT / "bin/ahe").read_text(encoding="utf-8")
+    hook_content = (
+        REPO_ROOT / "packages/ahe-codex/.codex/hooks/ahe-hook.js"
+    ).read_text(encoding="utf-8")
+    bin_content = (
+        REPO_ROOT / "packages/ahe-codex/bin/ahe-codex"
+    ).read_text(encoding="utf-8")
 
     assert "check-harness-size.sh" in thinking_content
     assert "COMPRESSION_REQUIRED" in thinking_content
     assert "replace old completed feature entries with one summarized done feature" in harness_content
     assert "Do not create backup copies when compressing harness history." in harness_content
-    assert "ahe-compression" in product_content
-    assert "ahe-compression" in hook_content
-    assert '"ahe-compression"' in bin_content
+    assert "compress" in product_content
+    assert "compress" in hook_content
+    assert '"compress"' in bin_content
     assert ".ahe/backups" not in harness_content
 
 

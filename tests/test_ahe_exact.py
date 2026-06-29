@@ -6,8 +6,8 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-HOOK_PATH = REPO_ROOT / ".codex/hooks/ahe-hook.js"
-THINKER_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-thinker/SKILL.md"
+HOOK_PATH = REPO_ROOT / "packages/ahe-codex/.codex/hooks/ahe-hook.js"
+THINKER_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/think/SKILL.md"
 
 
 def run_hook(prompt: str) -> dict[str, object] | None:
@@ -41,8 +41,8 @@ def additional_context(prompt: str) -> str:
 
 def test_exact_ahe_uses_thinker_as_primary_orchestrator() -> None:
     ctx = additional_context("ahe")
-    assert "Use `ahe-thinker` as the internal decision layer before choosing the next action" in ctx
-    assert "Decide the next AHE workflow with `ahe-thinker`" in ctx
+    assert "Use `think` as the internal decision layer before choosing the next action" in ctx
+    assert "Decide the next AHE workflow with `think`" in ctx
 
 
 # ===========================================================================
@@ -51,8 +51,8 @@ def test_exact_ahe_uses_thinker_as_primary_orchestrator() -> None:
 
 def test_exact_ahe_routes_to_init_when_no_harness_files_exist() -> None:
     ctx = additional_context("ahe")
-    assert "If no harness files exist, route to `$ahe-new`." in ctx
-    assert "$ahe-new" in ctx
+    assert "If no harness files exist, route to `$new`." in ctx
+    assert "$new" in ctx
 
 
 # ===========================================================================
@@ -104,17 +104,17 @@ def test_exact_ahe_handles_missing_or_invalid_feature_list() -> None:
 def test_exact_ahe_routes_to_specialized_skills_based_on_need() -> None:
     # Check the hook's routing directives for exact ahe
     ctx = additional_context("ahe")
-    assert "Call `ahe-reviewer` when repo or code understanding is needed" in ctx
-    assert "Call `ahe-conversator` when the next safe step is blocked on user input" in ctx
-    assert "Call `ahe-harness` when product docs, instructions, tracking, todo sync, or compression-aware harness maintenance must change" in ctx
-    assert "Call `ahe-solver` when the next job is solving or planning a feature" in ctx
+    assert "Call `review` when repo or code understanding is needed" in ctx
+    assert "Call `converse` when the next safe step is blocked on user input" in ctx
+    assert "Call `harness` when product docs, instructions, tracking, todo sync, or compression-aware harness maintenance must change" in ctx
+    assert "Call `solve` when the next job is solving or planning a feature" in ctx
 
     # Check the thinker's exact same routing rules
     thinker = THINKER_SKILL_MD_PATH.read_text(encoding="utf-8")
-    assert "ahe-reviewer" in thinker
-    assert "ahe-conversator" in thinker
-    assert "ahe-harness" in thinker
-    assert "ahe-solver" in thinker
+    assert "review" in thinker
+    assert "converse" in thinker
+    assert "harness" in thinker
+    assert "solve" in thinker
 
 
 if __name__ == "__main__":

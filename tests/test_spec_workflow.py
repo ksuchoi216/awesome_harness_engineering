@@ -4,12 +4,12 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-harness/SKILL.md"
+SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/harness/SKILL.md"
 
 
 def test_skill_md_contains_spec_workflow_sections() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
-    assert "## Command Workflow: ahe-harness" in content
+    assert "## Command Workflow: harness" in content
     assert "Harness Inspection" in content
     assert "Harness Decision Paths" in content
     assert "Harness Completion" in content
@@ -25,7 +25,7 @@ def test_skill_md_contains_expected_spec_conversation_contract() -> None:
     ]
     for required_input in required_inputs:
         assert required_input in content, (
-            f"Missing required input '{required_input}' in ahe-harness workflow definition"
+            f"Missing required input '{required_input}' in harness workflow definition"
         )
 
 
@@ -54,7 +54,7 @@ def test_product_spec_is_canonical_home_for_init_specification_details() -> None
     ]
     for required_behavior in required_behaviors:
         assert required_behavior in content, (
-            f"Missing canonical product-spec behavior '{required_behavior}' in ahe-harness"
+            f"Missing canonical product-spec behavior '{required_behavior}' in harness"
         )
 
 
@@ -70,7 +70,7 @@ def test_product_spec_supports_ordered_stage_documents() -> None:
     ]
     for required_behavior in required_behaviors:
         assert required_behavior in content, (
-            f"Missing staged product behavior '{required_behavior}' in ahe-harness"
+            f"Missing staged product behavior '{required_behavior}' in harness"
         )
 
 

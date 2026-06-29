@@ -1,5 +1,5 @@
 ---
-name: ahe-compression
+name: compress
 description: Internal AHE compression workflow for detecting oversized harness-engineering files and compacting them before AHE thinker or harness routing reads large context. Use when AGENTS.md, docs/product.md, docs/product{number}.md, docs/INSTRUCTIONS.md, feature-list.json, progress.md, session-handoff.md, docs/todo.md, or other AHE harness artifacts have too many lines or waste context.
 ---
 
@@ -7,8 +7,8 @@ description: Internal AHE compression workflow for detecting oversized harness-e
 
 This is an internal AHE workflow skill, not a user-facing command.
 
-Do not treat `$ahe-compression` as a user command.
-Use it after `ahe-thinker` or `ahe-harness` decides that harness context is too large to read
+Do not treat `$compress` as a user command.
+Use it after `think` or `harness` decides that harness context is too large to read
 efficiently.
 
 ## Size Detection
@@ -16,7 +16,7 @@ efficiently.
 Run the deterministic line-count preflight before reading full harness files:
 
 ```bash
-sh .codex/skills/ahe-compression/scripts/check-harness-size.sh
+sh .codex/skills/compress/scripts/check-harness-size.sh
 ```
 
 The script checks these AHE-managed files when they exist:
@@ -44,7 +44,7 @@ Default thresholds are configured in `.codex/ahe-shared/config.yaml`:
 Override thresholds only when the workspace has an explicit local rule using environment variables (e.g., `AHE_AGENT_MD_LIMIT`, `AHE_FILE_LINE_LIMIT`, `AHE_TOTAL_LINE_LIMIT`):
 
 ```bash
-AHE_AGENT_MD_LIMIT=100 AHE_TOTAL_LINE_LIMIT=900 sh .codex/skills/ahe-compression/scripts/check-harness-size.sh
+AHE_AGENT_MD_LIMIT=100 AHE_TOTAL_LINE_LIMIT=900 sh .codex/skills/compress/scripts/check-harness-size.sh
 ```
 
 Exit code meanings:

@@ -8,9 +8,9 @@
 # 1. Install uv (if not installed):
 #      curl -LsSf https://astral.sh/uv/install.sh | sh
 # 2. Run directly:
-#      uv run write_fix_plan.py --root "$PWD" --plan-name "Fix Plan Title" < /tmp/ahe-fix-plan.md
+#      uv run write_fix_plan.py --root "$PWD" --plan-name "Fix Plan Title" < /tmp/fix-plan.md
 # 3. Or with Python when dependencies are already available:
-#      python3 write_fix_plan.py --root "$PWD" --plan-name "Fix Plan Title" < /tmp/ahe-fix-plan.md
+#      python3 write_fix_plan.py --root "$PWD" --plan-name "Fix Plan Title" < /tmp/fix-plan.md
 
 from __future__ import annotations
 

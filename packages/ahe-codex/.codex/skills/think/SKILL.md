@@ -1,5 +1,5 @@
 ---
-name: ahe-thinker
+name: think
 description: Internal AHE orchestration protocol for routing exact `ahe` and explicit `ahe <query>` requests through the AHE agent network.
 ---
 
@@ -7,7 +7,7 @@ description: Internal AHE orchestration protocol for routing exact `ahe` and exp
 
 This is an internal AHE workflow skill, not a user-facing command.
 
-Do not treat `$ahe-thinker` as a user command.
+Do not treat `$think` as a user command.
 Use it as the central decision layer for AHE work.
 
 ## Purpose
@@ -15,24 +15,24 @@ Use it as the central decision layer for AHE work.
 - Judge what is missing before another agent acts.
 - Judge the active `project`, `feature`, or `sub-feature`.
 - Decide which of `Why`, `What`, and `How` are still missing.
-- Choose the next internal agent: `ahe-reviewer`, `ahe-conversator`,
-  `ahe-harness`, or `ahe-solver`.
+- Choose the next internal agent: `review`, `converse`,
+  `harness`, or `solve`.
 - Receive each agent result, reassess the state, and decide the next step.
 
 ## Routing Inputs
 
 - Exact `ahe` means continue existing harness work.
-- Exact `ahe init`, exact `ahe-init`, and exact `$ahe-init` stay on the
-  `$ahe-init` path.
-- Explicit `ahe <query>` means route the query through `ahe-thinker`.
+- Exact `ahe init`, exact `new`, and exact `$new` stay on the
+  `$new` path.
+- Explicit `ahe <query>` means route the query through `think`.
 - Broad non-prefixed prompts must not activate AHE.
 
 ## Size Preflight
 
 - Before reading full harness files, run
-  `sh .codex/skills/ahe-compression/scripts/check-harness-size.sh`.
+  `sh .codex/skills/compress/scripts/check-harness-size.sh`.
 - If the detector exits with `COMPRESSION_REQUIRED` or code `2`, call
-  `ahe-compression` before normal routing.
+  `compress` before normal routing.
 - Do not read oversized harness files wholesale before compression routing is
   settled.
 
@@ -51,35 +51,35 @@ Use it as the central decision layer for AHE work.
   feature work is not complete, or `docs/product.md` when no numbered stage
   exists.
 - If the need is understanding repo code, harness drift, progress evidence, or
-  CodeGraph context, call `ahe-reviewer`.
-- If the need is user clarification, call `ahe-conversator`.
+  CodeGraph context, call `review`.
+- If the need is user clarification, call `converse`.
 - If the need is updating harness artifacts, product docs, feature tracking,
-  todo sync, or compression of completed history, call `ahe-harness`.
-- If the need is solving or decomposing feature work, call `ahe-solver`.
+  todo sync, or compression of completed history, call `harness`.
+- If the need is solving or decomposing feature work, call `solve`.
 
 ## Interaction Model
 
-- `ahe-thinker` is centered, but direct worker-to-worker calls are allowed when
+- `think` is centered, but direct worker-to-worker calls are allowed when
   they are the obvious next step.
 - Typical loops:
-  - `ahe-thinker -> ahe-reviewer -> ahe-thinker`
-  - `ahe-thinker -> ahe-harness -> ahe-thinker`
-  - `ahe-thinker -> ahe-conversator -> ahe-thinker`
-  - `ahe-thinker -> ahe-solver -> ahe-thinker`
+  - `think -> review -> think`
+  - `think -> harness -> think`
+  - `think -> converse -> think`
+  - `think -> solve -> think`
 - Allowed direct handoffs include:
-  - `ahe-harness -> ahe-conversator`
-  - `ahe-solver -> ahe-reviewer`
-  - `ahe-reviewer -> ahe-harness`
+  - `harness -> converse`
+  - `solve -> review`
+  - `review -> harness`
 - Every handoff must state the goal, reason, relevant files or context, and the
   expected result.
 
 ## Broad Intent Routing
 
-- Use `ahe-reviewer` for review-first requests.
-- Use `ahe-harness` for product, instructions, progress, feature-list, todo, or
+- Use `review` for review-first requests.
+- Use `harness` for product, instructions, progress, feature-list, todo, or
   compression maintenance.
-- Use `ahe-solver` for feature implementation planning or execution work.
-- Use `ahe-conversator` when no safe next step exists without user input.
+- Use `solve` for feature implementation planning or execution work.
+- Use `converse` when no safe next step exists without user input.
 
 ## Completion
 

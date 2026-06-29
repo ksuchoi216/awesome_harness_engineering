@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SCRIPT_PATH = REPO_ROOT / ".codex/skills/ahe-fix/scripts/write_fix_plan.py"
+SCRIPT_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/fix/scripts/write_fix_plan.py"
 
 
 def run_writer(

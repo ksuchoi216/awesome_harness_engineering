@@ -21,7 +21,78 @@ Usage:
   ahe-antigravity install [--force]
   ahe-antigravity uninstall
   ahe-antigravity doctor
+  ahe-antigravity ahe-ship <plan-path>
 EOF
+}
+
+resolve_plan_path() {
+  local plan_path="$1"
+
+  if [ -z "${plan_path}" ]; then
+    printf 'Usage: ahe-antigravity ahe-ship <plan-path>\n' >&2
+    exit 1
+  fi
+
+  if [ "${plan_path#/}" = "${plan_path}" ]; then
+    plan_path="${PWD}/${plan_path}"
+  fi
+
+  if [ ! -f "${plan_path}" ]; then
+    printf 'Plan file does not exist: %s\n' "${plan_path}" >&2
+    exit 1
+  fi
+
+  local plan_dir
+  plan_dir="$(CDPATH= cd -- "$(dirname -- "${plan_path}")" && pwd)"
+  printf '%s/%s\n' "${plan_dir}" "$(basename -- "${plan_path}")"
+}
+
+ahe_ship_plan() {
+  local plan_path
+  plan_path="$(resolve_plan_path "${1:-}")"
+
+  if ! command -v agy >/dev/null 2>&1; then
+    printf 'Missing required executable: agy\n' >&2
+    exit 1
+  fi
+
+  local stdout_path
+  local stderr_path
+  stdout_path="$(mktemp)"
+  stderr_path="$(mktemp)"
+
+  local status=0
+  if agy < "${plan_path}" >"${stdout_path}" 2>"${stderr_path}"; then
+    status=0
+  else
+    status=$?
+  fi
+
+  cat "${stdout_path}"
+  cat "${stderr_path}" >&2
+
+  local combined_output
+  combined_output="$(cat "${stdout_path}")"$'\n'"$(cat "${stderr_path}")"
+  rm -f "${stdout_path}" "${stderr_path}"
+
+  if [ "${status}" -ne 0 ]; then
+    printf 'agy execution failed for %s\n' "${plan_path}" >&2
+    exit "${status}"
+  fi
+
+  case "${combined_output}" in
+    *AHE_PLAN_COMPLETE*)
+      ;;
+    *)
+      printf 'agy completed without required marker AHE_PLAN_COMPLETE for %s\n' "${plan_path}" >&2
+      exit 1
+      ;;
+  esac
+
+  rm -f "${plan_path}" || {
+    printf 'Verified completion but failed to remove plan file: %s\n' "${plan_path}" >&2
+    exit 1
+  }
 }
 
 install_skill() {
@@ -53,7 +124,7 @@ install_skill() {
   local target_skills_dir="${HOME}/.gemini/config/skills"
   
   # For Antigravity, we currently only have one skill to install
-  local skill_name="ahe-executor"
+  local skill_name="ahe-ship"
   local skill_target="${target_skills_dir}/${skill_name}"
 
   if [ -e "${skill_target}" ]; then
@@ -81,7 +152,7 @@ EOF
 
 doctor() {
   local target_skills_dir="${HOME}/.gemini/config/skills"
-  local skill_name="ahe-executor"
+  local skill_name="ahe-ship"
 
   if [ ! -f "${target_skills_dir}/${skill_name}/SKILL.md" ]; then
     printf 'Missing: %s/%s/SKILL.md\n' "${target_skills_dir}" "${skill_name}" >&2
@@ -93,7 +164,7 @@ doctor() {
 
 uninstall_skill() {
   local target_skills_dir="${HOME}/.gemini/config/skills"
-  local skill_name="ahe-executor"
+  local skill_name="ahe-ship"
   local skill_target="${target_skills_dir}/${skill_name}"
 
   echo "Uninstalling AHE Antigravity skill from ${skill_target}..."
@@ -119,6 +190,9 @@ main() {
       ;;
     doctor)
       doctor
+      ;;
+    ahe-ship)
+      ahe_ship_plan "$@"
       ;;
     -h|--help|help)
       usage

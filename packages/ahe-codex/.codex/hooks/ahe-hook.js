@@ -32,8 +32,8 @@ const COMMON_ROUTING_LINES = [
   "   - Always derive features from only the active product stage; keep future product stages as context until earlier stages are done.",
   "   - Check `feature-list.json` as a derived tracker.",
   "   - Check `progress.md`.",
-  "   - Use `ahe-thinker` as the internal decision layer before choosing the next action.",
-  "   - Before reading large harness files wholesale, let `ahe-thinker` run the `ahe-compression` size detector and call `ahe-compression` if compression is required.",
+  "   - Use `think` as the internal decision layer before choosing the next action.",
+  "   - Before reading large harness files wholesale, let `think` run the `compress` size detector and call `compress` if compression is required.",
   "",
   "3. Review code through CodeGraph when available:",
   "   - Prefer CodeGraph MCP or CodeGraph exploration for code review and impact context after the preflight command succeeds.",
@@ -51,18 +51,18 @@ const AHE_PROGRESS_DIRECTIVE = [
   "",
   ...COMMON_ROUTING_LINES,
   "",
-  "5. Decide the next AHE workflow with `ahe-thinker`:",
-  "   - If no harness files exist, route to `$ahe-new`.",
+  "5. Decide the next AHE workflow with `think`:",
+  "   - If no harness files exist, route to `$new`.",
   "   - If `docs/product.md` or `docs/INSTRUCTIONS.md` is missing or empty, classify the state as `harness engineering not enough`.",
   "   - If `feature-list.json` is missing or invalid, generating an empty one from template is allowed, but do not write specific features until `docs/product.md` and `docs/INSTRUCTIONS.md` are created and organized.",
   "   - When numbered product stages exist, derive feature-list items from only the active product stage.",
   "   - Advance from `docs/product1.md` to `docs/product2.md` only after all feature-list items derived from `docs/product1.md` are `done`; repeat this rule for later numeric stages.",
   "   - If any feature in `feature-list.json` has a status other than `done`, classify the state as `in the middle of building features` and continue the first unfinished feature whose dependencies are satisfied.",
   "   - If all features are `done` and no obvious harness gap remains, classify the state as `completed all` and ask the user for the next task.",
-  "   - Call `ahe-reviewer` when repo or code understanding is needed.",
-  "   - Call `ahe-conversator` when the next safe step is blocked on user input.",
-  "   - Call `ahe-harness` when product docs, instructions, tracking, todo sync, or compression-aware harness maintenance must change.",
-  "   - Call `ahe-solver` when the next job is solving or planning a feature.",
+  "   - Call `review` when repo or code understanding is needed.",
+  "   - Call `converse` when the next safe step is blocked on user input.",
+  "   - Call `harness` when product docs, instructions, tracking, todo sync, or compression-aware harness maintenance must change.",
+  "   - Call `solve` when the next job is solving or planning a feature.",
   "",
   "6. After the table, classify the harness into exactly one state.",
   "   - Use exactly one state: `harness engineering not enough`, `in the middle of building features`, or `completed all`.",
@@ -76,48 +76,51 @@ const AHE_NEW_DIRECTIVE = [
   "",
   "The user sent the exact AHE new command. Treat this as a possible new start request:",
   "",
-  "1. Route to `$ahe-new` first.",
+  "1. Route to `$new` first.",
   "2. If no AHE-managed harness files exist, start initialization normally.",
   "3. If any AHE-managed harness file exists, read the existing files, summarize the current project purpose and product specification state, and ask what restart scope the user wants.",
   "4. Do not remove, overwrite, or refresh existing harness files before the user answers the restart-scope question.",
   "5. If the chosen restart scope replaces prior harness history, summarize that replaced state in the refreshed tracking artifacts instead of creating backup copies.",
   "6. Interpret the restart scope from the user's free-form answer; examples like `purpose` and `product` are not a closed list.",
   "7. Product/instructions specification details belong in `docs/product.md` and `docs/INSTRUCTIONS.md`, not `AGENTS.md`.",
-  "8. After setup, call `ahe-harness` to build the initial product, instructions, and tracking state.",
-  "9. Use `ahe-thinker` before clarification when the next setup step is uncertain.",
-  "10. If clarification is needed, call `ahe-conversator` for the exact missing detail.",
+  "8. After setup, call `harness` to build the initial product, instructions, and tracking state.",
+  "9. Use `think` before clarification when the next setup step is uncertain.",
+  "10. If clarification is needed, call `converse` for the exact missing detail.",
 ].join("\n");
 
 const AHE_SHIP_DIRECTIVE = [
   AHE_DIRECTIVE_MARKER,
   "AHE plan export activated.",
   "",
-  "The user invoked `$ahe-ship` / `ahe ship`.",
+  "The user invoked `$ship` / `ahe ship`.",
   "",
-  "Use the independent `ahe-ship` skill only:",
+  "Use the independent `ship` skill only:",
   "1. Use the most recent `<proposed_plan>` already visible in this conversation.",
   "2. Do not ask for the plan again when the latest plan is unambiguous.",
   "3. Derive `plan_name` from the plan title and create `.plans/{plan_name}.md`.",
   "4. Add compact handoff context for Antigravity or another LLM platform.",
-  "5. Use `.codex/skills/ahe-ship/scripts/write_plan.py` to write the final markdown.",
+  "5. Use `.codex/skills/ship/scripts/write_plan.py` to write the final markdown.",
+  "6. Run `ahe-antigravity execute .plans/{plan_name}.md` from the active repository.",
+  "7. Treat execution as verified success only when Antigravity emits `AHE_PLAN_COMPLETE`.",
+  "8. If execution is not fully verified, keep `.plans/{plan_name}.md` in place.",
   "",
-  "Do not route through `ahe-thinker`, do not call other AHE agents, and do not run the normal AHE harness workflow.",
+  "Do not route through `think`, do not call other AHE agents, and do not run the normal AHE harness workflow.",
 ].join("\n");
 
 const AHE_FIX_DIRECTIVE = [
   AHE_DIRECTIVE_MARKER,
   "AHE fix planning activated.",
   "",
-  "The user invoked `$ahe-fix` / `ahe fix`.",
+  "The user invoked `$fix` / `ahe fix`.",
   "",
-  "Use the dedicated `ahe-fix` skill only:",
+  "Use the dedicated `fix` skill only:",
   "1. Understand the user's error, bug, mismatch, or intended change from the current conversation and repository context.",
   "2. Create a concrete fix plan for fixing errors or following the user's intention when it differs from normal AHE continuation.",
-  "3. If the fix goal, scope, or success criteria are unclear, call `ahe-conversator` and ask one focused question before writing the plan.",
+  "3. If the fix goal, scope, or success criteria are unclear, call `converse` and ask one focused question before writing the plan.",
   "4. Derive `plan_name` from the fix goal and create `.plans/{plan_name}.md`.",
-  "5. Use `.codex/skills/ahe-fix/scripts/write_fix_plan.py` to write the final markdown.",
+  "5. Use `.codex/skills/fix/scripts/write_fix_plan.py` to write the final markdown.",
   "",
-  "Do not route through `ahe-thinker` and do not run the normal AHE harness workflow.",
+  "Do not route through `think` and do not run the normal AHE harness workflow.",
 ].join("\n");
 
 function getQueryDirective(prompt) {
@@ -127,18 +130,18 @@ function getQueryDirective(prompt) {
     "",
     `Original prompt: "${prompt}"`,
     "",
-    "The user sent an explicit AHE query. Route it through `ahe-thinker`:",
+    "The user sent an explicit AHE query. Route it through `think`:",
     "",
     ...COMMON_ROUTING_LINES,
     "",
-    "5. Decide the next AHE workflow with `ahe-thinker` based on the original prompt:",
-    "   - Use `ahe-reviewer` for code or harness review work.",
-    "   - Use `ahe-harness` for product, instructions, progress, feature-list, todo, or compression maintenance.",
+    "5. Decide the next AHE workflow with `think` based on the original prompt:",
+    "   - Use `review` for code or harness review work.",
+    "   - Use `harness` for product, instructions, progress, feature-list, todo, or compression maintenance.",
     "   - When product stages exist, derive features from only the active product stage and advance numeric stages only after the current stage's derived feature-list items are `done`.",
     "   - For `ahe compress feature-list`, replace old completed feature entries with one summarized done feature, preserve unfinished details, and reconcile `feature-list.json` against `docs/product.md`.",
-    "   - If no new feature can be derived from `docs/product.md`, call `ahe-conversator` to ask what next feature, product direction, or goal should be tracked.",
-    "   - Use `ahe-solver` for feature-solving work.",
-    "   - If multiple plausible next steps remain, use `ahe-conversator` to ask the minimum question needed.",
+    "   - If no new feature can be derived from `docs/product.md`, call `converse` to ask what next feature, product direction, or goal should be tracked.",
+    "   - Use `solve` for feature-solving work.",
+    "   - If multiple plausible next steps remain, use `converse` to ask the minimum question needed.",
     "",
     "6. After the table, classify the harness into exactly one state.",
     "   - Use exactly one state: `harness engineering not enough`, `in the middle of building features`, or `completed all`.",
@@ -159,8 +162,8 @@ function isExactAheNewCommand(prompt) {
   const normalizedPrompt = normalizePrompt(prompt);
   return (
     normalizedPrompt === "ahe new" ||
-    normalizedPrompt === "ahe-new" ||
-    normalizedPrompt === "$ahe-new"
+    normalizedPrompt === "new" ||
+    normalizedPrompt === "$new"
   );
 }
 
@@ -168,8 +171,8 @@ function isExactAheShipCommand(prompt) {
   const normalizedPrompt = normalizePrompt(prompt);
   return (
     normalizedPrompt === "ahe ship" ||
-    normalizedPrompt === "ahe-ship" ||
-    normalizedPrompt === "$ahe-ship"
+    normalizedPrompt === "ship" ||
+    normalizedPrompt === "$ship"
   );
 }
 
@@ -177,8 +180,8 @@ function isExactAheFixCommand(prompt) {
   const normalizedPrompt = normalizePrompt(prompt);
   return (
     normalizedPrompt === "ahe fix" ||
-    normalizedPrompt === "ahe-fix" ||
-    normalizedPrompt === "$ahe-fix"
+    normalizedPrompt === "fix" ||
+    normalizedPrompt === "$fix"
   );
 }
 

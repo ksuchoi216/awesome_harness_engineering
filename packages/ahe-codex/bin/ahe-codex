@@ -22,15 +22,15 @@ readonly SOURCE_HOOKS_DIR="${PACKAGE_ROOT}/.codex/hooks"
 readonly AHE_CONFIG_BLOCK_START="# BEGIN AHE MANAGED CONFIG"
 readonly AHE_CONFIG_BLOCK_END="# END AHE MANAGED CONFIG"
 readonly MANAGED_SKILLS=(
-  "ahe-new"
-  "ahe-compression"
-  "ahe-conversator"
-  "ahe-fix"
-  "ahe-harness"
-  "ahe-reviewer"
-  "ahe-ship"
-  "ahe-solver"
-  "ahe-thinker"
+  "new"
+  "compress"
+  "converse"
+  "fix"
+  "harness"
+  "review"
+  "ship"
+  "solve"
+  "think"
 )
 
 codex_home() {
@@ -235,7 +235,7 @@ Next:
 1. Open Codex chat in any workspace.
 2. Use \`ahe new\` for a new start.
 3. Use exact \`ahe\` to continue existing harness work.
-4. Use \`ahe ship\` after Plan Mode to export the latest plan to .plans.
+4. Use \`ahe ship\` after Plan Mode to write the latest plan to .plans and run it through Antigravity.
 5. Use \`ahe fix\` to create a .plans fix plan for errors or changed intent.
 6. Use \`ahe <query>\` for explicit AHE requests such as \`ahe compress feature-list\`.
 EOF

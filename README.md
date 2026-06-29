@@ -2,7 +2,8 @@
 
 AHE installs global Codex and Antigravity skills that manage harness files through chat. The repository uses a one-package, two-internal-packages layout (`packages/ahe-codex` and `packages/ahe-antigravity`) shipped as a single npm package. The
 public entrypoints stay small: use `ahe new` to start or reset harness work,
-`ahe` to continue existing work, `ahe fix` to create a `.plans` fix plan, and
+`ahe` to continue existing work, `ahe ship` to save and ahe-ship a finished plan,
+`ahe fix` to create a `.plans` fix plan, and
 `ahe <query>` for explicit AHE requests such as `ahe compress feature-list`.
 
 ## Installed Skills
@@ -17,7 +18,7 @@ public entrypoints stay small: use `ahe new` to start or reset harness work,
 | `ahe-fix` | Independent fix planner that writes `.plans/{plan_name}.md` for errors or changed user intent. |
 | `ahe-solver` | Feature-solving agent that divides and plans implementation work. |
 | `ahe-compression` | Internal helper that detects oversized harness files before broad reads. |
-| `ahe-ship` | Independent exporter that writes the latest Codex Plan Mode plan to `.plans/*.md` for another LLM. |
+| `ahe-ship` | Independent exporter that writes the latest Codex Plan Mode plan to `.plans/*.md`, runs it through Antigravity, and deletes it only after verified completion. |
 
 ## Routing Model
 

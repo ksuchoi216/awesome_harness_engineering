@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SCRIPT_PATH = REPO_ROOT / ".codex/skills/ahe-ship/scripts/write_plan.py"
+SCRIPT_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ship/scripts/write_plan.py"
 
 
 @dataclass(frozen=True, slots=True)

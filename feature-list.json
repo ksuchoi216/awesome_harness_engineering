@@ -77,6 +77,16 @@
       ],
       "status": "done",
       "evidence": "Renamed .codex/skills/ahe-init to ahe-new and updated its SKILL.md. Updated ahe-hook.js, bin/ahe, README.md, and docs/PRODUCT.md for the ahe-new contract. Renamed test_init_workflow.py to test_new_workflow.py and updated all relevant test files. Verified with pytest tests/ -x, bash -n bin/ahe, node --check .codex/hooks/ahe-hook.js, and ./init.sh."
+    },
+    {
+      "id": "feat-050",
+      "name": "AHE Ship Executes Saved Plans Through Antigravity",
+      "description": "Update `ahe ship` so it writes `.plans/{plan_name}.md`, runs the saved plan through `ahe-antigravity execute` with `agy`, and removes the plan only after verified completion.",
+      "dependencies": [
+        "feat-049"
+      ],
+      "status": "done",
+      "evidence": "Updated `packages/ahe-antigravity/bin/ahe-antigravity`, `packages/ahe-antigravity/skills/execute/SKILL.md`, `packages/ahe-codex/.codex/skills/ship/SKILL.md`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-codex/.codex/skills/harness/SKILL.md`, `README.md`, `docs/PRODUCT.md`, and the packaged-path tests including the new `tests/test_ahe_antigravity_execute.py`. Verified with `pytest tests/test_ahe_ship_writer.py tests/test_ahe_antigravity_execute.py tests/test_ahe_hook.py -k 'ship or execute' -x`, `pytest tests/test_command_set.py tests/test_project_setup.py -x`, `pytest tests/ -x`, `ruff check src/ tests/`, `bash -n packages/ahe-antigravity/bin/ahe-antigravity`, `bash -n packages/ahe-codex/bin/ahe-codex`, `bash -n bin/ahe`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, `PYTHONPYCACHEPREFIX=/tmp/ahe-ship-pycache python3 -m py_compile packages/ahe-codex/.codex/skills/ship/scripts/write_plan.py`, `./init.sh`, and `python3 -m json.tool feature-list.json`. `mypy src/ --strict` could not run because `mypy` is not installed."
     }
   ]
 }

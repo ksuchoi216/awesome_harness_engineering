@@ -8,12 +8,12 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-TEMPLATE_DIR = REPO_ROOT / ".codex/ahe-shared/templates"
-NEW_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-new/SKILL.md"
-THINKER_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-thinker/SKILL.md"
-HARNESS_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-harness/SKILL.md"
-CONVERSATOR_SKILL_MD_PATH = REPO_ROOT / ".codex/skills/ahe-conversator/SKILL.md"
-HOOK_PATH = REPO_ROOT / ".codex/hooks/ahe-hook.js"
+TEMPLATE_DIR = REPO_ROOT / "packages/ahe-codex/.codex/ahe-shared/templates"
+NEW_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/new/SKILL.md"
+THINKER_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/think/SKILL.md"
+HARNESS_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/harness/SKILL.md"
+CONVERSATOR_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/converse/SKILL.md"
+HOOK_PATH = REPO_ROOT / "packages/ahe-codex/.codex/hooks/ahe-hook.js"
 
 
 # ---------------------------------------------------------------------------
@@ -52,15 +52,16 @@ def install_to(tmp_path: Path) -> subprocess.CompletedProcess[str]:
     workspace = tmp_path / "workspace"
     for d in (package_root, codex_home, workspace):
         d.mkdir()
+    (tmp_path / "home").mkdir()
     shutil.copy2(REPO_ROOT / "package.json", package_root / "package.json")
     shutil.copytree(REPO_ROOT / "bin", package_root / "bin")
-    shutil.copytree(REPO_ROOT / ".codex", package_root / ".codex")
+    shutil.copytree(REPO_ROOT / "packages", package_root / "packages")
     return subprocess.run(
         (str(package_root / "bin" / "ahe"), "install"),
         cwd=workspace,
         check=False,
         capture_output=True,
-        env={**os.environ, "CODEX_HOME": str(codex_home)},
+        env={**os.environ, "CODEX_HOME": str(codex_home), "HOME": str(tmp_path / "home")},
         text=True,
     )
 
@@ -112,7 +113,7 @@ def test_installer_copies_all_template_files_to_codex_home(tmp_path: Path) -> No
 
 def test_conversation_required_when_product_md_insufficient() -> None:
     ctx = additional_context("ahe")
-    assert "ahe-conversator" in ctx
+    assert "converse" in ctx
     assert "docs/product.md" in ctx
     assert (
         "missing or empty" in ctx
@@ -133,14 +134,14 @@ def test_conversation_optional_when_architecture_md_missing() -> None:
     # architecture.md is not listed as a hard requirement in the thinker
     # The thinker reads docs/*.md but does not block on architecture.md
     assert "docs/*.md" in thinker or "Read all existing `docs/*.md`" in thinker
-    # ahe-conversator is available for clarification but architecture is optional
-    assert "ahe-conversator" in thinker
+    # converse is available for clarification but architecture is optional
+    assert "converse" in thinker
 
 
 def test_thinker_routes_to_conversator_for_clarification() -> None:
     content = THINKER_SKILL_MD_PATH.read_text(encoding="utf-8")
-    assert "If the need is user clarification, call `ahe-conversator`." in content
-    assert "ahe-conversator" in content
+    assert "If the need is user clarification, call `converse`." in content
+    assert "converse" in content
     # conversator itself defines conversational protocol
     conv = CONVERSATOR_SKILL_MD_PATH.read_text(encoding="utf-8")
     assert "one question at a time" in conv.lower()
@@ -234,14 +235,14 @@ def test_ahe_new_with_conflict_asks_intention() -> None:
 
 
 def test_harness_files_reach_limit_triggers_compression() -> None:
-    """When harness files are oversized, ahe-compression is triggered."""
+    """When harness files are oversized, compress is triggered."""
     thinker = THINKER_SKILL_MD_PATH.read_text(encoding="utf-8")
     ctx = additional_context("ahe")
 
     assert "check-harness-size.sh" in thinker
     assert "COMPRESSION_REQUIRED" in thinker
-    assert "ahe-compression" in thinker
-    assert "ahe-compression" in ctx
+    assert "compress" in thinker
+    assert "compress" in ctx
 
 
 def test_all_done_then_ahe_new_creates_new_feature_list() -> None:
@@ -252,7 +253,7 @@ def test_all_done_then_ahe_new_creates_new_feature_list() -> None:
     # System should check whether all are truly done
     assert "`completed all`" in ctx
     # System supports deriving new features
-    assert "If no new feature can be derived from `docs/product.md`, call `ahe-conversator`" in harness
+    assert "If no new feature can be derived from `docs/product.md`, call `converse`" in harness
 
 
 

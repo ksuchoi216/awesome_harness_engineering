@@ -1,5 +1,5 @@
 ---
-name: ahe-conversator
+name: converse
 description: Internal AHE conversation protocol for recursive clarification, conversation state, and resume-aware workflow guidance.
 ---
 
@@ -7,8 +7,8 @@ description: Internal AHE conversation protocol for recursive clarification, con
 
 This is an internal AHE workflow skill, not a user-facing command.
 
-Do not treat `$ahe-conversator` as a user command.
-Use it after `ahe-thinker` or another AHE agent identifies a missing decision or
+Do not treat `$converse` as a user command.
+Use it after `think` or another AHE agent identifies a missing decision or
 missing `Why`, `What`, or `How`.
 
 ## When To Converse
