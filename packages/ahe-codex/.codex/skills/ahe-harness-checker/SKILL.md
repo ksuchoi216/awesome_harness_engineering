@@ -13,7 +13,8 @@ Use it when `ahe-think`, `ahe-harness`, or `ahe-new` decides that generated or m
 ## Protocol and Purpose
 
 Your primary purpose is to validate and repair generated harness artifacts after bootstrap/initialization or harness maintenance work.
-You have explicit authority to inspect the following key files:
+
+**CRITICAL MANDATORY STEP**: You MUST read and review the actual contents of all harness files before attempting to validate or repair them. You have explicit authority and the obligation to inspect the contents of the following key files:
 - `AGENTS.md`
 - `docs/product.md`
 - `docs/INSTRUCTIONS.md`
