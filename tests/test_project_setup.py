@@ -11,17 +11,19 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CODEX_PACKAGE_ROOT = REPO_ROOT / "packages/ahe-codex/.codex"
 ANTIGRAVITY_PACKAGE_ROOT = REPO_ROOT / "packages/ahe-antigravity"
 REQUIRED_SKILL_FILES = (
-    Path("packages/ahe-codex/.codex/skills/new/SKILL.md"),
-    Path("packages/ahe-codex/.codex/skills/converse/SKILL.md"),
-    Path("packages/ahe-codex/.codex/skills/think/SKILL.md"),
-    Path("packages/ahe-codex/.codex/skills/review/SKILL.md"),
-    Path("packages/ahe-codex/.codex/skills/harness/SKILL.md"),
-    Path("packages/ahe-codex/.codex/skills/solve/SKILL.md"),
-    Path("packages/ahe-codex/.codex/skills/fix/SKILL.md"),
-    Path("packages/ahe-codex/.codex/skills/fix/scripts/write_fix_plan.py"),
-    Path("packages/ahe-codex/.codex/skills/ship/SKILL.md"),
-    Path("packages/ahe-codex/.codex/skills/ship/scripts/write_plan.py"),
-    Path("packages/ahe-codex/.codex/skills/compress/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe-new/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe-converse/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe-think/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe-review/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe-feature/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe-solve/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe-fix/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe-fix/scripts/write_fix_plan.py"),
+    Path("packages/ahe-codex/.codex/skills/ahe-ship/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe-ship/scripts/write_plan.py"),
+    Path("packages/ahe-codex/.codex/skills/ahe-compress/SKILL.md"),
     Path("packages/ahe-codex/.codex/ahe-shared/config.yaml"),
     Path("packages/ahe-codex/.codex/ahe-shared/templates/AGENTS.md"),
     Path("packages/ahe-codex/.codex/ahe-shared/templates/product.md"),
@@ -68,7 +70,7 @@ def test_installer_package_metadata_exists() -> None:
 
 
 def test_product_contract_requires_global_installation() -> None:
-    product_content = (REPO_ROOT / "docs/PRODUCT.md").read_text(encoding="utf-8")
+    product_content = (REPO_ROOT / "docs/product.md").read_text(encoding="utf-8")
     readme_content = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
 
     assert "AHE always installs into the global Codex home" in product_content
@@ -113,18 +115,61 @@ def test_installer_copies_skill_files_into_global_codex_home(tmp_path: Path) -> 
     assert completed_process.returncode == 0, completed_process.stderr
     assert "AHE Codex skill installed." in completed_process.stdout
     assert str(codex_home) in completed_process.stdout
-    assert (codex_home / "skills/new/SKILL.md").exists()
-    assert (codex_home / "skills/converse/SKILL.md").exists()
-    assert (codex_home / "skills/think/SKILL.md").exists()
-    assert (codex_home / "skills/harness/SKILL.md").exists()
-    assert (codex_home / "skills/fix/SKILL.md").exists()
-    assert (codex_home / "skills/fix/scripts/write_fix_plan.py").exists()
-    assert (codex_home / "skills/ship/SKILL.md").exists()
-    assert (codex_home / "skills/ship/scripts/write_plan.py").exists()
+    assert (codex_home / "skills/ahe/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-new/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-converse/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-think/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-harness/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-fix/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-fix/scripts/write_fix_plan.py").exists()
+    assert (codex_home / "skills/ahe-ship/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-ship/scripts/write_plan.py").exists()
     assert (codex_home / "ahe-shared/templates/AGENTS.md").exists()
     assert (codex_home / "hooks/hooks.json").exists()
     assert (codex_home / "hooks/ahe-hook.js").exists()
-    assert not (workspace_root / ".codex/skills/new/SKILL.md").exists()
+    assert not (workspace_root / ".codex/skills/ahe-new/SKILL.md").exists()
+
+
+def test_installer_removes_legacy_ahe_skill_dirs(tmp_path: Path) -> None:
+    package_root = tmp_path / "package"
+    workspace_root = tmp_path / "workspace"
+    codex_home = tmp_path / "codex-home"
+    skills_root = codex_home / "skills"
+
+    package_root.mkdir()
+    workspace_root.mkdir()
+    skills_root.mkdir(parents=True)
+    home_root = tmp_path / "home"
+    home_root.mkdir()
+
+    shutil.copy2(REPO_ROOT / "package.json", package_root / "package.json")
+    shutil.copytree(REPO_ROOT / "bin", package_root / "bin")
+    shutil.copytree(REPO_ROOT / "packages", package_root / "packages")
+
+    for stale_name in ("new", "fix", "ship", "ahe-init", "ahe-reviewer"):
+        stale_skill_dir = skills_root / stale_name
+        stale_skill_dir.mkdir()
+        (stale_skill_dir / "SKILL.md").write_text(
+            f"---\nname: {stale_name}\n---\n",
+            encoding="utf-8",
+        )
+
+    completed_process = subprocess.run(
+        (str(package_root / "bin" / "ahe"), "install"),
+        cwd=workspace_root,
+        check=False,
+        capture_output=True,
+        env=isolated_environment(codex_home, home_root),
+        text=True,
+    )
+
+    assert completed_process.returncode == 0, completed_process.stderr
+    assert (codex_home / "skills/ahe/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-new/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-fix/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-ship/SKILL.md").exists()
+    stale_names = ("new", "fix", "ship", "ahe-init", "ahe-reviewer")
+    assert not any((skills_root / stale_name).exists() for stale_name in stale_names)
 
 
 def test_installer_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
@@ -204,6 +249,13 @@ def test_uninstaller_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
     shutil.copytree(package_root / "packages/ahe-codex/.codex/skills", codex_home / "skills")
     shutil.copytree(package_root / "packages/ahe-codex/.codex/ahe-shared", codex_home / "ahe-shared")
     shutil.copytree(package_root / "packages/ahe-codex/.codex/hooks", codex_home / "hooks")
+    for stale_name in ("new", "fix", "ship", "ahe-init", "ahe-reviewer"):
+        stale_skill_dir = codex_home / "skills" / stale_name
+        stale_skill_dir.mkdir()
+        (stale_skill_dir / "SKILL.md").write_text(
+            f"---\nname: {stale_name}\n---\n",
+            encoding="utf-8",
+        )
 
     config_path.write_text(
         "\n".join(
@@ -232,7 +284,12 @@ def test_uninstaller_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
     config_content = config_path.read_text(encoding="utf-8")
     assert "@ksuchoi216/ahe" not in config_content
     assert '[plugins."other"]' in config_content
+    assert not (codex_home / "skills/ahe-new").exists()
     assert not (codex_home / "skills/new").exists()
+    assert not (codex_home / "skills/fix").exists()
+    assert not (codex_home / "skills/ship").exists()
+    assert not (codex_home / "skills/ahe-init").exists()
+    assert not (codex_home / "skills/ahe-reviewer").exists()
     assert not (codex_home / "ahe-shared").exists()
     assert not (codex_home / "hooks").exists()
 
@@ -281,12 +338,13 @@ def test_installer_supports_local_npx_package_flow(tmp_path: Path) -> None:
 
     assert completed_process.returncode == 0, completed_process.stderr
     assert "AHE Codex skill installed." in completed_process.stdout
-    assert (codex_home / "skills/harness/SKILL.md").exists()
-    assert (codex_home / "skills/converse/SKILL.md").exists()
-    assert (codex_home / "skills/think/SKILL.md").exists()
+    assert (codex_home / "skills/ahe/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-harness/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-converse/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-think/SKILL.md").exists()
     assert (codex_home / "ahe-shared/schemas/process_status.schema.json").exists()
     assert (codex_home / "hooks/hooks.json").exists()
-    assert not (workspace_root / ".codex/skills/harness/SKILL.md").exists()
+    assert not (workspace_root / ".codex/skills/ahe-harness/SKILL.md").exists()
 
 
 def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
@@ -314,12 +372,13 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
     )
 
     assert install_process.returncode == 0, install_process.stderr
-    assert (codex_home / "skills/harness/SKILL.md").exists()
-    assert (codex_home / "skills/converse/SKILL.md").exists()
-    assert (codex_home / "skills/think/SKILL.md").exists()
+    assert (codex_home / "skills/ahe/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-harness/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-converse/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-think/SKILL.md").exists()
     assert (codex_home / "ahe-shared/templates/product.md").exists()
     assert (codex_home / "hooks/ahe-hook.js").exists()
-    assert not (workspace_root / ".codex/skills/harness/SKILL.md").exists()
+    assert not (workspace_root / ".codex/skills/ahe-harness/SKILL.md").exists()
 
     hooks_config = json.loads((codex_home / "hooks/hooks.json").read_text(encoding="utf-8"))
     hook_command = hooks_config["hooks"]["UserPromptSubmit"][0]["hooks"][0]["command"]
@@ -345,9 +404,10 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
     )
 
     assert uninstall_process.returncode == 0, uninstall_process.stderr
-    assert not (codex_home / "skills/new").exists()
-    assert not (codex_home / "skills/converse").exists()
-    assert not (codex_home / "skills/think").exists()
+    assert not (codex_home / "skills/ahe").exists()
+    assert not (codex_home / "skills/ahe-new").exists()
+    assert not (codex_home / "skills/ahe-converse").exists()
+    assert not (codex_home / "skills/ahe-think").exists()
     assert not (codex_home / "ahe-shared").exists()
     assert not (codex_home / "hooks").exists()
     config_content = config_path.read_text(encoding="utf-8")

@@ -42,7 +42,7 @@ def test_codex_doctor_accumulates_errors(tmp_path: Path) -> None:
     assert "errors)" in res.stderr
     
     subprocess.run((str(CODEX_BIN), "install"), env=env, check=True, capture_output=True)
-    (tmp_path / "codex" / "skills" / "new" / "SKILL.md").unlink()
+    (tmp_path / "codex" / "skills" / "ahe-new" / "SKILL.md").unlink()
     (tmp_path / "codex" / "hooks" / "ahe-hook.js").unlink()
     
     res = run_doctor(CODEX_BIN, env=env)

@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SKILL_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ship/SKILL.md"
+SKILL_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-ship/SKILL.md"
 
 
 def test_ship_skill_contract() -> None:

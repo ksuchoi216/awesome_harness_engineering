@@ -4,6 +4,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${SCRIPT_DIR}"
 
+echo "Uninstalling awesome_harness_engineering Codex skills..."
+./bin/ahe uninstall || true
+
 echo "Installing awesome_harness_engineering globally..."
 sudo npm install -g .
 

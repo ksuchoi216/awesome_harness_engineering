@@ -2,24 +2,50 @@
 
 AHE installs global Codex and Antigravity skills that manage harness files through chat. The repository uses a one-package, two-internal-packages layout (`packages/ahe-codex` and `packages/ahe-antigravity`) shipped as a single npm package. The
 public entrypoints stay small: use `ahe new` to start or reset harness work,
-`ahe` to continue existing work, `ahe ship` to save the latest plan,
+`ahe` to continue existing work, `ahe ship` to save the latest plan (in Codex) or execute a saved plan (in Antigravity),
 `ahe fix` to create a `.plans` fix plan, and
 `ahe <query>` or `<query> ahe` for explicit AHE requests such as `ahe compress`
 or `compress ahe`.
+
+## Core Command Workflows
+
+Here are intuitive flow examples for the primary AHE commands. While `ahe`, `ahe-new`, `ahe-ship`, and `ahe-fix` are the explicit commands, you can also use conversational queries (e.g., `ahe add dashboard export feature`) which are automatically routed.
+
+### `ahe new` Flow
+1. **Empty Workspace**: You have a new or existing repo that needs AHE.
+2. **ahe-new calling**: You type `ahe new` in Codex.
+3. **Initialization**: It prepares the workspace, creates templates, and hands off to `ahe-harness` to sync your product docs.
+
+### `ahe ship` Flow
+1. **plan mode in codex**: Generate an implementation plan inside Codex.
+2. **ahe-ship calling in codex**: Codex saves the plan to `.plans/` and stops.
+3. **ahe-ship calling in antigravity**: Antigravity executes the saved plan and cleans it up.
+
+### `ahe fix` Flow
+1. **Error Encountered**: A test fails or intent changes after execution.
+2. **ahe-fix calling**: You type `ahe fix` (or `ahe fix stale tests`) in Codex.
+3. **Fix Plan Creation**: It generates a dedicated fix plan in `.plans/` ready for Antigravity to execute.
+
+### General `ahe` Flow
+1. **Ongoing Work**: You need to implement a feature or update docs.
+2. **ahe calling**: You type `ahe` or a specific query like `ahe update product spec` in Codex.
+3. **Automatic Routing**: `ahe-think` evaluates your request and automatically routes it to the right agent (like `ahe-solve` or `ahe-harness`).
 
 ## Installed Skills
 
 | Skill | Role |
 | --- | --- |
+| `ahe` | Top-level user-facing continuation skill that routes exact `ahe` and `ahe` query forms through `ahe-think`. |
 | `ahe-new` | New-start workflow that prepares the workspace and hands product/tracking work to `ahe-harness`. |
 | `ahe-think` | Centered internal router that judges what is missing and chooses the next agent. |
 | `ahe-review` | Review agent for repo code, harness state, and CodeGraph context. |
 | `ahe-converse` | Clarification agent for recursive user conversation. |
 | `ahe-harness` | Harness-management agent for product docs, instructions, feature tracking, todo sync, and compression-aware maintenance. |
+| `ahe-feature` | Internal helper for deriving feature-list entries from product context. |
 | `ahe-fix` | Independent fix planner that writes `.plans/{plan_name}.md` for errors or changed user intent. |
 | `ahe-solve` | Feature-solving agent that divides and plans implementation work. |
 | `ahe-compress` | Internal helper that detects oversized harness files before broad reads. |
-| `ahe-ship` | Independent exporter that writes the latest Codex Plan Mode plan to `.plans/*.md` and stops there. |
+| `ahe-ship` | In Codex: saves Plan Mode plan to `.plans/`. In Antigravity: executes exactly one plan from `.plans/`. |
 
 ## Routing Model
 
@@ -28,7 +54,7 @@ The Codex-side model is centered but flexible:
 - exact `ahe` -> `ahe-think` -> `ahe-review | ahe-converse | ahe-harness | ahe-solve`
 - `ahe <query>` or `<query> ahe` -> `ahe-think` -> `ahe-review | ahe-converse | ahe-harness | ahe-solve`
 - exact `ahe new` -> dedicated new-start workflow first, then `ahe-harness`
-- exact `ahe ship` -> independent plan-export workflow
+- exact `ahe ship` -> independent plan-export workflow (Codex) or execution workflow (Antigravity)
 - exact `ahe fix`, `ahe fix <query>`, or `<query> ahe fix` -> independent fix-plan workflow
 
 - `ahe-think` is the center of judgment.

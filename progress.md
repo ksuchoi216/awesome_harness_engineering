@@ -2,8 +2,8 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-30 00:37 +0900
-**Session ID:** feat-057-bidirectional-ahe-query-matching
+**Last Updated:** 2026-06-30 11:23 +0900
+**Session ID:** feat-060-install-ahe-as-a-global-codex-skill
 **Active Feature:** None
 
 ## Completed
@@ -25,12 +25,14 @@
 - [x] Implemented `feat-056 Revert AHE Ship To Save-Only` by removing automatic Antigravity execution and cleanup from the ship workflow, updating the hook, docs, tests, and doctor checks accordingly.
 - [x] Implemented `feat-057 Bidirectional AHE Query Command Matching` by letting the hook accept `ahe <query>` and `<query> ahe` for thinker-routed continuation, while keeping `ahe fix <query>` and `<query> ahe fix` on the independent fix-plan path.
 - [x] Implemented `feat-058 Align AHE Startup Contract With Think-Led Read Order` by canonicalizing artifact names (`docs/product.md`, `progress.md`, `session-handoff.md`, `status.json`), setting explicit `think` routing in Codex, and aligning `AGENTS.md` and test fixtures.
+- [x] Implemented `feat-059 Global-Only AHE Skill Display Cleanup` by making the Codex installer and uninstaller remove stale AHE-owned legacy skill directories such as `new`, `fix`, `ship`, `ahe-init`, and older aliases so only current global `ahe-*` skills remain visible.
+- [x] Implemented `feat-060 Install AHE As A Global Codex Skill` by packaging a real `ahe` skill under `packages/ahe-codex/.codex/skills/ahe`, adding it to the managed global install set, and installing it into `/Users/KC/.codex/skills/ahe`.
 
 ## In Progress
 
 - [ ] No active implementation in progress.
-Details: `feat-055 Simplify AHE Compress To One User Command` is complete.
-Latest: `feat-057 Bidirectional AHE Query Command Matching` is complete; the hook now accepts both prefix and suffix query forms for `ahe` and `ahe fix` while preserving the independent `ahe fix` workflow.
+Details: `feat-060 Install AHE As A Global Codex Skill` is complete.
+Latest: `feat-060 Install AHE As A Global Codex Skill` is complete; the real `/Users/KC/.codex` installation now contains `/Users/KC/.codex/skills/ahe/SKILL.md` alongside the existing `ahe-*` skills.
 Blockers: None.
 
 ## Blocked
@@ -54,6 +56,8 @@ Blockers: None.
 - **AHE ship must use the high Gemini model in Antigravity**: The Antigravity wrapper now runs saved ship plans with `agy --model "Gemini 3.1 Pro (High)"` so ship execution does not drift with the CLI default model.
 - **AHE compress should stay as one user command**: `ahe compress` is now the only documented compression entrypoint, and it always checks both harness-file pressure and stale overlapping tests before routing follow-up work.
 - **AHE query matching is bidirectional**: thinker-routed continuation now accepts both `ahe <query>` and `<query> ahe`, while fix planning accepts `ahe fix <query>` and `<query> ahe fix` without routing those fix queries through `ahe-think`.
+- **AHE installer cleans old skill aliases**: `ahe install` and `ahe uninstall` remove AHE-owned legacy skill directories (`new`, `fix`, `ship`, old `ahe-*` aliases) from the global Codex home so the skills picker shows only the current global `ahe-*` set.
+- **AHE is now a real global skill entry**: the Codex installer manages `/Users/KC/.codex/skills/ahe` as a first-class user-facing continuation skill instead of relying on the repo's `bin/ahe` path to appear in search results.
 
 ## Change Log
 
@@ -73,3 +77,5 @@ Blockers: None.
 - `packages/ahe-antigravity/bin/ahe-antigravity`, `packages/ahe-antigravity/skills/ahe-ship/SKILL.md`, `packages/ahe-codex/.codex/skills/ship/SKILL.md`, `README.md`, `docs/PRODUCT.md`, and `tests/test_ahe_antigravity_ship.py` - Locked `ahe ship` execution to `Gemini 3.1 Pro (High)` in Antigravity and added contract coverage for the `agy --model` call.
 - `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `packages/ahe-codex/.codex/skills/compress/SKILL.md`, `packages/ahe-codex/.codex/skills/think/SKILL.md`, `packages/ahe-codex/.codex/skills/harness/SKILL.md`, `packages/ahe-codex/bin/ahe-codex`, `README.md`, `docs/PRODUCT.md`, `tests/test_ahe_hook.py`, `tests/test_compression_workflow.py` - Unified compression wording under `ahe compress` and documented that it checks both harness-size and stale-test detectors.
 - `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `packages/ahe-codex/.codex/skills/think/SKILL.md`, `packages/ahe-codex/.codex/skills/fix/SKILL.md`, `README.md`, `docs/PRODUCT.md`, and `tests/test_ahe_hook.py` - Added bidirectional query matching for `ahe` and `ahe fix`, kept fix queries off the thinker route, and documented the updated Codex-side architecture.
+- `packages/ahe-codex/bin/ahe-codex`, `tests/test_project_setup.py`, `feature-list.json`, and `progress.md` - Added legacy AHE skill cleanup during install/uninstall and focused regression coverage for global-only skill display.
+- `packages/ahe-codex/.codex/skills/ahe/SKILL.md`, `packages/ahe-codex/bin/ahe-codex`, `README.md`, `docs/product.md`, `tests/test_project_setup.py`, and `tests/test_command_set.py` - Added a real top-level global `ahe` skill entry and verified that it installs into `/Users/KC/.codex/skills/ahe`.

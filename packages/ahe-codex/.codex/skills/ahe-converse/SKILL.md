@@ -7,8 +7,8 @@ description: Internal AHE conversation protocol for recursive clarification, con
 
 This is an internal AHE workflow skill, not a user-facing command.
 
-Do not treat `$converse` as a user command.
-Use it after `think` or another AHE agent identifies a missing decision or
+Do not treat `$ahe-converse` as a user command.
+Use it after `ahe-think` or another AHE agent identifies a missing decision or
 missing `Why`, `What`, or `How`.
 
 ## When To Converse

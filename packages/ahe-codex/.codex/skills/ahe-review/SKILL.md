@@ -7,8 +7,8 @@ description: Internal AHE review workflow for understanding repo code, harness f
 
 This is an internal AHE workflow skill, not a user-facing command.
 
-Do not treat `$review` as a user command.
-Use it when `think` or another worker needs evidence from code or harness
+Do not treat `$ahe-review` as a user command.
+Use it when `ahe-think` or another worker needs evidence from code or harness
 state before deciding what to do next.
 
 ## Review Scope
@@ -30,10 +30,10 @@ state before deciding what to do next.
 
 ## Handoffs
 
-- Report findings back to `think` by default.
-- Call `harness` directly when review finds harness drift, stale tracking,
+- Report findings back to `ahe-think` by default.
+- Call `ahe-harness` directly when review finds harness drift, stale tracking,
   or product doc / feature-list mismatches.
-- Call `converse` only when the missing information must come from the
+- Call `ahe-converse` only when the missing information must come from the
   user.
 
 ## Output

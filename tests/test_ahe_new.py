@@ -9,13 +9,13 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = REPO_ROOT / "packages/ahe-codex/.codex/ahe-shared/templates"
-NEW_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/new/SKILL.md"
+NEW_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-new/SKILL.md"
 SKILL_MD_PATH = NEW_SKILL_MD_PATH
 INIT_SKILL_MD_PATH = NEW_SKILL_MD_PATH
-THINKER_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/think/SKILL.md"
-HARNESS_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/harness/SKILL.md"
-CONVERSATOR_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/converse/SKILL.md"
-SOLVER_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/solve/SKILL.md"
+THINKER_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-think/SKILL.md"
+HARNESS_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md"
+CONVERSATOR_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-converse/SKILL.md"
+SOLVER_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-solve/SKILL.md"
 HOOK_PATH = REPO_ROOT / "packages/ahe-codex/.codex/hooks/ahe-hook.js"
 
 
@@ -116,7 +116,7 @@ def test_installer_copies_all_template_files_to_codex_home(tmp_path: Path) -> No
 
 def test_conversation_required_when_product_md_insufficient() -> None:
     ctx = additional_context("ahe")
-    assert "converse" in ctx
+    assert "ahe-converse" in ctx
     assert "docs/product.md" in ctx
     assert (
         "missing or empty" in ctx
@@ -138,13 +138,13 @@ def test_conversation_optional_when_architecture_md_missing() -> None:
     # The thinker reads docs/*.md but does not block on architecture.md
     assert "docs/*.md" in thinker or "Read all existing `docs/*.md`" in thinker
     # converse is available for clarification but architecture is optional
-    assert "converse" in thinker
+    assert "ahe-converse" in thinker
 
 
 def test_thinker_routes_to_conversator_for_clarification() -> None:
     content = THINKER_SKILL_MD_PATH.read_text(encoding="utf-8")
-    assert "If the need is user clarification, call `converse`." in content
-    assert "converse" in content
+    assert "If the need is user clarification, call `ahe-converse`." in content
+    assert "ahe-converse" in content
     # conversator itself defines conversational protocol
     conv = CONVERSATOR_SKILL_MD_PATH.read_text(encoding="utf-8")
     assert "one question at a time" in conv.lower()
@@ -225,14 +225,14 @@ def test_all_features_done_triggers_completion_check() -> None:
 
 
 def test_ahe_new_with_conflict_asks_intention() -> None:
-    """When features not all done but user calls ahe new, ask about conflict."""
+    """When features not all done but user calls ahe-new, ask about conflict."""
     init = NEW_SKILL_MD_PATH.read_text(encoding="utf-8")
 
     # New skill asks restart scope when existing harness exists
     assert "ask what restart scope the user wants before removing, overwriting, or refreshing existing harness files" in init
     assert "Interpret the restart scope from the user's free-form answer" in init
     # The hook also enforces the restart-scope question
-    ctx = additional_context("ahe new")
+    ctx = additional_context("ahe-new")
     assert "ask what restart scope the user wants" in ctx
     assert "Do not remove, overwrite, or refresh existing harness files before the user answers" in ctx
 
@@ -244,19 +244,19 @@ def test_harness_files_reach_limit_triggers_compression() -> None:
 
     assert "check-harness-size.sh" in thinker
     assert "COMPRESSION_REQUIRED" in thinker
-    assert "compress" in thinker
-    assert "compress" in ctx
+    assert "ahe-compress" in thinker
+    assert "ahe-compress" in ctx
 
 
 def test_all_done_then_ahe_new_creates_new_feature_list() -> None:
-    """When all done and user calls ahe new, check completion then handle."""
+    """When all done and user calls ahe-new, check completion then handle."""
     harness = HARNESS_SKILL_MD_PATH.read_text(encoding="utf-8")
     ctx = additional_context("ahe")
 
     # System should check whether all are truly done
     assert "`completed all`" in ctx
     # System supports deriving new features
-    assert "If no new feature can be derived from `docs/product.md`, call `converse`" in harness
+    assert "If no new feature can be derived from `docs/product.md`, call `ahe-converse`" in harness
 
 def test_skill_md_contains_init_workflow_sections() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
@@ -292,7 +292,7 @@ def test_skill_md_contains_generated_files() -> None:
 def test_skill_md_contains_three_sequential_steps_and_status_tracking() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
     expected_steps = [
-        'call "harness"',
+        'call "ahe-harness"',
     ]
     for step in expected_steps:
         assert step in content, f"Missing step '{step}' in new workflow definition"
@@ -355,7 +355,7 @@ def test_skill_md_keeps_specification_details_out_of_agents_md() -> None:
     required_behaviors = [
         "Keep `AGENTS.md` limited to the project purpose and base agent settings.",
         "Do not put product specification details in `AGENTS.md`.",
-        "Send product behavior, scope, requirements, success criteria, and workflow details to `harness` so they are written in `docs/product.md` first.",
+        "Send product behavior, scope, requirements, success criteria, and workflow details to `ahe-harness` so they are written in `docs/product.md` first.",
         "Generating an empty `feature-list.json` from a template is allowed, but do not write concrete feature items until `docs/product.md` is populated.",
     ]
     for required_behavior in required_behaviors:
@@ -386,7 +386,7 @@ def test_startup_workflow_reads_all_docs_markdown() -> None:
 def test_product_spec_is_canonical_home_for_init_specification_details() -> None:
     content = HARNESS_SKILL_MD_PATH.read_text(encoding="utf-8")
     required_behaviors = [
-        "`docs/product.md` is the canonical home for product specification details collected during `ahe new`.",
+        "`docs/product.md` is the canonical home for product specification details collected during `ahe-new`.",
         "Write product behavior, scope, requirements, success criteria, and workflow details into `docs/product.md`.",
         "`docs/product.md` is the canonical source of truth. Concrete feature items for `feature-list.json` must be derived from it only after it has been populated.",
         "Do not move product specification details into `AGENTS.md`.",

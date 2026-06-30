@@ -53,8 +53,8 @@ The project uses an internal `packages/` workspace layout, separating `ahe-codex
 
 The global Codex installation (`ahe-codex`) contains:
 
-- skills: `ahe-new`, `ahe-think`, `ahe-review`, `ahe-converse`,
-  `ahe-harness`, `ahe-fix`, `ahe-solve`, `ahe-ship`, and `ahe-compress`
+- skills: `ahe`, `ahe-new`, `ahe-think`, `ahe-review`, `ahe-converse`,
+  `ahe-harness`, `ahe-feature`, `ahe-fix`, `ahe-solve`, `ahe-ship`, and `ahe-compress`
 - shared templates: `AGENTS.md`, `product.md`, `progress.md`,
   `session-handoff.md`, `init.sh`, and `feature-list.json`
 - schemas: `process_status.schema.json` and `feature-list-schema.json`

@@ -62,6 +62,8 @@ Before ending a session:
 3. Record any unresolved risks or blockers
 4. Commit with descriptive message once work is in safe state
 5. Leave repo clean enough for next session to run `./init.sh` immediately
+6. Reinstall both the codex and antigravity skills globally by running install.sh without npm.
+
 
 ## Verification Commands
 - Tests: pytest tests/ -x

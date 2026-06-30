@@ -5,7 +5,7 @@ description: Initialize AHE in the current workspace and create the base harness
 
 # AHE New
 
-Use this skill when the user invokes `$new`.
+Use this skill when the user invokes `$ahe-new`.
 
 ## Command Workflow: new
 
@@ -43,9 +43,9 @@ Use this skill when the user invokes `$new`.
 - Update only the `PROJECT_PURPOSE` portion of `AGENTS.md`.
 - Keep `AGENTS.md` limited to the project purpose and base agent settings.
 - Do not put product specification details in `AGENTS.md`.
-- Send product behavior, scope, requirements, success criteria, and workflow details to `harness` so they are written in `docs/product.md` first.
+- Send product behavior, scope, requirements, success criteria, and workflow details to `ahe-harness` so they are written in `docs/product.md` first.
 - Generating an empty `feature-list.json` from a template is allowed, but do not write concrete feature items until `docs/product.md` is populated.
-- When staged product docs exist, let `harness` derive concrete feature
+- When staged product docs exist, let `ahe-harness` derive concrete feature
   items from only the active product stage.
 - Ask whether the project language is Python using a Codex-supported structured response request with meaningful options and custom input.
 - If the user answers that the project language is not Python, ask again: "Which language do you use?".
@@ -61,7 +61,7 @@ Use this skill when the user invokes `$new`.
 - Before copying a template file into the workspace root, check whether the target file already exists and ask for explicit overwrite confirmation when needed.
 - Execute the following two steps sequentially, updating the progress status (`current_step` in `status.json`):
   1. complete the embedded init setup work (status: "new")
-  2. call "harness" (status: "harness")
+  2. call "ahe-harness" (status: "ahe-harness")
 
 ### Harness Generation
 
@@ -74,7 +74,7 @@ Use this skill when the user invokes `$new`.
 
 ## Clarification Rule
 
-When the next setup step is not clear, follow the `think` protocol first. If `think` finds missing information, follow the `converse` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
+When the next setup step is not clear, follow the `ahe-think` protocol first. If `ahe-think` finds missing information, follow the `ahe-converse` protocol. Ask again recursively using a Codex-supported structured response request, provide 2-3 meaningful mutually exclusive options when possible, and allow custom input when predefined options are not enough.
 
 ### User Response Target
 

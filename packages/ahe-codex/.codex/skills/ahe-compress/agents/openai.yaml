@@ -1,6 +1,6 @@
 interface:
   display_name: "AHE Compression"
   short_description: "Compress oversized harness context"
-  default_prompt: "Use $compress to compact oversized AHE harness files before continuing."
+  default_prompt: "Use $ahe-compress to compact oversized AHE harness files before continuing."
 policy:
   allow_implicit_invocation: false

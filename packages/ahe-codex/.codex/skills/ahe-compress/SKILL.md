@@ -7,7 +7,7 @@ description: Internal AHE compression workflow for detecting oversized harness-e
 
 This is an internal AHE workflow skill, not a user-facing command.
 
-Do not treat `$compress` as a user command.
+Do not treat `$ahe-compress` as a user command.
 Use it after `think` or `harness` decides that harness context is too large to read
 efficiently, or when test-suite cleanup is needed. When the user explicitly asks
 for `ahe compress`, this skill must check both harness-file size pressure and

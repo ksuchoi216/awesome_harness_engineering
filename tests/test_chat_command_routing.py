@@ -5,10 +5,10 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILL_PATHS = (
-    REPO_ROOT / "packages/ahe-codex/.codex/skills/new/SKILL.md",
-    REPO_ROOT / "packages/ahe-codex/.codex/skills/fix/SKILL.md",
-    REPO_ROOT / "packages/ahe-codex/.codex/skills/harness/SKILL.md",
-    REPO_ROOT / "packages/ahe-codex/.codex/skills/solve/SKILL.md",
+    REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-new/SKILL.md",
+    REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-fix/SKILL.md",
+    REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md",
+    REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-solve/SKILL.md",
 )
 
 
@@ -34,17 +34,17 @@ def test_each_skill_md_has_yaml_frontmatter() -> None:
 
 def test_skill_files_match_expected_command_names() -> None:
     init_content = (
-        REPO_ROOT / "packages/ahe-codex/.codex/skills/new/SKILL.md"
+        REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-new/SKILL.md"
     ).read_text(encoding="utf-8")
-    assert "$new" in init_content
+    assert "$ahe-new" in init_content
 
     for skill_name in (
-        "think",
-        "review",
-        "converse",
-        "harness",
-        "solve",
-        "compress",
+        "ahe-think",
+        "ahe-review",
+        "ahe-converse",
+        "ahe-harness",
+        "ahe-solve",
+        "ahe-compress",
     ):
         content = (
             REPO_ROOT / f"packages/ahe-codex/.codex/skills/{skill_name}/SKILL.md"

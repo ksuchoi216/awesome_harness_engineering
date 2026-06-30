@@ -7,7 +7,7 @@ description: Internal AHE orchestration protocol for routing exact `ahe`, `ahe <
 
 This is an internal AHE workflow skill, not a user-facing command.
 
-Do not treat `$think` as a user command.
+Do not treat `$ahe-think` as a user command.
 Use it as the central decision layer for AHE work.
 
 ## Purpose
@@ -15,29 +15,29 @@ Use it as the central decision layer for AHE work.
 - Judge what is missing before another agent acts.
 - Judge the active `project`, `feature`, or `sub-feature`.
 - Decide which of `Why`, `What`, and `How` are still missing.
-- Choose the next internal agent: `review`, `converse`,
-  `harness`, or `solve`.
+- Choose the next internal agent: `ahe-review`, `ahe-converse`,
+  `ahe-harness`, or `ahe-solve`.
 - Receive each agent result, reassess the state, and decide the next step.
 
 ## Routing Inputs
 
 - Exact `ahe` means continue existing harness work.
-- Exact `ahe init`, exact `new`, and exact `$new` stay on the
-  `$new` path.
-- `ahe <query>` and `<query> ahe` mean route the query through `think`.
+- Exact `ahe init`, exact `ahe-new`, and exact `$ahe-new` stay on the
+  `$ahe-new` path.
+- `ahe <query>` and `<query> ahe` mean route the query through `ahe-think`.
 - Broad non-prefixed prompts must not activate AHE.
 
 ## Size and Stale-Test Preflight
 
 - Before reading full harness files, run
-  `sh .codex/skills/compress/scripts/check-harness-size.sh`.
-- Run the test-overlap detector `python .codex/skills/compress/scripts/detect_stale_tests.py`
+  `sh .codex/skills/ahe-compress/scripts/check-harness-size.sh`.
+- Run the test-overlap detector `python .codex/skills/ahe-compress/scripts/detect_stale_tests.py`
   when the user's explicit AHE query is compression-oriented (e.g., `ahe compress`).
 - Run both compression detectors before choosing the next compression step.
 - If either detector exits with `COMPRESSION_REQUIRED` or code `2`, call
-  `compress` before normal routing. However, `compress` must not delete tests directly;
-  for test compression, `think` must decide whether the next step is `harness` for
-  harness-file compaction, `review` for stale-test confirmation and keeper selection,
+  `ahe-compress` before normal routing. However, `ahe-compress` must not delete tests directly;
+  for test compression, `ahe-think` must decide whether the next step is `ahe-harness` for
+  harness-file compaction, `ahe-review` for stale-test confirmation and keeper selection,
   or both in sequence.
 - Do not read oversized harness files wholesale before compression routing is
   settled.
@@ -47,7 +47,7 @@ Use it as the central decision layer for AHE work.
 - Check whether the copied harness files are correct before reading their contents.
 - Read files strictly in this order:
   `AGENTS.md` -> `docs/product.md` plus `docs/product{n}.md` -> `docs/architecture.md` -> `docs/instructions.md` -> `init.sh` -> `feature-list.json` -> `status.json` -> `progress.md` -> `session-handoff.md`
-- `think` explicitly owns the "what to do next" decisions for Codex-side AHE work.
+- `ahe-think` explicitly owns the "what to do next" decisions for Codex-side AHE work.
 
 ## Decision Rules
 
@@ -64,35 +64,41 @@ Use it as the central decision layer for AHE work.
   feature work is not complete, or `docs/product.md` when no numbered stage
   exists.
 - If the need is understanding repo code, harness drift, progress evidence, or
-  CodeGraph context, call `review`.
-- If the need is user clarification, call `converse`.
+  CodeGraph context, call `ahe-review`.
+- If the need is user clarification, call `ahe-converse`.
 - If the need is updating harness artifacts, product docs, feature tracking,
-  todo sync, or compression of completed history, call `harness`.
-- If the need is solving or decomposing feature work, call `solve`.
+  todo sync, or compression of completed history, call `ahe-harness`.
+- If the need is solving or decomposing feature work, call `ahe-solve`.
 
 ## Interaction Model
 
-- `think` is centered, but direct worker-to-worker calls are allowed when
+- `ahe-think` is centered, but direct worker-to-worker calls are allowed when
   they are the obvious next step.
 - Typical loops:
-  - `think -> review -> think`
-  - `think -> harness -> think`
-  - `think -> converse -> think`
-  - `think -> solve -> think`
+  - `ahe-think -> ahe-review -> ahe-think`
+  - `ahe-think -> ahe-harness -> ahe-think`
+  - `ahe-think -> ahe-converse -> ahe-think`
+  - `ahe-think -> ahe-solve -> ahe-think`
 - Allowed direct handoffs include:
-  - `harness -> converse`
-  - `solve -> review`
-  - `review -> harness`
+  - `ahe-harness -> ahe-converse`
+  - `ahe-solve -> ahe-review`
+  - `ahe-review -> ahe-harness`
 - Every handoff must state the goal, reason, relevant files or context, and the
   expected result.
 
 ## Broad Intent Routing
 
-- Use `review` for review-first requests.
-- Use `harness` for product, instructions, progress, feature-list, todo, or
+- Use `ahe-review` for review-first requests.
+- Use `ahe-harness` for product, instructions, progress, feature-list, todo, or
   compression maintenance.
-- Use `solve` for feature implementation planning or execution work.
-- Use `converse` when no safe next step exists without user input.
+- Use `ahe-solve` for feature implementation planning or execution work.
+- Use `ahe-converse` when no safe next step exists without user input.
+
+## Hard Editing Rule
+
+- `AGENTS.md` and any `instructions.md` file may only be modified inside an explicitly changeable section.
+- If no changeable section exists, AHE must ask via `ahe-converse` instead of editing.
+- Reference and template folders must be strictly excluded from reads and edits per project rules.
 
 ## Completion
 

@@ -172,6 +172,28 @@
       ],
       "status": "done",
       "evidence": "Canonicalized artifact names around `AGENTS.md`, `docs/product.md`, `docs/product{n}.md`, `docs/architecture.md`, `docs/instructions.md`, `init.sh`, `feature-list.json`, `status.json`, `progress.md`, and `session-handoff.md`. Updated `PROGRESS.md`, `SESSION-HANDOFF.md`, and `docs/PRODUCT.md` to lowercase in previous steps, and verified test suite completion via `./init.sh && pytest tests/ -x`."
+    },
+    {
+      "id": "feat-059",
+      "name": "Global-Only AHE Skill Display Cleanup",
+      "description": "Remove stale legacy AHE skill directories during install and uninstall so Codex displays only the current global `ahe-*` skills instead of duplicate local-style and global entries.",
+      "dependencies": [
+        "feat-044",
+        "feat-049"
+      ],
+      "status": "done",
+      "evidence": "Updated `packages/ahe-codex/bin/ahe-codex` to clean legacy AHE-owned skill directories such as `new`, `fix`, `ship`, `ahe-init`, and older aliases before installing current `ahe-*` global skills and during uninstall. Updated `tests/test_project_setup.py` to assert current `ahe-*` install paths and legacy cleanup. Verified with `bash -n packages/ahe-codex/bin/ahe-codex`, `pytest tests/test_project_setup.py -x`, `ruff check tests/test_project_setup.py`, an isolated `CODEX_HOME` installer smoke that listed only current `ahe-*` skills, `CODEX_HOME=/Users/KC/.codex packages/ahe-codex/bin/ahe-codex install --force`, `CODEX_HOME=/Users/KC/.codex packages/ahe-codex/bin/ahe-codex doctor`, and `./init.sh`."
+    },
+    {
+      "id": "feat-060",
+      "name": "Install AHE As A Global Codex Skill",
+      "description": "Package and install a top-level global `ahe` Codex skill so the skill picker shows `ahe` as a real skill entry instead of only surfacing `bin/ahe` from the repo.",
+      "dependencies": [
+        "feat-057",
+        "feat-059"
+      ],
+      "status": "done",
+      "evidence": "Added `packages/ahe-codex/.codex/skills/ahe/SKILL.md`, updated `packages/ahe-codex/bin/ahe-codex`, `README.md`, `docs/product.md`, `tests/test_project_setup.py`, and `tests/test_command_set.py` so `ahe` is part of the managed global skill set and installer expectations. Verified with `bash -n packages/ahe-codex/bin/ahe-codex`, `pytest tests/test_project_setup.py tests/test_command_set.py -x`, `ruff check tests/test_project_setup.py tests/test_command_set.py`, `CODEX_HOME=/Users/KC/.codex packages/ahe-codex/bin/ahe-codex install --force`, `sed -n '1,40p' /Users/KC/.codex/skills/ahe/SKILL.md`, `CODEX_HOME=/Users/KC/.codex packages/ahe-codex/bin/ahe-codex doctor`, and `./init.sh`."
     }
   ]
 }
