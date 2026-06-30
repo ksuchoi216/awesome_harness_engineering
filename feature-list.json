@@ -204,6 +204,16 @@
       ],
       "status": "done",
       "evidence": "Updated `packages/ahe-codex/.codex/hooks/ahe-hook.js` to extract and prepend CodeGraph preflight instructions to all AHE entrypoints. Updated `tests/test_ahe_hook.py` to assert the preflight text across `ahe new`, `ahe ship`, `ahe fix`, and `ahe-overview`. Verified with `pytest tests/test_ahe_hook.py -x`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, and `./init.sh`."
+    },
+    {
+      "id": "feat-062",
+      "name": "Post-Generation Harness Checker",
+      "description": "Add post-generation harness checker to AHE bootstrap flow to validate and repair generated harness artifacts after bootstrap/initialization or harness maintenance.",
+      "dependencies": [
+        "feat-061"
+      ],
+      "status": "done",
+      "evidence": "Added `ahe-harness-checker` internal skill, integrated into `ahe-new`, `ahe-harness`, and `ahe-think` workflows, updated `ahe-hook.js`, and added corresponding tests. Rewrote `ahe-harness-checker/SKILL.md` for robustness."
     }
   ]
 }

@@ -8,7 +8,7 @@
 
 ## Completed
 
-- [x] Implemented post-generation harness checker flow by adding the `ahe-harness-checker` internal skill, updating the `ahe-new` setup to sequentially execute the three-step sequence (`new -> ahe-harness -> ahe-harness-checker`), requiring `ahe-harness` completion to hand off to the checker, adding the checker to the allowed network in `ahe-think`, updating hook directives and spec docs, and expanding test suites.
+- [x] Implemented `feat-062 Post-Generation Harness Checker` by adding the `ahe-harness-checker` internal skill, updating the `ahe-new` setup to sequentially execute the three-step sequence (`new -> ahe-harness -> ahe-harness-checker`), requiring `ahe-harness` completion to hand off to the checker, adding the checker to the allowed network in `ahe-think`, updating hook directives and spec docs, and expanding test suites.
 - [x] Compressed the historical tracker surface into one summary feature covering `feat-001` through `feat-042` so `feature-list.json` stops carrying stale per-feature history after the AHE routing and compression work stabilized.
 - [x] Implemented `feat-043 No-Backup Feature History Compression` by removing AHE workflow backup-copy guidance from the init and compression contracts, updating the exact `ahe init` and `ahe compress feature-list` hook text, and documenting that replaced harness history should be summarized in the refreshed tracking artifacts instead of copied aside.
 - [x] Updated the contract tests in `tests/test_init_workflow.py`, `tests/test_ahe_hook.py`, and `tests/test_compression_workflow.py` to enforce the new no-backup and summarized-history behavior.
