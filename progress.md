@@ -2,12 +2,13 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-30 11:23 +0900
-**Session ID:** feat-060-install-ahe-as-a-global-codex-skill
+**Last Updated:** 2026-06-30 20:35 +0900
+**Session ID:** harness-checker-implementation
 **Active Feature:** None
 
 ## Completed
 
+- [x] Implemented post-generation harness checker flow by adding the `ahe-harness-checker` internal skill, updating the `ahe-new` setup to sequentially execute the three-step sequence (`new -> ahe-harness -> ahe-harness-checker`), requiring `ahe-harness` completion to hand off to the checker, adding the checker to the allowed network in `ahe-think`, updating hook directives and spec docs, and expanding test suites.
 - [x] Compressed the historical tracker surface into one summary feature covering `feat-001` through `feat-042` so `feature-list.json` stops carrying stale per-feature history after the AHE routing and compression work stabilized.
 - [x] Implemented `feat-043 No-Backup Feature History Compression` by removing AHE workflow backup-copy guidance from the init and compression contracts, updating the exact `ahe init` and `ahe compress feature-list` hook text, and documenting that replaced harness history should be summarized in the refreshed tracking artifacts instead of copied aside.
 - [x] Updated the contract tests in `tests/test_init_workflow.py`, `tests/test_ahe_hook.py`, and `tests/test_compression_workflow.py` to enforce the new no-backup and summarized-history behavior.
@@ -27,12 +28,13 @@
 - [x] Implemented `feat-058 Align AHE Startup Contract With Think-Led Read Order` by canonicalizing artifact names (`docs/product.md`, `progress.md`, `session-handoff.md`, `status.json`), setting explicit `think` routing in Codex, and aligning `AGENTS.md` and test fixtures.
 - [x] Implemented `feat-059 Global-Only AHE Skill Display Cleanup` by making the Codex installer and uninstaller remove stale AHE-owned legacy skill directories such as `new`, `fix`, `ship`, `ahe-init`, and older aliases so only current global `ahe-*` skills remain visible.
 - [x] Implemented `feat-060 Install AHE As A Global Codex Skill` by packaging a real `ahe` skill under `packages/ahe-codex/.codex/skills/ahe`, adding it to the managed global install set, and installing it into `/Users/KC/.codex/skills/ahe`.
+- [x] Implemented `feat-061 Add CodeGraph Preflight To All AHE Entrypoints` by extracting CodeGraph preflight instructions and prepending them to all AHE hook directives (`ahe`, `ahe new`, `ahe ship`, `ahe fix`, `ahe-overview`), along with accompanying test assertions.
 
 ## In Progress
 
 - [ ] No active implementation in progress.
-Details: `feat-060 Install AHE As A Global Codex Skill` is complete.
-Latest: `feat-060 Install AHE As A Global Codex Skill` is complete; the real `/Users/KC/.codex` installation now contains `/Users/KC/.codex/skills/ahe/SKILL.md` alongside the existing `ahe-*` skills.
+Details: `feat-061 Add CodeGraph Preflight To All AHE Entrypoints` is complete.
+Latest: `feat-061 Add CodeGraph Preflight To All AHE Entrypoints` is complete; `ahe-hook.js` has been updated and the test suite passes.
 Blockers: None.
 
 ## Blocked
@@ -79,3 +81,6 @@ Blockers: None.
 - `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `packages/ahe-codex/.codex/skills/think/SKILL.md`, `packages/ahe-codex/.codex/skills/fix/SKILL.md`, `README.md`, `docs/PRODUCT.md`, and `tests/test_ahe_hook.py` - Added bidirectional query matching for `ahe` and `ahe fix`, kept fix queries off the thinker route, and documented the updated Codex-side architecture.
 - `packages/ahe-codex/bin/ahe-codex`, `tests/test_project_setup.py`, `feature-list.json`, and `progress.md` - Added legacy AHE skill cleanup during install/uninstall and focused regression coverage for global-only skill display.
 - `packages/ahe-codex/.codex/skills/ahe/SKILL.md`, `packages/ahe-codex/bin/ahe-codex`, `README.md`, `docs/product.md`, `tests/test_project_setup.py`, and `tests/test_command_set.py` - Added a real top-level global `ahe` skill entry and verified that it installs into `/Users/KC/.codex/skills/ahe`.
+- `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `tests/test_ahe_hook.py`, `feature-list.json`, and `progress.md` - Extracted CodeGraph preflight instructions and prepended them to all hook directives (`ahe`, `ahe new`, `ahe ship`, `ahe fix`, `ahe-overview`).
+- `packages/ahe-codex/.codex/skills/ahe-harness-checker/SKILL.md` [NEW], `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-codex/.codex/skills/ahe-new/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `docs/product.md`, `tests/test_project_setup.py`, `tests/test_command_set.py`, `tests/test_ahe_new.py` - Implemented post-generation harness checker flow and updated setup orchestration sequence and testing.
+

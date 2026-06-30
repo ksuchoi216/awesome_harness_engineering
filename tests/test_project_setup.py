@@ -18,6 +18,7 @@ REQUIRED_SKILL_FILES = (
     Path("packages/ahe-codex/.codex/skills/ahe-think/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-review/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe-harness-checker/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-feature/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-solve/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-fix/SKILL.md"),
@@ -122,6 +123,7 @@ def test_installer_copies_skill_files_into_global_codex_home(tmp_path: Path) -> 
     assert (codex_home / "skills/ahe-converse/SKILL.md").exists()
     assert (codex_home / "skills/ahe-think/SKILL.md").exists()
     assert (codex_home / "skills/ahe-harness/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-harness-checker/SKILL.md").exists()
     assert (codex_home / "skills/ahe-fix/SKILL.md").exists()
     assert (codex_home / "skills/ahe-fix/scripts/write_fix_plan.py").exists()
     assert (codex_home / "skills/ahe-ship/SKILL.md").exists()

@@ -79,10 +79,13 @@ Use it as the central decision layer for AHE work.
   - `ahe-think -> ahe-harness -> ahe-think`
   - `ahe-think -> ahe-converse -> ahe-think`
   - `ahe-think -> ahe-solve -> ahe-think`
+  - `ahe-think -> ahe-harness-checker -> ahe-think`
 - Allowed direct handoffs include:
   - `ahe-harness -> ahe-converse`
   - `ahe-solve -> ahe-review`
   - `ahe-review -> ahe-harness`
+  - `ahe-harness -> ahe-harness-checker`
+  - `ahe-new -> ahe-harness -> ahe-harness-checker`
 - Every handoff must state the goal, reason, relevant files or context, and the
   expected result.
 

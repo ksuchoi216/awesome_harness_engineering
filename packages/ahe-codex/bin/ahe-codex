@@ -28,6 +28,7 @@ readonly MANAGED_SKILLS=(
   "ahe-feature"
   "ahe-fix"
   "ahe-harness"
+  "ahe-harness-checker"
   "ahe-new"
   "ahe-overview"
   "ahe-review"

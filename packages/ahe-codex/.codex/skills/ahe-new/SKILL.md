@@ -59,9 +59,10 @@ Use this skill when the user invokes `$ahe-new`.
 - Find all template files under `.codex/ahe-shared/templates/`.
 - Ignore `AGENTS.md` and `product.md` when copying template files.
 - Before copying a template file into the workspace root, check whether the target file already exists and ask for explicit overwrite confirmation when needed.
-- Execute the following two steps sequentially, updating the progress status (`current_step` in `status.json`):
+- Execute the following three steps sequentially, updating the progress status (`current_step` in `status.json`):
   1. complete the embedded init setup work (status: "new")
   2. call "ahe-harness" (status: "ahe-harness")
+  3. call "ahe-harness-checker" (status: "ahe-harness-checker")
 
 ### Harness Generation
 

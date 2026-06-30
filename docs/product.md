@@ -31,6 +31,7 @@ Internal workflow skills:
 - `ahe-harness`
 - `ahe-solve`
 - `ahe-compress`
+- `ahe-harness-checker`
 
 The independent user-facing exporter is `ahe-ship`. It detects if the current
 Codex thread is in Plan Mode and exits Plan Mode first. Then it writes the
@@ -54,7 +55,7 @@ The project uses an internal `packages/` workspace layout, separating `ahe-codex
 The global Codex installation (`ahe-codex`) contains:
 
 - skills: `ahe`, `ahe-new`, `ahe-think`, `ahe-review`, `ahe-converse`,
-  `ahe-harness`, `ahe-feature`, `ahe-fix`, `ahe-solve`, `ahe-ship`, and `ahe-compress`
+  `ahe-harness`, `ahe-feature`, `ahe-fix`, `ahe-solve`, `ahe-ship`, `ahe-compress`, and `ahe-harness-checker`
 - shared templates: `AGENTS.md`, `product.md`, `progress.md`,
   `session-handoff.md`, `init.sh`, and `feature-list.json`
 - schemas: `process_status.schema.json` and `feature-list-schema.json`
@@ -68,7 +69,7 @@ The Codex-side model is:
 
 - exact `ahe` -> `ahe-think` -> `ahe-review | ahe-converse | ahe-harness | ahe-solve`
 - `ahe <query>` or `<query> ahe` -> `ahe-think` -> `ahe-review | ahe-converse | ahe-harness | ahe-solve`
-- exact `ahe new` -> dedicated new-start workflow first, then `ahe-harness`
+- exact `ahe new` -> dedicated new-start workflow first, then `ahe-harness` -> `ahe-harness-checker`
 - exact `ahe ship` -> independent plan export workflow
 - exact `ahe fix`, `ahe fix <query>`, or `<query> ahe fix` -> independent fix-plan workflow
 
@@ -168,6 +169,15 @@ The Codex-side model is:
 - Call `ahe-converse` when the fix target, scope, or success criteria are
   unclear.
 - Stay independent from `ahe-think` and the normal AHE status workflow.
+
+### `ahe-harness-checker`
+
+- Position as an internal, non-user-facing worker skill.
+- Validate and repair generated harness artifacts after bootstrap/initialization or harness maintenance.
+- Explicit authority to inspect: `AGENTS.md`, `docs/product.md`, `docs/INSTRUCTIONS.md`, `feature-list.json`, `progress.md`, `session-handoff.md`, `init.sh`, and `status.json`.
+- Detect and classify failures: missing required files, empty files, invalid JSON, wrong casing, unauthorized `AGENTS.md` edits, missing product docs, and template/layout drift.
+- Repair behavior: directly fix deterministic local drift; escalate to `ahe-converse` when user intent is required.
+
 
 ## 5. Hook Behavior
 

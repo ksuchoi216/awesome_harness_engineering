@@ -125,15 +125,19 @@ def test_auto_operation_describes_staged_product_docs() -> None:
     )
 
 
-def test_auto_operation_requires_codegraph_preflight_before_status_checks() -> None:
-    additional_context = additional_context_for_prompt("ahe")
-
+def _assert_codegraph_preflight_present(additional_context: str) -> None:
     assert "CodeGraph preflight" in additional_context
     assert "command -v codegraph" in additional_context
     assert "NOT INSTALLATION of codegraph" in additional_context
     assert "skip `codegraph init` and `codegraph sync`" in additional_context
     assert "If `.codegraph/` does not exist, run `codegraph init`" in additional_context
     assert "If `.codegraph/` exists, run `codegraph sync`" in additional_context
+
+
+def test_auto_operation_requires_codegraph_preflight_before_status_checks() -> None:
+    additional_context = additional_context_for_prompt("ahe")
+
+    _assert_codegraph_preflight_present(additional_context)
     assert additional_context.index("CodeGraph preflight") < additional_context.index(
         "Inspect current harness state"
     )
@@ -149,6 +153,7 @@ def test_exact_ahe_new_prompt_emits_new_start_context() -> None:
     for prompt in ("ahe-new", "ahe-new"):
         additional_context = additional_context_for_prompt(prompt)
 
+        _assert_codegraph_preflight_present(additional_context)
         assert "AHE automatic operation activated." in additional_context
         assert "ahe-new" in additional_context
         assert "ahe-think" in additional_context
@@ -166,6 +171,7 @@ def test_exact_ahe_ship_emit_independent_ship_context() -> None:
     for prompt in ("ahe-ship", "ahe-ship"):
         additional_context = additional_context_for_prompt(prompt)
 
+        _assert_codegraph_preflight_present(additional_context)
         assert "AHE plan export activated." in additional_context
         assert "ahe-think" in additional_context
         assert "ahe-ship" in additional_context
@@ -182,6 +188,7 @@ def test_exact_ahe_fix_emit_fix_plan_context() -> None:
     for prompt in ("ahe-fix", "ahe-fix"):
         additional_context = additional_context_for_prompt(prompt)
 
+        _assert_codegraph_preflight_present(additional_context)
         assert "AHE fix planning activated." in additional_context
         assert "ahe-think" in additional_context
         assert "ahe-fix" in additional_context
@@ -195,6 +202,7 @@ def test_exact_ahe_fix_emit_fix_plan_context() -> None:
 def test_exact_ahe_overview_emit_overview_context() -> None:
     additional_context = additional_context_for_prompt("ahe-overview")
 
+    _assert_codegraph_preflight_present(additional_context)
     assert "AHE overview activated." in additional_context
     assert "ahe-overview" in additional_context
     assert ".codex/skills/ahe-overview/SKILL.md" in additional_context

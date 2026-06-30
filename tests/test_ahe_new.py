@@ -293,6 +293,7 @@ def test_skill_md_contains_three_sequential_steps_and_status_tracking() -> None:
     content = SKILL_MD_PATH.read_text(encoding="utf-8")
     expected_steps = [
         'call "ahe-harness"',
+        'call "ahe-harness-checker"',
     ]
     for step in expected_steps:
         assert step in content, f"Missing step '{step}' in new workflow definition"
@@ -300,6 +301,7 @@ def test_skill_md_contains_three_sequential_steps_and_status_tracking() -> None:
     expected_statuses = [
         'new',
         'harness',
+        'harness-checker',
     ]
     for status in expected_statuses:
         assert status in content, f"Missing progress status '{status}' in new workflow definition"

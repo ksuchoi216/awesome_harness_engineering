@@ -75,6 +75,7 @@ be created, updated, reconciled, or compressed. It remains responsible for track
   blockers, and recent verification evidence.
 - Keep `session-handoff.md` focused on the next-session startup path.
 - Keep `status.json` aligned with the active workflow.
+- When harness files are created or refreshed, hand off to `ahe-harness-checker` before considering the harness ready.
 
 ## Clarification Rule
 
