@@ -2,10 +2,10 @@
 
 AHE installs global Codex and Antigravity skills that manage harness files through chat. The repository uses a one-package, two-internal-packages layout (`packages/ahe-codex` and `packages/ahe-antigravity`) shipped as a single npm package. The
 public entrypoints stay small: use `ahe new` to start or reset harness work,
-`ahe` to continue existing work, `ahe ship` to save the latest plan (in Codex) or execute a saved plan (in Antigravity),
+`ahe` to continue existing work, `ahe ship` to save the latest plan (in Codex) or refresh and execute a saved plan (in Antigravity),
 `ahe fix` to create a `.plans` fix plan, and
 `ahe <query>` or `<query> ahe` for explicit AHE requests such as `ahe compress`
-or `compress ahe`.
+or `compress ahe`. For a detailed in-chat explanation of the AHE architecture and workflows, use `ahe-overview`.
 
 ## Core Command Workflows
 
@@ -19,12 +19,12 @@ Here are intuitive flow examples for the primary AHE commands. While `ahe`, `ahe
 ### `ahe ship` Flow
 1. **plan mode in codex**: Generate an implementation plan inside Codex.
 2. **ahe-ship calling in codex**: Codex saves the plan to `.plans/` and stops.
-3. **ahe-ship calling in antigravity**: Antigravity executes the saved plan and cleans it up.
+3. **ahe-ship calling in antigravity**: Antigravity refreshes the saved plan against current code, executes it, and cleans it up.
 
 ### `ahe fix` Flow
 1. **Error Encountered**: A test fails or intent changes after execution.
 2. **ahe-fix calling**: You type `ahe fix` (or `ahe fix stale tests`) in Codex.
-3. **Fix Plan Creation**: It generates a dedicated fix plan in `.plans/` ready for Antigravity to execute.
+3. **Fix Plan Creation**: It generates a dedicated fix plan in `.plans/` ready for Antigravity to refresh and execute.
 
 ### General `ahe` Flow
 1. **Ongoing Work**: You need to implement a feature or update docs.
@@ -45,7 +45,8 @@ Here are intuitive flow examples for the primary AHE commands. While `ahe`, `ahe
 | `ahe-fix` | Independent fix planner that writes `.plans/{plan_name}.md` for errors or changed user intent. |
 | `ahe-solve` | Feature-solving agent that divides and plans implementation work. |
 | `ahe-compress` | Internal helper that detects oversized harness files before broad reads. |
-| `ahe-ship` | In Codex: saves Plan Mode plan to `.plans/`. In Antigravity: executes exactly one plan from `.plans/`. |
+| `ahe-overview` | Explains the AHE concept, entrypoints, and main workflows in chat with Mermaid diagrams. |
+| `ahe-ship` | In Codex: saves Plan Mode plan to `.plans/`. In Antigravity: refreshes and executes exactly one plan from `.plans/`. |
 
 ## Routing Model
 
@@ -78,6 +79,6 @@ The Codex-side model is centered but flexible:
 
 Only exact `ahe`, exact `ahe new`, exact `ahe-new`, exact `$ahe-new`, and
 exact `ahe ship`, exact `ahe-ship`, exact `$ahe-ship`, exact `ahe fix`, exact
-`ahe-fix`, exact `$ahe-fix`, `ahe fix <query>`, `<query> ahe fix`,
-`ahe <query>`, and `<query> ahe` activate the hook.
+exact `ahe-fix`, exact `$ahe-fix`, `ahe fix <query>`, `<query> ahe fix`,
+`ahe-overview`, `ahe <query>`, and `<query> ahe` activate the hook.
 Middle mentions that do not fit those command shapes do not.

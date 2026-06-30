@@ -19,7 +19,8 @@ readonly AGY_MODEL="Gemini 3.1 Pro (High)"
 build_execution_prompt() {
   local plan_markdown="$1"
 
-  printf '%s\n' "Execute this saved AHE plan exactly as written."
+  printf '%s\n' "Reconcile this saved AHE plan against the current repository state."
+  printf '%s\n' "Overwrite the original .plans/ file with the refreshed plan, then execute the refreshed plan exactly."
   printf '\n'
   printf '%s\n' "# Saved Plan"
   printf '%s' "${plan_markdown}"

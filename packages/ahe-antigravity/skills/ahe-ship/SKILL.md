@@ -16,8 +16,8 @@ When the user asks to implement or execute a plan, do not scan or implement all 
 
 Perform the following steps:
 1. **Show the title**: Display the title of the selected plan to the user.
-2. **Replan**: Create an implementation plan based on the `.plans/` file and wait for user approval.
-3. **Implement**: Execute every listed requirement in the plan, omitting nothing.
+2. **Replan**: Reconcile the selected plan against the current repository state and create a refreshed implementation plan. Overwrite the selected `.plans/{plan_name}.md` file with this refreshed plan. Wait for user approval.
+3. **Implement**: Execute every listed requirement in the refreshed plan, omitting nothing.
 
 Do not ask to open, read, or restate the `.plans/` file.
 Use the saved AHE plan content already provided in the prompt.

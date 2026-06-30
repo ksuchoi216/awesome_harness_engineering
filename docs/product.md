@@ -60,7 +60,7 @@ The global Codex installation (`ahe-codex`) contains:
 - schemas: `process_status.schema.json` and `feature-list-schema.json`
 - hooks: `hooks.json` and `ahe-hook.js`
 
-The global Antigravity installation (`ahe-antigravity`) installs the `ahe-ship` skill to `~/.gemini/config/skills/ahe-ship` for running a saved plan through `agy`.
+The global Antigravity installation (`ahe-antigravity`) installs the `ahe-ship` skill to `~/.gemini/config/skills/ahe-ship` for refreshing a saved plan against the current codebase and then running it through `agy`.
 
 ## 3. Agent Model
 

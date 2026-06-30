@@ -29,31 +29,11 @@ readonly MANAGED_SKILLS=(
   "ahe-fix"
   "ahe-harness"
   "ahe-new"
+  "ahe-overview"
   "ahe-review"
   "ahe-ship"
   "ahe-solve"
   "ahe-think"
-)
-readonly LEGACY_AHE_SKILLS=(
-  "ahe-compression"
-  "ahe-conversation"
-  "ahe-conversator"
-  "ahe-init"
-  "ahe-reviewer"
-  "ahe-solver"
-  "ahe-spec"
-  "ahe-thinker"
-  "ahe-thinking"
-  "ahe-update"
-  "compress"
-  "converse"
-  "fix"
-  "harness"
-  "new"
-  "review"
-  "ship"
-  "solve"
-  "think"
 )
 
 codex_home() {
@@ -128,15 +108,6 @@ cleanup_ahe_config_entries() {
   mv "${temp_path}" "${config_path}"
 }
 
-cleanup_legacy_ahe_skills() {
-  local target_skills_dir="$1"
-  local skill_name=""
-
-  for skill_name in "${LEGACY_AHE_SKILLS[@]}"; do
-    rm -rf "${target_skills_dir}/${skill_name}"
-  done
-}
-
 install_skill() {
   local force="false"
   local backup="false"
@@ -180,7 +151,6 @@ install_skill() {
   local skill_target=""
 
   cleanup_ahe_config_entries "${target_config_path}"
-  cleanup_legacy_ahe_skills "${target_skills_dir}"
 
   for skill_name in "${MANAGED_SKILLS[@]}"; do
     skill_target="${target_skills_dir}/${skill_name}"
@@ -356,7 +326,6 @@ uninstall_skill() {
   for skill_name in "${MANAGED_SKILLS[@]}"; do
     rm -rf "${target_skills_dir}/${skill_name}"
   done
-  cleanup_legacy_ahe_skills "${target_skills_dir}"
 
   rm -rf "${target_shared_dir}"
   rm -rf "${target_hooks_dir}"

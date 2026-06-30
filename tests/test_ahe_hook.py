@@ -192,6 +192,17 @@ def test_exact_ahe_fix_emit_fix_plan_context() -> None:
         assert "explicit AHE query" not in additional_context
 
 
+def test_exact_ahe_overview_emit_overview_context() -> None:
+    additional_context = additional_context_for_prompt("ahe-overview")
+
+    assert "AHE overview activated." in additional_context
+    assert "ahe-overview" in additional_context
+    assert ".codex/skills/ahe-overview/SKILL.md" in additional_context
+    assert "explain the AHE concept" in additional_context
+    assert "status report table" not in additional_context
+    assert "Do not run the normal AHE harness workflow." in additional_context
+
+
 def test_middle_ahe_mention_does_not_trigger() -> None:
     assert hook_output_for_prompt("please explain ahe commands today") is None
 

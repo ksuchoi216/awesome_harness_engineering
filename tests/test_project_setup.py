@@ -13,6 +13,7 @@ ANTIGRAVITY_PACKAGE_ROOT = REPO_ROOT / "packages/ahe-antigravity"
 REQUIRED_SKILL_FILES = (
     Path("packages/ahe-codex/.codex/skills/ahe/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-new/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe-overview/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-converse/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-think/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-review/SKILL.md"),
@@ -117,6 +118,7 @@ def test_installer_copies_skill_files_into_global_codex_home(tmp_path: Path) -> 
     assert str(codex_home) in completed_process.stdout
     assert (codex_home / "skills/ahe/SKILL.md").exists()
     assert (codex_home / "skills/ahe-new/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-overview/SKILL.md").exists()
     assert (codex_home / "skills/ahe-converse/SKILL.md").exists()
     assert (codex_home / "skills/ahe-think/SKILL.md").exists()
     assert (codex_home / "skills/ahe-harness/SKILL.md").exists()
@@ -128,48 +130,6 @@ def test_installer_copies_skill_files_into_global_codex_home(tmp_path: Path) -> 
     assert (codex_home / "hooks/hooks.json").exists()
     assert (codex_home / "hooks/ahe-hook.js").exists()
     assert not (workspace_root / ".codex/skills/ahe-new/SKILL.md").exists()
-
-
-def test_installer_removes_legacy_ahe_skill_dirs(tmp_path: Path) -> None:
-    package_root = tmp_path / "package"
-    workspace_root = tmp_path / "workspace"
-    codex_home = tmp_path / "codex-home"
-    skills_root = codex_home / "skills"
-
-    package_root.mkdir()
-    workspace_root.mkdir()
-    skills_root.mkdir(parents=True)
-    home_root = tmp_path / "home"
-    home_root.mkdir()
-
-    shutil.copy2(REPO_ROOT / "package.json", package_root / "package.json")
-    shutil.copytree(REPO_ROOT / "bin", package_root / "bin")
-    shutil.copytree(REPO_ROOT / "packages", package_root / "packages")
-
-    for stale_name in ("new", "fix", "ship", "ahe-init", "ahe-reviewer"):
-        stale_skill_dir = skills_root / stale_name
-        stale_skill_dir.mkdir()
-        (stale_skill_dir / "SKILL.md").write_text(
-            f"---\nname: {stale_name}\n---\n",
-            encoding="utf-8",
-        )
-
-    completed_process = subprocess.run(
-        (str(package_root / "bin" / "ahe"), "install"),
-        cwd=workspace_root,
-        check=False,
-        capture_output=True,
-        env=isolated_environment(codex_home, home_root),
-        text=True,
-    )
-
-    assert completed_process.returncode == 0, completed_process.stderr
-    assert (codex_home / "skills/ahe/SKILL.md").exists()
-    assert (codex_home / "skills/ahe-new/SKILL.md").exists()
-    assert (codex_home / "skills/ahe-fix/SKILL.md").exists()
-    assert (codex_home / "skills/ahe-ship/SKILL.md").exists()
-    stale_names = ("new", "fix", "ship", "ahe-init", "ahe-reviewer")
-    assert not any((skills_root / stale_name).exists() for stale_name in stale_names)
 
 
 def test_installer_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
@@ -249,13 +209,6 @@ def test_uninstaller_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
     shutil.copytree(package_root / "packages/ahe-codex/.codex/skills", codex_home / "skills")
     shutil.copytree(package_root / "packages/ahe-codex/.codex/ahe-shared", codex_home / "ahe-shared")
     shutil.copytree(package_root / "packages/ahe-codex/.codex/hooks", codex_home / "hooks")
-    for stale_name in ("new", "fix", "ship", "ahe-init", "ahe-reviewer"):
-        stale_skill_dir = codex_home / "skills" / stale_name
-        stale_skill_dir.mkdir()
-        (stale_skill_dir / "SKILL.md").write_text(
-            f"---\nname: {stale_name}\n---\n",
-            encoding="utf-8",
-        )
 
     config_path.write_text(
         "\n".join(
@@ -285,11 +238,6 @@ def test_uninstaller_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
     assert "@ksuchoi216/ahe" not in config_content
     assert '[plugins."other"]' in config_content
     assert not (codex_home / "skills/ahe-new").exists()
-    assert not (codex_home / "skills/new").exists()
-    assert not (codex_home / "skills/fix").exists()
-    assert not (codex_home / "skills/ship").exists()
-    assert not (codex_home / "skills/ahe-init").exists()
-    assert not (codex_home / "skills/ahe-reviewer").exists()
     assert not (codex_home / "ahe-shared").exists()
     assert not (codex_home / "hooks").exists()
 

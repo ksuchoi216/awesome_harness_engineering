@@ -127,6 +127,18 @@ const AHE_FIX_DIRECTIVE = [
   "Do not run the normal AHE harness workflow.",
 ].join("\n");
 
+const AHE_OVERVIEW_DIRECTIVE = [
+  AHE_DIRECTIVE_MARKER,
+  "AHE overview activated.",
+  "",
+  "The user invoked `ahe-overview`.",
+  "",
+  "1. Read `.codex/skills/ahe-overview/SKILL.md`.",
+  "2. Present its contents to explain the AHE concept to the user.",
+  "",
+  "Do not run the normal AHE harness workflow.",
+].join("\n");
+
 function normalizePrompt(prompt) {
   return prompt.trim().replace(/\s+/g, " ").toLowerCase();
 }
@@ -148,6 +160,10 @@ function isExactAheShipCommand(prompt) {
 function isExactAheFixCommand(prompt) {
   const normalizedPrompt = normalizePrompt(prompt);
   return normalizedPrompt === "ahe-fix" || normalizedPrompt === "ahe fix";
+}
+
+function isExactAheOverviewCommand(prompt) {
+  return normalizePrompt(prompt) === "ahe-overview";
 }
 
 async function main() {
@@ -215,6 +231,18 @@ async function main() {
           hookSpecificOutput: {
             hookEventName: "UserPromptSubmit",
             additionalContext: AHE_FIX_DIRECTIVE,
+          },
+        }) + "\n"
+      );
+      return;
+    }
+
+    if (isExactAheOverviewCommand(parsed.prompt)) {
+      process.stdout.write(
+        JSON.stringify({
+          hookSpecificOutput: {
+            hookEventName: "UserPromptSubmit",
+            additionalContext: AHE_OVERVIEW_DIRECTIVE,
           },
         }) + "\n"
       );

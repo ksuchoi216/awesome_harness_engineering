@@ -36,7 +36,8 @@ def run_ahe_ship(
 
 def expected_execution_prompt(plan_markdown: str) -> str:
     return (
-        "Execute this saved AHE plan exactly as written.\n\n"
+        "Reconcile this saved AHE plan against the current repository state.\n"
+        "Overwrite the original .plans/ file with the refreshed plan, then execute the refreshed plan exactly.\n\n"
         "# Saved Plan\n"
         f"{plan_markdown}\n"
         "When every requirement is fully complete and verified, print the exact line "

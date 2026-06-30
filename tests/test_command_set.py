@@ -19,6 +19,7 @@ def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
             "ahe-fix",
             "ahe-harness",
             "ahe-new",
+            "ahe-overview",
             "ahe-review",
             "ahe-ship",
             "ahe-solve",
@@ -47,6 +48,15 @@ def test_public_command_skills_are_user_facing_commands() -> None:
     assert "ahe-fix" in fix_content
     assert ".plans/{plan_name}.md" in fix_content
     assert "converse" in fix_content
+
+    overview_content = (SKILL_DIR / "ahe-overview/SKILL.md").read_text(encoding="utf-8")
+    assert "ahe-overview" in overview_content
+    assert "ahe-think" in overview_content
+    assert "ahe-harness" in overview_content
+    assert "ahe-review" in overview_content
+    assert "ahe-converse" in overview_content
+    assert "ahe fix" in overview_content
+    assert "ahe ship" in overview_content
 
     internal_skill_names = (
         "ahe-compress",
