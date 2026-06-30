@@ -194,6 +194,16 @@
       ],
       "status": "done",
       "evidence": "Added `packages/ahe-codex/.codex/skills/ahe/SKILL.md`, updated `packages/ahe-codex/bin/ahe-codex`, `README.md`, `docs/product.md`, `tests/test_project_setup.py`, and `tests/test_command_set.py` so `ahe` is part of the managed global skill set and installer expectations. Verified with `bash -n packages/ahe-codex/bin/ahe-codex`, `pytest tests/test_project_setup.py tests/test_command_set.py -x`, `ruff check tests/test_project_setup.py tests/test_command_set.py`, `CODEX_HOME=/Users/KC/.codex packages/ahe-codex/bin/ahe-codex install --force`, `sed -n '1,40p' /Users/KC/.codex/skills/ahe/SKILL.md`, `CODEX_HOME=/Users/KC/.codex packages/ahe-codex/bin/ahe-codex doctor`, and `./init.sh`."
+    },
+    {
+      "id": "feat-061",
+      "name": "Add CodeGraph Preflight To All AHE Entrypoints",
+      "description": "Make every hook-driven AHE entrypoint emit the same CodeGraph preflight instructions before normal routing.",
+      "dependencies": [
+        "feat-060"
+      ],
+      "status": "done",
+      "evidence": "Updated `packages/ahe-codex/.codex/hooks/ahe-hook.js` to extract and prepend CodeGraph preflight instructions to all AHE entrypoints. Updated `tests/test_ahe_hook.py` to assert the preflight text across `ahe new`, `ahe ship`, `ahe fix`, and `ahe-overview`. Verified with `pytest tests/test_ahe_hook.py -x`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, and `./init.sh`."
     }
   ]
 }
