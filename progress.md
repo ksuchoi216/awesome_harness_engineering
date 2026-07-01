@@ -2,12 +2,13 @@
 
 ## Current Status
 
-**Last Updated:** 2026-07-01 16:56 +0900
-**Session ID:** apply-ahe-git-commit-split
-**Active Feature:** `feat-069 Remove completed Antigravity ship plans`
+**Last Updated:** 2026-07-01 18:24 +0900
+**Session ID:** fix-ahe-git-local-ahead-dirty-safety
+**Active Feature:** `feat-070 Allow AHE Git Local-Ahead Dirty Commits`
 
 ## Completed
 
+- [x] Implemented `feat-070 Allow AHE Git Local-Ahead Dirty Commits` by clarifying that dirty repos which are only locally ahead of upstream continue to commit-message review, while dirty repos that need upstream commits still block.
 - [x] Implemented `feat-069 Remove completed Antigravity ship plans` by deleting saved Antigravity ship plans only after `AHE_PLAN_COMPLETE`, then applying the pending work as separated commits through the `ahe-git` workflow.
 - [x] Implemented `feat-068 Move install script into scripts directory` by moving the real installer to `scripts/install.sh` and leaving a root `install.sh` wrapper that forwards to the new path so the existing repo workflow still works.
 - [x] Implemented `feat-067 Split deploy and local validation scripts` by moving the real npm publish flow into `scripts/deploy.sh`, adding `scripts/test.sh` for branch-local validation, and removing the root `deploy.sh`.
@@ -41,8 +42,8 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-Details: `feat-069 Remove completed Antigravity ship plans` is complete.
-Latest: Antigravity now removes saved ship plans after the completion marker, full pytest passes, and the pending work was committed in separated logical commits.
+Details: `feat-070 Allow AHE Git Local-Ahead Dirty Commits` is complete.
+Latest: `ahe-git` now distinguishes local-ahead dirty repos from dirty repos that need upstream commits before committing.
 Blockers: None.
 
 ## Blocked
@@ -68,7 +69,7 @@ Blockers: None.
 - **AHE query matching is bidirectional**: thinker-routed continuation now accepts both `ahe <query>` and `<query> ahe`, while fix planning accepts `ahe fix <query>` and `<query> ahe fix` without routing those fix queries through `ahe-think`.
 - **AHE installer cleans old skill aliases**: `ahe install` and `ahe uninstall` remove AHE-owned legacy skill directories (`new`, `fix`, `ship`, old `ahe-*` aliases) from the global Codex home so the skills picker shows only the current global `ahe-*` set.
 - **AHE is now a real global skill entry**: the Codex installer manages `/Users/KC/.codex/skills/ahe` as a first-class user-facing continuation skill instead of relying on the repo's `bin/ahe` path to appear in search results.
-- **AHE git orchestrates git safely**: `ahe git`, `ahe-git`, and `$ahe-git` provide safe git orchestration across a repository and its submodules without routing through `ahe-think`. It enforces fast-forward pulls and halts on conflicts.
+- **AHE git orchestrates git safely**: `ahe git`, `ahe-git`, and `$ahe-git` provide safe git orchestration across a repository and its submodules without routing through `ahe-think`. It enforces fast-forward pulls, halts on conflicts, and allows commit review when a dirty repo is only locally ahead of upstream.
 - **npm releases are tag-driven**: GitHub Actions should publish only on bare semver tag pushes like `0.1.8`, only when the tagged commit is on `master`, and only when the pushed tag exactly matches the root `package.json` version.
 - **Release tags must match package manifests**: The next GitFlow release should use `0.1.8` because the root and workspace `package.json` files now declare `0.1.8`.
 - **Local release validation should never publish**: `scripts/test.sh` is now the local verification entrypoint, while `scripts/deploy.sh` remains the explicit real publish path.
@@ -77,6 +78,16 @@ Blockers: None.
 
 ## Verification
 
+- [x] `pytest tests/test_ahe_git_skill_contract.py -x`
+- [x] `pytest tests/test_ahe_git_skill_contract.py tests/test_ahe_antigravity_git.py -x`
+- [x] `pytest tests/ -x`
+- [x] `ruff check tests/`
+- [x] `bash -n install.sh scripts/install.sh packages/ahe-codex/bin/ahe-codex packages/ahe-antigravity/bin/ahe-antigravity bin/ahe`
+- [x] `packages/ahe-codex/bin/ahe-codex install --force`
+- [x] `packages/ahe-antigravity/bin/ahe-antigravity install --force`
+- [x] `rg -n "locally ahead of upstream|upstream has commits not present locally" /Users/KC/.codex/skills/ahe-git/SKILL.md /Users/KC/.gemini/config/skills/ahe-git/SKILL.md`
+- [x] `packages/ahe-codex/bin/ahe-codex doctor`
+- [x] `packages/ahe-antigravity/bin/ahe-antigravity doctor`
 - [x] `./init.sh`
 - [x] `ruff check tests/`
 - [x] `python3 -m json.tool feature-list.json`
@@ -121,4 +132,5 @@ Details: Not runnable because `mypy` is not installed in this environment.
 - `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `tests/test_ahe_hook.py`, `feature-list.json`, and `progress.md` - Extracted CodeGraph preflight instructions and prepended them to all hook directives (`ahe`, `ahe new`, `ahe ship`, `ahe fix`, `ahe-overview`).
 - `packages/ahe-codex/.codex/skills/ahe-harness-checker/SKILL.md` [NEW], `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-codex/.codex/skills/ahe-new/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `docs/product.md`, `tests/test_project_setup.py`, `tests/test_command_set.py`, `tests/test_ahe_new.py` - Implemented post-generation harness checker flow and updated setup orchestration sequence and testing.
 - `packages/ahe-codex/.codex/skills/ahe-git/SKILL.md` [NEW], `packages/ahe-antigravity/skills/ahe-git/SKILL.md` [NEW], `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-antigravity/bin/ahe-antigravity`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `README.md`, `docs/product.md`, `feature-list.json`, `tests/test_ahe_git_skill_contract.py`, `tests/test_ahe_antigravity_git.py`, `tests/test_command_set.py`, `tests/test_project_setup.py`, `tests/test_ahe_hook.py` - Added independent git orchestration workflow and corresponding tests.
+- `packages/ahe-codex/.codex/skills/ahe-git/SKILL.md`, `packages/ahe-antigravity/skills/ahe-git/SKILL.md`, `docs/product.md`, `tests/test_ahe_git_skill_contract.py`, `feature-list.json`, `progress.md` - Clarified that dirty repos which are only locally ahead of upstream continue to commit review, while dirty repos that need upstream commits still block.
 - `.github/workflows/publish.yml`, `feature-list.json`, `progress.md`, `session-handoff.md` - Added the npm publish workflow for `v*.*.*` tags, enforced tag/package version parity plus `master` containment, and recorded the corrected remote tag move from `v0.1.1` to `v0.1.7`.

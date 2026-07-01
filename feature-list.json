@@ -284,6 +284,16 @@
       ],
       "status": "done",
       "evidence": "Updated `packages/ahe-antigravity/bin/ahe-antigravity` to remove the plan file only after `AHE_PLAN_COMPLETE`. Verified with `pytest tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy -x`, `pytest tests/ -x`, `ruff check tests/`, `bash -n packages/ahe-antigravity/bin/ahe-antigravity`, `./init.sh`, and `git diff --check`. `mypy src/ --strict` is still unavailable because `mypy` is not installed."
+    },
+    {
+      "id": "feat-070",
+      "name": "Allow AHE Git Local-Ahead Dirty Commits",
+      "description": "Clarify the `ahe-git` safety contract so repos that are only locally ahead of upstream and dirty continue to commit review, while dirty repos that need upstream commits still block.",
+      "dependencies": [
+        "feat-063"
+      ],
+      "status": "done",
+      "evidence": "Updated the Codex and Antigravity `ahe-git` skill contracts plus `docs/product.md`, and locked the local-ahead dirty behavior in `tests/test_ahe_git_skill_contract.py`. Verified with the red failure from `pytest tests/test_ahe_git_skill_contract.py -x`, then passing `pytest tests/test_ahe_git_skill_contract.py tests/test_ahe_antigravity_git.py -x`, `pytest tests/ -x`, `ruff check tests/`, `python3 -m json.tool feature-list.json`, `git diff --check`, `./init.sh`, shell syntax checks, direct Codex and Antigravity skill reinstalls without npm, installed-skill text inspection, and both package doctor commands."
     }
   ]
 }

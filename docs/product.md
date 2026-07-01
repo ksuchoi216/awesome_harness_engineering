@@ -184,8 +184,11 @@ The Codex-side model is:
 ### `ahe-git`
 
 - Provide safe git orchestration across a repository and its submodules.
-- Stop and ask the user for manual intervention if any repo state is not clean
-  for a fast-forward pull, or if there are conflicts.
+- Stop and ask the user for manual intervention if a dirty repo needs upstream
+  commits first, if the repo is diverged, or if there are conflicts.
+- Continue with commit review when a dirty repo is only locally ahead of
+  upstream, because adding another local commit does not require changing branch
+  topology.
 - Do not attempt automatic merge, rebase, or stash operations.
 - Draft and verify concise conventional commit messages based on diffs.
 

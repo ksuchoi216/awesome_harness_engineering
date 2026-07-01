@@ -15,7 +15,8 @@ Use this skill only to orchestrate safe Git pulls and commits across the active 
 2. **Safe Pull**: For each repo, run `git fetch` and inspect the current branch and upstream state:
    - If the repo is clean and upstream is ahead, fast-forward with `git pull --ff-only`.
    - If the repo is already at upstream head, continue.
-   - If the repo has local changes and is not already at upstream head, **stop and explain the issue**.
+   - If the repo is locally ahead of upstream and has local changes, continue to Dirty-State Review.
+   - If the repo has local changes and upstream has commits not present locally, **stop and explain the issue**.
    - If upstream is missing, detached, diverged, rebasing, merging, cherry-picking, or cannot fast-forward cleanly, **stop and explain the issue**.
    - *Never* auto-stash, auto-merge, auto-rebase, auto-resolve conflicts, or change branch topology.
 3. **Failure Policy**: On any hard Git state, stop immediately and report:
