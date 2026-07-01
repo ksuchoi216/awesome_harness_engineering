@@ -2,12 +2,14 @@
 
 ## Current Status
 
-**Last Updated:** 2026-07-01 14:31 +0900
-**Session ID:** package-version-bump-0-1-8
-**Active Feature:** `feat-065 Prepare v0.1.8 package metadata`
+**Last Updated:** 2026-07-01 15:05 +0900
+**Session ID:** split-deploy-and-test-scripts
+**Active Feature:** `feat-067 Split deploy and local validation scripts`
 
 ## Completed
 
+- [x] Implemented `feat-067 Split deploy and local validation scripts` by moving the real npm publish flow into `scripts/deploy.sh`, adding `scripts/test.sh` for branch-local validation, and removing the root `deploy.sh`.
+- [x] Implemented `feat-066 Use bare semver release tags for npm publish` by changing the GitHub Actions release trigger from `v*.*.*` tags to bare semver tags like `0.1.8`, and by requiring the pushed tag to exactly match `package.json` without a `v` prefix.
 - [x] Implemented `feat-065 Prepare v0.1.8 package metadata` by bumping the root and workspace package manifest versions from `0.1.7` to `0.1.8` so the next GitFlow release tag can match the publish workflow expectation.
 - [x] Implemented `feat-064 Publish npm package from release tags` by adding `.github/workflows/publish.yml` to trigger on `v*.*.*` tags, verify the tag commit is reachable from `master`, require the tag name to match the root `package.json` version, install `pytest`, and publish with `NPM_TOKEN`.
 - [x] Replaced the obsolete remote release tag `v0.1.1` with `v0.1.7` so the current GitHub release tag matches the root and workspace package versions (`0.1.7`).
@@ -37,8 +39,8 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-Details: `feat-065 Prepare v0.1.8 package metadata` is complete.
-Latest: Bumped the three package manifests to `0.1.8` so the next GitFlow release can create `v0.1.8` on `master` without tripping the publish workflow's tag/package parity check.
+Details: `feat-067 Split deploy and local validation scripts` is complete.
+Latest: The real publish script now lives in `scripts/deploy.sh`, while `scripts/test.sh` performs local release validation on the current branch without calling `npm publish`.
 Blockers: None.
 
 ## Blocked
@@ -65,8 +67,9 @@ Blockers: None.
 - **AHE installer cleans old skill aliases**: `ahe install` and `ahe uninstall` remove AHE-owned legacy skill directories (`new`, `fix`, `ship`, old `ahe-*` aliases) from the global Codex home so the skills picker shows only the current global `ahe-*` set.
 - **AHE is now a real global skill entry**: the Codex installer manages `/Users/KC/.codex/skills/ahe` as a first-class user-facing continuation skill instead of relying on the repo's `bin/ahe` path to appear in search results.
 - **AHE git orchestrates git safely**: `ahe git`, `ahe-git`, and `$ahe-git` provide safe git orchestration across a repository and its submodules without routing through `ahe-think`. It enforces fast-forward pulls and halts on conflicts.
-- **npm releases are tag-driven**: GitHub Actions should publish only on `v*.*.*` tag pushes, only when the tagged commit is on `master`, and only when the pushed tag exactly matches the root `package.json` version.
-- **Release tags must match package manifests**: The next GitFlow release should use `v0.1.8` because the root and workspace `package.json` files now declare `0.1.8`.
+- **npm releases are tag-driven**: GitHub Actions should publish only on bare semver tag pushes like `0.1.8`, only when the tagged commit is on `master`, and only when the pushed tag exactly matches the root `package.json` version.
+- **Release tags must match package manifests**: The next GitFlow release should use `0.1.8` because the root and workspace `package.json` files now declare `0.1.8`.
+- **Local release validation should never publish**: `scripts/test.sh` is now the local verification entrypoint, while `scripts/deploy.sh` remains the explicit real publish path.
 
 ## Verification
 
@@ -78,6 +81,11 @@ Blockers: None.
 - [x] `python3 -m json.tool packages/ahe-codex/package.json`
 - [x] `python3 -m json.tool packages/ahe-antigravity/package.json`
 - [x] `rg -n '"version"\s*:\s*"0\.1\.8"' package.json packages -g 'package.json'`
+- [x] `python3 -m json.tool feature-list.json`
+- [x] `git diff --check`
+- [x] `bash -n scripts/deploy.sh scripts/test.sh`
+- [ ] `bash scripts/test.sh`
+Details: Stops as designed at the existing `npm test` failure from `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy` before any publish step.
 - [ ] `pytest tests/ -x`
 Details: Fails on the pre-existing `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy`, where the plan file is not deleted after `AHE_PLAN_COMPLETE`.
 - [ ] `ruff check src/`

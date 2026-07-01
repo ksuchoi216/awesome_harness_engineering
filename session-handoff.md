@@ -3,11 +3,14 @@
 ## Current Product Context
 
 - Goal: Keep AHE's Codex-facing harness workflow compact, explicit, and cheap to resume in chat.
-- Current status: `feat-064 Publish npm package from release tags` is complete.
-- Branch / commit: `develop`; the live AHE contracts now install globally, read all existing `docs/*.md` files, use lowercase filenames for product/progress/session artifacts, ship independent Plan Mode and fix-plan exporters, support ordered staged product docs, execute saved ship plans through Antigravity, provide safe git orchestration, and publish npm releases from guarded version tags.
+- Current status: `feat-067 Split deploy and local validation scripts` is complete.
+- Branch / commit: `develop`; the live AHE contracts now install globally, read all existing `docs/*.md` files, use lowercase filenames for product/progress/session artifacts, ship independent Plan Mode and fix-plan exporters, support ordered staged product docs, execute saved ship plans through Antigravity, provide safe git orchestration, publish npm releases from guarded bare-semver tags, and separate real publish from local release validation.
 
 ## Last Completed Work
 
+- [x] Moved the real npm publish flow into `scripts/deploy.sh`.
+- [x] Added `scripts/test.sh` to run branch-local validation with `npm test` and `npm pack --dry-run` without publishing.
+- [x] Updated `.github/workflows/publish.yml` so npm publish now triggers on bare semver tags like `0.1.8` instead of `v0.1.8`, while still requiring tag/package parity and `master` containment.
 - [x] Replaced the remote release tag `v0.1.1` with `v0.1.7` so the current published tag matches the root/workspace package version `0.1.7`.
 - [x] Added `.github/workflows/publish.yml` to publish on `v*.*.*` tag pushes, require the tagged commit to be contained in `master`, require the tag to match `package.json`, install `pytest`, and run `npm publish` with `NPM_TOKEN`.
 - [x] Added `ahe-git` skill directories and `SKILL.md` files for both Codex and Antigravity.
@@ -49,8 +52,10 @@
 
 ## Important Files
 
-- `.github/workflows/publish.yml` - Publishes `@ksuchoi216/ahe` when a `v*.*.*` tag push matches `package.json` and points to a commit reachable from `master`.
+- `.github/workflows/publish.yml` - Publishes `@ksuchoi216/ahe` when a bare semver tag push like `0.1.8` matches `package.json` and points to a commit reachable from `master`.
 - `docs/product.md` - Canonical product and workflow contract for global AHE installation plus no-backup restart/compression behavior.
+- `scripts/deploy.sh` - Explicit real publish script that still performs npm login checks, optional branch switching, dry-run pack, and `npm publish`.
+- `scripts/test.sh` - Local release validation script that runs `npm test` and `npm pack --dry-run` on the current branch without publishing.
 - `bin/ahe` - Installer, doctor, and uninstaller now target the global Codex home.
 - `AGENTS.md` - Startup workflow now tells Codex to read all existing `docs/*.md` files, especially product-style docs.
 - `.codex/skills/ahe-init/SKILL.md` - Restart-scope workflow; now replaces in-scope harness files without creating backup copies and reads all docs context.
@@ -76,8 +81,8 @@
 2. Read `feature-list.json` and `progress.md`.
 3. Run `./init.sh`.
 4. Add the `NPM_TOKEN` repository secret in GitHub before relying on the new publish workflow.
-5. Create or push future release tags in `v<package.json version>` format from `master` so the publish workflow accepts them.
-6. Use `ahe ship` immediately after a Codex Plan Mode `<proposed_plan>` to write the saved plan, execute it through Antigravity, and keep the file only when completion is not fully verified.
+5. Create or push future release tags in `<package.json version>` format from `master` so the publish workflow accepts them.
+6. Use `scripts/test.sh` for local release validation and reserve `scripts/deploy.sh` for intentional real npm publishing.
 
 ## Verification Status
 
@@ -85,7 +90,7 @@
 |---|---|---|---|
 | Init sanity | `./init.sh` | Pass | Startup check still reports the expected Python-default environment guidance. |
 | Remote tag replacement | `git push origin :refs/tags/v0.1.1`, `git push origin v0.1.7`, `git ls-remote --tags origin 'v0.1.*'` | Pass | Confirmed `origin` no longer has `v0.1.1` and now exposes only `v0.1.7` for the current release tag. |
-| Publish workflow inspection | `sed -n '1,220p' .github/workflows/publish.yml` | Pass | Workflow now triggers on `v*.*.*`, checks `master` containment, enforces tag/package parity, installs `pytest`, and publishes with `NPM_TOKEN`. |
+| Publish workflow inspection | `sed -n '1,220p' .github/workflows/publish.yml` | Pass | Workflow now triggers on bare semver tags like `0.1.8`, checks `master` containment, enforces tag/package parity, installs `pytest`, and publishes with `NPM_TOKEN`. |
 | Lint | `ruff check tests/` | Pass | Existing tracked Python test files lint cleanly. |
 | Diff hygiene | `git diff --check` | Pass | No whitespace or patch formatting errors in the workflow/tracking changes. |
 | Full tests | `pytest tests/ -x` | Fail | Pre-existing failure in `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy`; the plan file still exists after `AHE_PLAN_COMPLETE`. |

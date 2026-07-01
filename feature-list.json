@@ -244,6 +244,26 @@
       ],
       "status": "done",
       "evidence": "Updated `package.json`, `packages/ahe-codex/package.json`, and `packages/ahe-antigravity/package.json` from `0.1.7` to `0.1.8`. Verified with `python3 -m json.tool package.json`, `python3 -m json.tool packages/ahe-codex/package.json`, `python3 -m json.tool packages/ahe-antigravity/package.json`, and `rg -n '\"version\"\\s*:\\s*\"0\\.1\\.8\"' package.json packages -g 'package.json'`."
+    },
+    {
+      "id": "feat-066",
+      "name": "Use bare semver release tags for npm publish",
+      "description": "Update the publish workflow to trigger on release tags like `0.1.8` instead of `v0.1.8`, while keeping the tag/package parity and `master` containment checks.",
+      "dependencies": [
+        "feat-065"
+      ],
+      "status": "done",
+      "evidence": "Updated `.github/workflows/publish.yml` so GitHub Actions now listens for `*.*.*` tag pushes and requires `GITHUB_REF_NAME` to exactly equal the root `package.json` version without a `v` prefix. Verified with `python3 -m json.tool feature-list.json`, `git diff --check`, and local inspection of the workflow YAML."
+    },
+    {
+      "id": "feat-067",
+      "name": "Split deploy and local validation scripts",
+      "description": "Move the real npm publish flow into `scripts/deploy.sh` and add `scripts/test.sh` for local release validation without performing a publish.",
+      "dependencies": [
+        "feat-066"
+      ],
+      "status": "done",
+      "evidence": "Moved the original publish flow from root `deploy.sh` to `scripts/deploy.sh`, added `scripts/test.sh` to run `npm test` and `npm pack --dry-run` on the current branch without publishing, and removed the root script. Verified with `bash -n scripts/deploy.sh scripts/test.sh`, `python3 -m json.tool feature-list.json`, `git diff --check`, and a local run of `scripts/test.sh` that stops at the existing failing test suite before any publish step."
     }
   ]
 }
