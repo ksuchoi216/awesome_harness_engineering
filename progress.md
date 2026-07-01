@@ -2,12 +2,15 @@
 
 ## Current Status
 
-**Last Updated:** 2026-06-30 20:35 +0900
-**Session ID:** harness-checker-implementation
-**Active Feature:** None
+**Last Updated:** 2026-07-01 14:31 +0900
+**Session ID:** package-version-bump-0-1-8
+**Active Feature:** `feat-065 Prepare v0.1.8 package metadata`
 
 ## Completed
 
+- [x] Implemented `feat-065 Prepare v0.1.8 package metadata` by bumping the root and workspace package manifest versions from `0.1.7` to `0.1.8` so the next GitFlow release tag can match the publish workflow expectation.
+- [x] Implemented `feat-064 Publish npm package from release tags` by adding `.github/workflows/publish.yml` to trigger on `v*.*.*` tags, verify the tag commit is reachable from `master`, require the tag name to match the root `package.json` version, install `pytest`, and publish with `NPM_TOKEN`.
+- [x] Replaced the obsolete remote release tag `v0.1.1` with `v0.1.7` so the current GitHub release tag matches the root and workspace package versions (`0.1.7`).
 - [x] Implemented `feat-063 Add ahe-git command` by adding `ahe-git` as an independent git orchestration skill, wiring it to Codex hooks, updating the Codex installer and Antigravity wrapper, and expanding test suites.
 - [x] Implemented `feat-062 Post-Generation Harness Checker` by adding the `ahe-harness-checker` internal skill, updating the `ahe-new` setup to sequentially execute the three-step sequence (`new -> ahe-harness -> ahe-harness-checker`), requiring `ahe-harness` completion to hand off to the checker, adding the checker to the allowed network in `ahe-think`, updating hook directives and spec docs, and expanding test suites.
 - [x] Compressed the historical tracker surface into one summary feature covering `feat-001` through `feat-042` so `feature-list.json` stops carrying stale per-feature history after the AHE routing and compression work stabilized.
@@ -34,8 +37,8 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-Details: `feat-063 Add ahe-git command` is complete.
-Latest: `feat-063 Add ahe-git command` is complete; `ahe-hook.js`, `ahe-antigravity`, test files have been updated and the test suite passes.
+Details: `feat-065 Prepare v0.1.8 package metadata` is complete.
+Latest: Bumped the three package manifests to `0.1.8` so the next GitFlow release can create `v0.1.8` on `master` without tripping the publish workflow's tag/package parity check.
 Blockers: None.
 
 ## Blocked
@@ -62,6 +65,23 @@ Blockers: None.
 - **AHE installer cleans old skill aliases**: `ahe install` and `ahe uninstall` remove AHE-owned legacy skill directories (`new`, `fix`, `ship`, old `ahe-*` aliases) from the global Codex home so the skills picker shows only the current global `ahe-*` set.
 - **AHE is now a real global skill entry**: the Codex installer manages `/Users/KC/.codex/skills/ahe` as a first-class user-facing continuation skill instead of relying on the repo's `bin/ahe` path to appear in search results.
 - **AHE git orchestrates git safely**: `ahe git`, `ahe-git`, and `$ahe-git` provide safe git orchestration across a repository and its submodules without routing through `ahe-think`. It enforces fast-forward pulls and halts on conflicts.
+- **npm releases are tag-driven**: GitHub Actions should publish only on `v*.*.*` tag pushes, only when the tagged commit is on `master`, and only when the pushed tag exactly matches the root `package.json` version.
+- **Release tags must match package manifests**: The next GitFlow release should use `v0.1.8` because the root and workspace `package.json` files now declare `0.1.8`.
+
+## Verification
+
+- [x] `./init.sh`
+- [x] `ruff check tests/`
+- [x] `python3 -m json.tool feature-list.json`
+- [x] `git diff --check`
+- [x] `python3 -m json.tool package.json`
+- [x] `python3 -m json.tool packages/ahe-codex/package.json`
+- [x] `python3 -m json.tool packages/ahe-antigravity/package.json`
+- [x] `rg -n '"version"\s*:\s*"0\.1\.8"' package.json packages -g 'package.json'`
+- [ ] `pytest tests/ -x`
+Details: Fails on the pre-existing `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy`, where the plan file is not deleted after `AHE_PLAN_COMPLETE`.
+- [ ] `ruff check src/`
+Details: Not runnable because this repository currently has no `src/` directory.
 
 ## Change Log
 
@@ -86,4 +106,4 @@ Blockers: None.
 - `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `tests/test_ahe_hook.py`, `feature-list.json`, and `progress.md` - Extracted CodeGraph preflight instructions and prepended them to all hook directives (`ahe`, `ahe new`, `ahe ship`, `ahe fix`, `ahe-overview`).
 - `packages/ahe-codex/.codex/skills/ahe-harness-checker/SKILL.md` [NEW], `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-codex/.codex/skills/ahe-new/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `docs/product.md`, `tests/test_project_setup.py`, `tests/test_command_set.py`, `tests/test_ahe_new.py` - Implemented post-generation harness checker flow and updated setup orchestration sequence and testing.
 - `packages/ahe-codex/.codex/skills/ahe-git/SKILL.md` [NEW], `packages/ahe-antigravity/skills/ahe-git/SKILL.md` [NEW], `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-antigravity/bin/ahe-antigravity`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `README.md`, `docs/product.md`, `feature-list.json`, `tests/test_ahe_git_skill_contract.py`, `tests/test_ahe_antigravity_git.py`, `tests/test_command_set.py`, `tests/test_project_setup.py`, `tests/test_ahe_hook.py` - Added independent git orchestration workflow and corresponding tests.
-
+- `.github/workflows/publish.yml`, `feature-list.json`, `progress.md`, `session-handoff.md` - Added the npm publish workflow for `v*.*.*` tags, enforced tag/package version parity plus `master` containment, and recorded the corrected remote tag move from `v0.1.1` to `v0.1.7`.

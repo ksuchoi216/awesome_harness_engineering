@@ -3,11 +3,13 @@
 ## Current Product Context
 
 - Goal: Keep AHE's Codex-facing harness workflow compact, explicit, and cheap to resume in chat.
-- Current status: `feat-063 Add ahe-git command` is complete.
-- Branch / commit: `develop`; the live AHE contracts now install globally, read all existing `docs/*.md` files, use lowercase filenames for product/progress/session artifacts, ship independent Plan Mode and fix-plan exporters, support ordered staged product docs, execute saved ship plans through Antigravity, and provide safe git orchestration.
+- Current status: `feat-064 Publish npm package from release tags` is complete.
+- Branch / commit: `develop`; the live AHE contracts now install globally, read all existing `docs/*.md` files, use lowercase filenames for product/progress/session artifacts, ship independent Plan Mode and fix-plan exporters, support ordered staged product docs, execute saved ship plans through Antigravity, provide safe git orchestration, and publish npm releases from guarded version tags.
 
 ## Last Completed Work
 
+- [x] Replaced the remote release tag `v0.1.1` with `v0.1.7` so the current published tag matches the root/workspace package version `0.1.7`.
+- [x] Added `.github/workflows/publish.yml` to publish on `v*.*.*` tag pushes, require the tagged commit to be contained in `master`, require the tag to match `package.json`, install `pytest`, and run `npm publish` with `NPM_TOKEN`.
 - [x] Added `ahe-git` skill directories and `SKILL.md` files for both Codex and Antigravity.
 - [x] Wired Codex hook detection in `ahe-hook.js` for `ahe git` and `ahe-git`.
 - [x] Updated Codex installer and Antigravity wrapper to include `ahe-git` support.
@@ -38,6 +40,8 @@
 
 ## Current Open Questions
 
+- The new GitHub Actions workflow assumes the repository secret is named `NPM_TOKEN`; publish will fail until that secret exists in GitHub.
+- `pytest tests/ -x` currently fails on the pre-existing `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy`, where the temporary plan file still exists after the wrapper reports `AHE_PLAN_COMPLETE`.
 - `mypy src/ --strict` could not run because `mypy` is not installed in this environment.
 - `make check` could not run because this repo has no `check` target.
 - `quick_validate.py .codex/skills/ahe-ship` could not run with system Python because `yaml` is not installed.
@@ -45,6 +49,7 @@
 
 ## Important Files
 
+- `.github/workflows/publish.yml` - Publishes `@ksuchoi216/ahe` when a `v*.*.*` tag push matches `package.json` and points to a commit reachable from `master`.
 - `docs/product.md` - Canonical product and workflow contract for global AHE installation plus no-backup restart/compression behavior.
 - `bin/ahe` - Installer, doctor, and uninstaller now target the global Codex home.
 - `AGENTS.md` - Startup workflow now tells Codex to read all existing `docs/*.md` files, especially product-style docs.
@@ -70,15 +75,20 @@
 1. Read `AGENTS.md`.
 2. Read `feature-list.json` and `progress.md`.
 3. Run `./init.sh`.
-4. Use `ahe ship` immediately after a Codex Plan Mode `<proposed_plan>` to write the saved plan, execute it through Antigravity, and keep the file only when completion is not fully verified.
-5. Use `ahe fix` when the desired output is a fix plan for an error or changed user intent.
-6. When staged product docs exist, continue the first numeric product stage whose derived `feature-list.json` items are not all `done`.
+4. Add the `NPM_TOKEN` repository secret in GitHub before relying on the new publish workflow.
+5. Create or push future release tags in `v<package.json version>` format from `master` so the publish workflow accepts them.
+6. Use `ahe ship` immediately after a Codex Plan Mode `<proposed_plan>` to write the saved plan, execute it through Antigravity, and keep the file only when completion is not fully verified.
 
 ## Verification Status
 
 | Check | Command | Result | Notes |
 |---|---|---|---|
 | Init sanity | `./init.sh` | Pass | Startup check still reports the expected Python-default environment guidance. |
+| Remote tag replacement | `git push origin :refs/tags/v0.1.1`, `git push origin v0.1.7`, `git ls-remote --tags origin 'v0.1.*'` | Pass | Confirmed `origin` no longer has `v0.1.1` and now exposes only `v0.1.7` for the current release tag. |
+| Publish workflow inspection | `sed -n '1,220p' .github/workflows/publish.yml` | Pass | Workflow now triggers on `v*.*.*`, checks `master` containment, enforces tag/package parity, installs `pytest`, and publishes with `NPM_TOKEN`. |
+| Lint | `ruff check tests/` | Pass | Existing tracked Python test files lint cleanly. |
+| Diff hygiene | `git diff --check` | Pass | No whitespace or patch formatting errors in the workflow/tracking changes. |
+| Full tests | `pytest tests/ -x` | Fail | Pre-existing failure in `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy`; the plan file still exists after `AHE_PLAN_COMPLETE`. |
 | Focused init contract | `pytest tests/test_init_workflow.py -x` | Pass | Confirms no-backup restart wording and summary-based replacement behavior. |
 | Focused hook contract | `pytest tests/test_ahe_hook.py -x` | Pass | Confirms exact `ahe init`, explicit `ahe compress`, and independent `ahe ship` directives match the current contract. |
 | Focused ship contract | `pytest tests/test_ahe_ship_writer.py tests/test_ahe_antigravity_execute.py tests/test_ahe_hook.py -k 'ship or execute' -x` | Pass | 8 passed; confirms writer behavior, wrapper execution, completion-marker cleanup, and direct hook route. |
