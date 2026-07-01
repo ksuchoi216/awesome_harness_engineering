@@ -234,6 +234,16 @@
       ],
       "status": "done",
       "evidence": "Added `.github/workflows/publish.yml` to trigger on `v*.*.*` tag pushes, verify the tagged commit is on `master`, require `GITHUB_REF_NAME` to match `package.json` version, install `pytest`, and run `npm publish` with `NPM_TOKEN`. Replaced remote tag `v0.1.1` with `v0.1.7` so the current release tag matches the published package version, and confirmed `origin` now exposes only `refs/tags/v0.1.7`. Verified with `./init.sh`, `ruff check tests/`, `python3 -m json.tool feature-list.json`, `git diff --check`, and local inspection of the workflow YAML. `pytest tests/ -x` currently fails on the pre-existing `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy`; `ruff check src/` is not runnable because this repo has no `src/` directory."
+    },
+    {
+      "id": "feat-065",
+      "name": "Prepare v0.1.8 package metadata",
+      "description": "Bump the published npm package metadata to `0.1.8` across the root and workspace package manifests so the next GitFlow release tag can align with the publish workflow.",
+      "dependencies": [
+        "feat-064"
+      ],
+      "status": "done",
+      "evidence": "Updated `package.json`, `packages/ahe-codex/package.json`, and `packages/ahe-antigravity/package.json` from `0.1.7` to `0.1.8`. Verified with `python3 -m json.tool package.json`, `python3 -m json.tool packages/ahe-codex/package.json`, `python3 -m json.tool packages/ahe-antigravity/package.json`, and `rg -n '\"version\"\\s*:\\s*\"0\\.1\\.8\"' package.json packages -g 'package.json'`."
     }
   ]
 }

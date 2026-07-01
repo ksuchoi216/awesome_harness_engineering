@@ -2,12 +2,13 @@
 
 ## Current Status
 
-**Last Updated:** 2026-07-01 14:14 +0900
-**Session ID:** npm-release-publish-workflow
-**Active Feature:** `feat-064 Publish npm package from release tags`
+**Last Updated:** 2026-07-01 14:31 +0900
+**Session ID:** package-version-bump-0-1-8
+**Active Feature:** `feat-065 Prepare v0.1.8 package metadata`
 
 ## Completed
 
+- [x] Implemented `feat-065 Prepare v0.1.8 package metadata` by bumping the root and workspace package manifest versions from `0.1.7` to `0.1.8` so the next GitFlow release tag can match the publish workflow expectation.
 - [x] Implemented `feat-064 Publish npm package from release tags` by adding `.github/workflows/publish.yml` to trigger on `v*.*.*` tags, verify the tag commit is reachable from `master`, require the tag name to match the root `package.json` version, install `pytest`, and publish with `NPM_TOKEN`.
 - [x] Replaced the obsolete remote release tag `v0.1.1` with `v0.1.7` so the current GitHub release tag matches the root and workspace package versions (`0.1.7`).
 - [x] Implemented `feat-063 Add ahe-git command` by adding `ahe-git` as an independent git orchestration skill, wiring it to Codex hooks, updating the Codex installer and Antigravity wrapper, and expanding test suites.
@@ -36,8 +37,8 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-Details: `feat-064 Publish npm package from release tags` is complete.
-Latest: Added the publish workflow, corrected the release tag on origin from `v0.1.1` to `v0.1.7`, confirmed `origin` now exposes only `v0.1.7`, and recorded the current verification results.
+Details: `feat-065 Prepare v0.1.8 package metadata` is complete.
+Latest: Bumped the three package manifests to `0.1.8` so the next GitFlow release can create `v0.1.8` on `master` without tripping the publish workflow's tag/package parity check.
 Blockers: None.
 
 ## Blocked
@@ -65,6 +66,7 @@ Blockers: None.
 - **AHE is now a real global skill entry**: the Codex installer manages `/Users/KC/.codex/skills/ahe` as a first-class user-facing continuation skill instead of relying on the repo's `bin/ahe` path to appear in search results.
 - **AHE git orchestrates git safely**: `ahe git`, `ahe-git`, and `$ahe-git` provide safe git orchestration across a repository and its submodules without routing through `ahe-think`. It enforces fast-forward pulls and halts on conflicts.
 - **npm releases are tag-driven**: GitHub Actions should publish only on `v*.*.*` tag pushes, only when the tagged commit is on `master`, and only when the pushed tag exactly matches the root `package.json` version.
+- **Release tags must match package manifests**: The next GitFlow release should use `v0.1.8` because the root and workspace `package.json` files now declare `0.1.8`.
 
 ## Verification
 
@@ -72,6 +74,10 @@ Blockers: None.
 - [x] `ruff check tests/`
 - [x] `python3 -m json.tool feature-list.json`
 - [x] `git diff --check`
+- [x] `python3 -m json.tool package.json`
+- [x] `python3 -m json.tool packages/ahe-codex/package.json`
+- [x] `python3 -m json.tool packages/ahe-antigravity/package.json`
+- [x] `rg -n '"version"\s*:\s*"0\.1\.8"' package.json packages -g 'package.json'`
 - [ ] `pytest tests/ -x`
 Details: Fails on the pre-existing `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy`, where the plan file is not deleted after `AHE_PLAN_COMPLETE`.
 - [ ] `ruff check src/`
