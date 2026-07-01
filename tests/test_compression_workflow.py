@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SKILL_DIR = REPO_ROOT / ".codex/skills/ahe-compression"
+SKILL_DIR = REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-compress"
 SCRIPT_PATH = SKILL_DIR / "scripts/check-harness-size.sh"
 
 
@@ -31,37 +31,79 @@ def test_detector_reports_no_compression_for_small_harness_file(tmp_path: Path) 
 
 
 def test_detector_requires_compression_for_oversized_file(tmp_path: Path) -> None:
-    harness_file = tmp_path / "PROGRESS.md"
+    harness_file = tmp_path / "progress.md"
     harness_file.write_text(
         "\n".join(f"- item {index}" for index in range(180)) + "\n",
         encoding="utf-8",
     )
 
-    completed_process = run_detector(tmp_path, "PROGRESS.md")
+    completed_process = run_detector(tmp_path, "progress.md")
 
     assert completed_process.returncode == 2
-    assert "COMPRESS\tPROGRESS.md\t180\tlimit=180" in completed_process.stdout
+    assert "COMPRESS\tprogress.md\t180\tlimit=180" in completed_process.stdout
     assert "COMPRESSION_REQUIRED" in completed_process.stdout
+
+
+def test_detector_checks_numbered_product_stage_docs(tmp_path: Path) -> None:
+    docs_dir = tmp_path / "docs"
+    docs_dir.mkdir()
+    stage_file = docs_dir / "product1.md"
+    stage_file.write_text(
+        "\n".join(f"- stage item {index}" for index in range(180)) + "\n",
+        encoding="utf-8",
+    )
+
+    completed_process = run_detector(tmp_path)
+
+    assert completed_process.returncode == 2
+    assert "COMPRESS\tdocs/product1.md\t180\tlimit=180" in completed_process.stdout
+    assert "COMPRESSION_REQUIRED" in completed_process.stdout
+
+
+def test_detector_ignores_non_numeric_product_docs_by_default(tmp_path: Path) -> None:
+    docs_dir = tmp_path / "docs"
+    docs_dir.mkdir()
+    stage_file = docs_dir / "product-alpha.md"
+    stage_file.write_text(
+        "\n".join(f"- ignored item {index}" for index in range(180)) + "\n",
+        encoding="utf-8",
+    )
+
+    completed_process = run_detector(tmp_path)
+
+    assert completed_process.returncode == 0
+    assert "docs/product-alpha.md" not in completed_process.stdout
+    assert "COMPRESSION_NOT_REQUIRED" in completed_process.stdout
 
 
 def test_product_docs_route_thinking_to_compression() -> None:
     thinking_content = (
-        REPO_ROOT / ".codex/skills/ahe-thinker/SKILL.md"
+        REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-think/SKILL.md"
     ).read_text(encoding="utf-8")
     harness_content = (
-        REPO_ROOT / ".codex/skills/ahe-harness/SKILL.md"
+        REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md"
     ).read_text(encoding="utf-8")
-    product_content = (REPO_ROOT / "docs/PRODUCT.md").read_text(encoding="utf-8")
-    hook_content = (REPO_ROOT / ".codex/hooks/ahe-hook.js").read_text(encoding="utf-8")
-    bin_content = (REPO_ROOT / "bin/ahe").read_text(encoding="utf-8")
+    product_content = (REPO_ROOT / "docs/product.md").read_text(encoding="utf-8")
+    hook_content = (
+        REPO_ROOT / "packages/ahe-codex/.codex/hooks/ahe-hook.js"
+    ).read_text(encoding="utf-8")
+    bin_content = (
+        REPO_ROOT / "packages/ahe-codex/bin/ahe-codex"
+    ).read_text(encoding="utf-8")
 
     assert "check-harness-size.sh" in thinking_content
     assert "COMPRESSION_REQUIRED" in thinking_content
+    assert "detect_stale_tests.py" in thinking_content
+    assert "must not delete tests directly" in thinking_content
+    assert "Run both compression detectors before choosing the next compression step." in thinking_content
+    assert "stale overlapping tests" in product_content
+    assert "TEST_COMPRESSION_REQUIRED" in product_content
+    assert "For `ahe compress`, run both the harness-size detector and the stale-test detector." in product_content
     assert "replace old completed feature entries with one summarized done feature" in harness_content
     assert "Do not create backup copies when compressing harness history." in harness_content
-    assert "ahe-compression" in product_content
-    assert "ahe-compression" in hook_content
-    assert '"ahe-compression"' in bin_content
+    assert "ahe-compress" in product_content
+    assert "ahe-compress" in hook_content
+    assert '"ahe-compress"' in bin_content
     assert ".ahe/backups" not in harness_content
 
 

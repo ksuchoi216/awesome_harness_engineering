@@ -1,0 +1,4 @@
+interface:
+  display_name: "AHE Ship"
+  short_description: "Export Codex plans to .plans handoff files"
+  default_prompt: "Use $ship to export the latest Codex Plan Mode plan into a .plans handoff file."

@@ -1,0 +1,373 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly VERSION="0.1.0"
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+
+while [ -L "${SCRIPT_PATH}" ]; do
+  SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${SCRIPT_PATH}")" && pwd)"
+  SCRIPT_PATH="$(readlink "${SCRIPT_PATH}")"
+
+  case "${SCRIPT_PATH}" in
+    /*) ;;
+    *) SCRIPT_PATH="${SCRIPT_DIR}/${SCRIPT_PATH}" ;;
+  esac
+done
+
+readonly SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${SCRIPT_PATH}")" && pwd)"
+readonly PACKAGE_ROOT="$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)"
+readonly SOURCE_SKILLS_DIR="${PACKAGE_ROOT}/.codex/skills"
+readonly SOURCE_SHARED_DIR="${PACKAGE_ROOT}/.codex/ahe-shared"
+readonly SOURCE_HOOKS_DIR="${PACKAGE_ROOT}/.codex/hooks"
+readonly AHE_CONFIG_BLOCK_START="# BEGIN AHE MANAGED CONFIG"
+readonly AHE_CONFIG_BLOCK_END="# END AHE MANAGED CONFIG"
+readonly MANAGED_SKILLS=(
+  "ahe"
+  "ahe-compress"
+  "ahe-converse"
+  "ahe-feature"
+  "ahe-fix"
+  "ahe-git"
+  "ahe-harness"
+  "ahe-harness-checker"
+  "ahe-new"
+  "ahe-overview"
+  "ahe-review"
+  "ahe-ship"
+  "ahe-solve"
+  "ahe-think"
+)
+
+codex_home() {
+  if [ -n "${CODEX_HOME:-}" ]; then
+    printf '%s\n' "${CODEX_HOME}"
+    return 0
+  fi
+
+  printf '%s\n' "${HOME}/.codex"
+}
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ahe install [--force] [--backup]
+  ahe uninstall
+  ahe doctor
+  ahe version
+EOF
+}
+
+backup_existing_installation() {
+  local target_dir="$1"
+  local backup_root="$2"
+  local backup_name="$3"
+  local timestamp
+
+  timestamp="$(date '+%Y%m%d-%H%M%S')"
+  mkdir -p "${backup_root}"
+  mv "${target_dir}" "${backup_root}/${backup_name}-${timestamp}"
+}
+
+cleanup_ahe_config_entries() {
+  local config_path="$1"
+  local temp_path=""
+
+  if [ ! -f "${config_path}" ]; then
+    return 0
+  fi
+
+  temp_path="${config_path}.ahe-cleanup"
+  awk -v block_start="${AHE_CONFIG_BLOCK_START}" -v block_end="${AHE_CONFIG_BLOCK_END}" '
+    function is_ahe_header(line) {
+      return line ~ /^\[agents\."?ahe[-_][^]]*"?\]$/ ||
+        line ~ /^\[hooks\.state\."ahe[^"]*"\]$/ ||
+        line ~ /^\[plugins\."?ahe[^]]*"?\]$/ ||
+        line ~ /^\[plugins\."@ksuchoi216\/ahe[^"]*"\]$/
+    }
+
+    $0 == block_start {
+      skip = 1
+      next
+    }
+
+    $0 == block_end {
+      skip = 0
+      next
+    }
+
+    /^\[/ {
+      if (is_ahe_header($0)) {
+        skip = 1
+        next
+      }
+      skip = 0
+    }
+
+    skip != 1 {
+      print
+    }
+  ' "${config_path}" > "${temp_path}"
+  mv "${temp_path}" "${config_path}"
+}
+
+install_skill() {
+  local force="false"
+  local backup="false"
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --force)
+        force="true"
+        ;;
+      --backup)
+        backup="true"
+        ;;
+      *)
+        printf 'Unknown install option: %s\n' "$1" >&2
+        usage >&2
+        exit 1
+        ;;
+    esac
+    shift
+  done
+
+  if [ ! -d "${SOURCE_SKILLS_DIR}" ]; then
+    printf 'Packaged skill files are missing: %s\n' "${SOURCE_SKILLS_DIR}" >&2
+    exit 1
+  fi
+
+  if [ ! -d "${SOURCE_SHARED_DIR}" ]; then
+    printf 'Packaged shared files are missing: %s\n' "${SOURCE_SHARED_DIR}" >&2
+    exit 1
+  fi
+
+  local target_codex_home
+  target_codex_home="$(codex_home)"
+
+  local target_skills_dir="${target_codex_home}/skills"
+  local target_shared_dir="${target_codex_home}/ahe-shared"
+  local target_hooks_dir="${target_codex_home}/hooks"
+  local target_config_path="${target_codex_home}/config.toml"
+  local backup_dir="${target_codex_home}/_backups"
+  local skill_name=""
+  local skill_target=""
+
+  cleanup_ahe_config_entries "${target_config_path}"
+
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    skill_target="${target_skills_dir}/${skill_name}"
+
+    if [ -e "${skill_target}" ]; then
+      if [ "${backup}" = "true" ]; then
+        backup_existing_installation "${skill_target}" "${backup_dir}" "${skill_name}"
+      elif [ "${force}" != "true" ]; then
+        cat <<EOF >&2
+AHE skill is already installed at:
+  ${skill_target}
+
+Re-run with --force to overwrite or --backup to move the existing install aside first.
+EOF
+        exit 1
+      else
+        rm -rf "${skill_target}"
+      fi
+    fi
+  done
+
+  if [ -e "${target_shared_dir}" ]; then
+    if [ "${backup}" = "true" ]; then
+      backup_existing_installation "${target_shared_dir}" "${backup_dir}" "ahe-shared"
+    elif [ "${force}" = "true" ]; then
+      rm -rf "${target_shared_dir}"
+    else
+      cat <<EOF >&2
+AHE shared assets are already installed at:
+  ${target_shared_dir}
+
+Re-run with --force to overwrite or --backup to move the existing install aside first.
+EOF
+      exit 1
+    fi
+  fi
+
+  if [ -e "${target_hooks_dir}" ]; then
+    if [ "${backup}" = "true" ]; then
+      backup_existing_installation "${target_hooks_dir}" "${backup_dir}" "hooks"
+    elif [ "${force}" = "true" ]; then
+      rm -rf "${target_hooks_dir}"
+    else
+      cat <<EOF >&2
+AHE hooks are already installed at:
+  ${target_hooks_dir}
+
+Re-run with --force to overwrite or --backup to move the existing install aside first.
+EOF
+      exit 1
+    fi
+  fi
+
+  mkdir -p "${target_skills_dir}"
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    cp -R "${SOURCE_SKILLS_DIR}/${skill_name}" "${target_skills_dir}/${skill_name}"
+  done
+  cp -R "${SOURCE_SHARED_DIR}" "${target_shared_dir}"
+  cp -R "${SOURCE_HOOKS_DIR}" "${target_hooks_dir}"
+  cat > "${target_hooks_dir}/hooks.json" <<EOF
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${target_hooks_dir}/ahe-hook.js\"",
+            "timeout": 5,
+            "statusMessage": "AHE: Checking Keyword Trigger"
+          }
+        ]
+      }
+    ]
+  }
+}
+EOF
+
+ cat <<EOF
+AHE Codex skill installed.
+Global Codex home:
+  ${target_codex_home}
+
+Next:
+1. Open Codex chat in any workspace.
+2. Use \`ahe new\` for a new start.
+3. Use exact \`ahe\` to continue existing harness work.
+4. Use \`ahe ship\` after Plan Mode to write the latest plan to .plans.
+5. Use \`ahe fix\` to create a .plans fix plan for errors or changed intent.
+6. Use \`ahe <query>\` for explicit AHE requests such as \`ahe compress\`.
+EOF
+}
+
+doctor() {
+  printf '=== codex ===\n'
+
+  local target_codex_home
+  target_codex_home="$(codex_home)"
+
+  local target_skills_dir="${target_codex_home}/skills"
+  local target_shared_dir="${target_codex_home}/ahe-shared"
+  local target_hooks_dir="${target_codex_home}/hooks"
+  local skill_name=""
+  local errors=0
+
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    if [ ! -f "${target_skills_dir}/${skill_name}/SKILL.md" ]; then
+      printf 'Missing: %s/%s/SKILL.md\n' "${target_skills_dir}" "${skill_name}" >&2
+      errors=$((errors + 1))
+    fi
+  done
+
+  if [ ! -f "${target_shared_dir}/config.yaml" ]; then
+    printf 'Missing: %s/config.yaml\n' "${target_shared_dir}" >&2
+    errors=$((errors + 1))
+  fi
+
+  if [ ! -d "${target_shared_dir}/templates" ]; then
+    printf 'Missing: %s/templates\n' "${target_shared_dir}" >&2
+    errors=$((errors + 1))
+  fi
+
+  if [ ! -d "${target_shared_dir}/schemas" ]; then
+    printf 'Missing: %s/schemas\n' "${target_shared_dir}" >&2
+    errors=$((errors + 1))
+  fi
+
+  if [ ! -f "${target_hooks_dir}/hooks.json" ]; then
+    printf 'Missing: %s/hooks.json\n' "${target_hooks_dir}" >&2
+    errors=$((errors + 1))
+  else
+    if ! TARGET_HOOKS_DIR="${target_hooks_dir}" node -e "
+      try {
+        const h = require(process.env.TARGET_HOOKS_DIR + '/hooks.json');
+        const cmd = h.hooks.UserPromptSubmit[0].hooks[0].command;
+        if (!cmd.includes(process.env.TARGET_HOOKS_DIR + '/ahe-hook.js')) {
+          process.exit(1);
+        }
+      } catch (e) {
+        process.exit(1);
+      }
+    " 2>/dev/null; then
+      printf 'Invalid hook command: %s/hooks.json does not point to %s/ahe-hook.js\n' "${target_hooks_dir}" "${target_hooks_dir}" >&2
+      errors=$((errors + 1))
+    fi
+  fi
+
+  if [ ! -f "${target_hooks_dir}/ahe-hook.js" ]; then
+    printf 'Missing: %s/ahe-hook.js\n' "${target_hooks_dir}" >&2
+    errors=$((errors + 1))
+  fi
+
+  if [ "${errors}" -gt 0 ]; then
+    printf 'AHE Codex skill installation is unhealthy (%d errors).\n' "${errors}" >&2
+    exit 1
+  fi
+
+  printf 'AHE Codex skill installation looks healthy.\n'
+}
+
+uninstall_skill() {
+  local target_codex_home
+  target_codex_home="$(codex_home)"
+
+  local target_skills_dir="${target_codex_home}/skills"
+  local target_shared_dir="${target_codex_home}/ahe-shared"
+  local target_hooks_dir="${target_codex_home}/hooks"
+  local target_config_path="${target_codex_home}/config.toml"
+  local skill_name=""
+
+  echo "Uninstalling AHE skills from ${target_codex_home}..."
+
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    rm -rf "${target_skills_dir}/${skill_name}"
+  done
+
+  rm -rf "${target_shared_dir}"
+  rm -rf "${target_hooks_dir}"
+  cleanup_ahe_config_entries "${target_config_path}"
+
+  echo "AHE skills uninstalled successfully."
+}
+
+main() {
+  if [ "$#" -eq 0 ]; then
+    usage
+    exit 1
+  fi
+
+  local command="$1"
+  shift
+
+  case "${command}" in
+    install)
+      install_skill "$@"
+      ;;
+    uninstall)
+      uninstall_skill
+      ;;
+    doctor)
+      doctor
+      ;;
+    version)
+      printf '%s\n' "${VERSION}"
+      ;;
+    -h|--help|help)
+      usage
+      exit 0
+      ;;
+    *)
+      printf 'Unknown command: %s\n' "${command}" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

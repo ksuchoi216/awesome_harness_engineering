@@ -1,0 +1,326 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+while [ -L "${SCRIPT_PATH}" ]; do
+  SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${SCRIPT_PATH}")" && pwd)"
+  SCRIPT_PATH="$(readlink "${SCRIPT_PATH}")"
+  case "${SCRIPT_PATH}" in
+    /*) ;;
+    *) SCRIPT_PATH="${SCRIPT_DIR}/${SCRIPT_PATH}" ;;
+  esac
+done
+
+readonly SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${SCRIPT_PATH}")" && pwd)"
+readonly PACKAGE_ROOT="$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)"
+readonly SOURCE_SKILLS_DIR="${PACKAGE_ROOT}/skills"
+readonly AGY_MODEL="Gemini 3.1 Pro (High)"
+readonly MANAGED_SKILLS=("ahe-ship" "ahe-git")
+
+build_execution_prompt() {
+  local plan_markdown="$1"
+
+  printf '%s\n' "Reconcile this saved AHE plan against the current repository state."
+  printf '%s\n' "Overwrite the original .plans/ file with the refreshed plan, then execute the refreshed plan exactly."
+  printf '\n'
+  printf '%s\n' "# Saved Plan"
+  printf '%s' "${plan_markdown}"
+
+  case "${plan_markdown}" in
+    *$'\n')
+      ;;
+    *)
+      printf '\n'
+      ;;
+  esac
+  printf '\n'
+
+  printf '%s\n' "When every requirement is fully complete and verified, print the exact line AHE_PLAN_COMPLETE."
+}
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ahe-antigravity install [--force]
+  ahe-antigravity uninstall
+  ahe-antigravity doctor
+  ahe-antigravity ahe-ship <plan-path>
+  ahe-antigravity ahe-git [repo-root]
+EOF
+}
+
+resolve_plan_path() {
+  local plan_path="$1"
+
+  if [ -z "${plan_path}" ]; then
+    printf 'Usage: ahe-antigravity ahe-ship <plan-path>\n' >&2
+    exit 1
+  fi
+
+  if [ "${plan_path#/}" = "${plan_path}" ]; then
+    plan_path="${PWD}/${plan_path}"
+  fi
+
+  if [ ! -f "${plan_path}" ]; then
+    printf 'Plan file does not exist: %s\n' "${plan_path}" >&2
+    exit 1
+  fi
+
+  local plan_dir
+  plan_dir="$(CDPATH= cd -- "$(dirname -- "${plan_path}")" && pwd)"
+  printf '%s/%s\n' "${plan_dir}" "$(basename -- "${plan_path}")"
+}
+
+read_plan_markdown() {
+  local plan_path="$1"
+  cat "${plan_path}"
+}
+
+
+ahe_ship_plan() {
+  local plan_path
+  plan_path="$(resolve_plan_path "${1:-}")"
+
+  if ! command -v agy >/dev/null 2>&1; then
+    printf 'Missing required executable: agy\n' >&2
+    exit 1
+  fi
+
+  local execution_prompt
+  execution_prompt="$(build_execution_prompt "$(read_plan_markdown "${plan_path}")")"
+
+  local stdout_path
+  local stderr_path
+  stdout_path="$(mktemp)"
+  stderr_path="$(mktemp)"
+
+  local status=0
+  if printf '%s\n' "${execution_prompt}" | agy --model "${AGY_MODEL}" >"${stdout_path}" 2>"${stderr_path}"; then
+    status=0
+  else
+    status=$?
+  fi
+
+  cat "${stdout_path}"
+  cat "${stderr_path}" >&2
+
+  local combined_output
+  combined_output="$(cat "${stdout_path}")"$'\n'"$(cat "${stderr_path}")"
+  rm -f "${stdout_path}" "${stderr_path}"
+
+  if [ "${status}" -ne 0 ]; then
+    printf 'agy execution failed for %s\n' "${plan_path}" >&2
+    exit "${status}"
+  fi
+
+  case "${combined_output}" in
+    *AHE_PLAN_COMPLETE*)
+      ;;
+    *)
+      printf 'agy completed without required marker AHE_PLAN_COMPLETE for %s\n' "${plan_path}" >&2
+      exit 1
+      ;;
+  esac
+}
+
+build_git_execution_prompt() {
+  local repo_root="$1"
+
+  printf '%s\n' "Run the ahe-git skill workflow on the repository at: ${repo_root}"
+  printf '%s\n' "You must follow the AHE Git skill instructions exactly."
+  printf '\n'
+  printf '%s\n' "When the full workflow is finished successfully with no skipped work, print the exact line AHE_GIT_COMPLETE."
+}
+
+ahe_git() {
+  local repo_root="${1:-$PWD}"
+
+  if [ ! -d "${repo_root}" ]; then
+    printf 'Target path is not a directory: %s\n' "${repo_root}" >&2
+    exit 1
+  fi
+
+  repo_root="$(CDPATH= cd -- "${repo_root}" && pwd)"
+
+  if ! command -v agy >/dev/null 2>&1; then
+    printf 'Missing required executable: agy\n' >&2
+    exit 1
+  fi
+
+  local execution_prompt
+  execution_prompt="$(build_git_execution_prompt "${repo_root}")"
+
+  local stdout_path
+  local stderr_path
+  stdout_path="$(mktemp)"
+  stderr_path="$(mktemp)"
+
+  local status=0
+  if printf '%s\n' "${execution_prompt}" | agy --model "${AGY_MODEL}" >"${stdout_path}" 2>"${stderr_path}"; then
+    status=0
+  else
+    status=$?
+  fi
+
+  cat "${stdout_path}"
+  cat "${stderr_path}" >&2
+
+  local combined_output
+  combined_output="$(cat "${stdout_path}")"$'\n'"$(cat "${stderr_path}")"
+  rm -f "${stdout_path}" "${stderr_path}"
+
+  if [ "${status}" -ne 0 ]; then
+    printf 'agy execution failed for ahe-git in %s\n' "${repo_root}" >&2
+    exit "${status}"
+  fi
+
+  case "${combined_output}" in
+    *AHE_GIT_COMPLETE*)
+      ;;
+    *)
+      printf 'agy completed without required marker AHE_GIT_COMPLETE for ahe-git in %s\n' "${repo_root}" >&2
+      exit 1
+      ;;
+  esac
+}
+
+install_skill() {
+  local force="false"
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --force)
+        force="true"
+        ;;
+      --backup)
+        # Ignored for Antigravity, but accepted for compatibility with root script
+        ;;
+      *)
+        printf 'Unknown install option: %s\n' "$1" >&2
+        usage >&2
+        exit 1
+        ;;
+    esac
+    shift
+  done
+
+  if [ ! -d "${SOURCE_SKILLS_DIR}" ]; then
+    printf 'Packaged skill files are missing: %s\n' "${SOURCE_SKILLS_DIR}" >&2
+    exit 1
+  fi
+
+  # Determine target directory
+  local target_skills_dir="${HOME}/.gemini/config/skills"
+  local skill_name=""
+  local skill_target=""
+  
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    skill_target="${target_skills_dir}/${skill_name}"
+
+    if [ -e "${skill_target}" ]; then
+      if [ "${force}" != "true" ]; then
+        cat <<EOF >&2
+AHE Antigravity skill ${skill_name} is already installed at:
+  ${skill_target}
+
+Re-run with --force to overwrite.
+EOF
+        exit 1
+      else
+        rm -rf "${skill_target}"
+      fi
+    fi
+  done
+
+  mkdir -p "${target_skills_dir}"
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    cp -R "${SOURCE_SKILLS_DIR}/${skill_name}" "${target_skills_dir}/${skill_name}"
+  done
+
+  cat <<EOF
+AHE Antigravity skills installed at:
+  ${target_skills_dir}
+EOF
+}
+
+doctor() {
+  printf '=== antigravity ===\n'
+
+  local target_skills_dir="${HOME}/.gemini/config/skills"
+  local skill_name=""
+  local skill_md=""
+  local errors=0
+
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    skill_md="${target_skills_dir}/${skill_name}/SKILL.md"
+    if [ ! -f "${skill_md}" ]; then
+      printf 'Missing: %s\n' "${skill_md}" >&2
+      errors=$((errors + 1))
+    fi
+  done
+
+  if ! command -v agy >/dev/null 2>&1; then
+    printf 'Missing required executable: agy\n' >&2
+    errors=$((errors + 1))
+  fi
+
+  if [ "${errors}" -gt 0 ]; then
+    printf 'AHE Antigravity skill installation is unhealthy (%d errors).\n' "${errors}" >&2
+    exit 1
+  fi
+  printf 'AHE Antigravity skill installation looks healthy.\n\n'
+}
+
+uninstall_skill() {
+  local target_skills_dir="${HOME}/.gemini/config/skills"
+  local skill_name=""
+  local skill_target=""
+
+  echo "Uninstalling AHE Antigravity skills from ${target_skills_dir}..."
+  
+  for skill_name in "${MANAGED_SKILLS[@]}"; do
+    skill_target="${target_skills_dir}/${skill_name}"
+    rm -rf "${skill_target}"
+  done
+
+  echo "AHE Antigravity skills uninstalled successfully."
+}
+
+main() {
+  if [ "$#" -eq 0 ]; then
+    usage
+    exit 1
+  fi
+
+  local command="$1"
+  shift
+
+  case "${command}" in
+    install)
+      install_skill "$@"
+      ;;
+    uninstall)
+      uninstall_skill
+      ;;
+    doctor)
+      doctor
+      ;;
+    ahe-ship)
+      ahe_ship_plan "$@"
+      ;;
+    ahe-git)
+      ahe_git "$@"
+      ;;
+    -h|--help|help)
+      usage
+      exit 0
+      ;;
+    *)
+      printf 'Unknown command: %s\n' "${command}" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"
