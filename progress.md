@@ -2,12 +2,13 @@
 
 ## Current Status
 
-**Last Updated:** 2026-07-01 15:05 +0900
-**Session ID:** split-deploy-and-test-scripts
-**Active Feature:** `feat-067 Split deploy and local validation scripts`
+**Last Updated:** 2026-07-01 15:32 +0900
+**Session ID:** move-install-script
+**Active Feature:** `feat-068 Move install script into scripts directory`
 
 ## Completed
 
+- [x] Implemented `feat-068 Move install script into scripts directory` by moving the real installer to `scripts/install.sh` and leaving a root `install.sh` wrapper that forwards to the new path so the existing repo workflow still works.
 - [x] Implemented `feat-067 Split deploy and local validation scripts` by moving the real npm publish flow into `scripts/deploy.sh`, adding `scripts/test.sh` for branch-local validation, and removing the root `deploy.sh`.
 - [x] Implemented `feat-066 Use bare semver release tags for npm publish` by changing the GitHub Actions release trigger from `v*.*.*` tags to bare semver tags like `0.1.8`, and by requiring the pushed tag to exactly match `package.json` without a `v` prefix.
 - [x] Implemented `feat-065 Prepare v0.1.8 package metadata` by bumping the root and workspace package manifest versions from `0.1.7` to `0.1.8` so the next GitFlow release tag can match the publish workflow expectation.
@@ -39,8 +40,8 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-Details: `feat-067 Split deploy and local validation scripts` is complete.
-Latest: The real publish script now lives in `scripts/deploy.sh`, while `scripts/test.sh` performs local release validation on the current branch without calling `npm publish`.
+Details: `feat-068 Move install script into scripts directory` is complete.
+Latest: The actual reinstall flow now lives in `scripts/install.sh`, while the root `install.sh` remains a thin compatibility wrapper because `AGENTS.md` still instructs future sessions to run `install.sh`.
 Blockers: None.
 
 ## Blocked
@@ -70,6 +71,7 @@ Blockers: None.
 - **npm releases are tag-driven**: GitHub Actions should publish only on bare semver tag pushes like `0.1.8`, only when the tagged commit is on `master`, and only when the pushed tag exactly matches the root `package.json` version.
 - **Release tags must match package manifests**: The next GitFlow release should use `0.1.8` because the root and workspace `package.json` files now declare `0.1.8`.
 - **Local release validation should never publish**: `scripts/test.sh` is now the local verification entrypoint, while `scripts/deploy.sh` remains the explicit real publish path.
+- **Installer implementation lives under `scripts/`**: `scripts/install.sh` is the real reinstall script; the root `install.sh` only forwards there to preserve the existing documented workflow.
 
 ## Verification
 
@@ -83,6 +85,9 @@ Blockers: None.
 - [x] `rg -n '"version"\s*:\s*"0\.1\.8"' package.json packages -g 'package.json'`
 - [x] `python3 -m json.tool feature-list.json`
 - [x] `git diff --check`
+- [x] `bash -n install.sh scripts/install.sh scripts/deploy.sh scripts/test.sh`
+- [x] `bash install.sh --help`
+Details: The root wrapper forwarded into `scripts/install.sh`; the script reached the real uninstall/install flow and then stopped on existing privileged operations (`rm` under `/Users/KC/.codex` and `/Users/KC/.gemini`, then `sudo npm install -g .`) because this environment does not permit them.
 - [x] `bash -n scripts/deploy.sh scripts/test.sh`
 - [ ] `bash scripts/test.sh`
 Details: Stops as designed at the existing `npm test` failure from `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy` before any publish step.

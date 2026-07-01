@@ -264,6 +264,16 @@
       ],
       "status": "done",
       "evidence": "Moved the original publish flow from root `deploy.sh` to `scripts/deploy.sh`, added `scripts/test.sh` to run `npm test` and `npm pack --dry-run` on the current branch without publishing, and removed the root script. Verified with `bash -n scripts/deploy.sh scripts/test.sh`, `python3 -m json.tool feature-list.json`, `git diff --check`, and a local run of `scripts/test.sh` that stops at the existing failing test suite before any publish step."
+    },
+    {
+      "id": "feat-068",
+      "name": "Move install script into scripts directory",
+      "description": "Move the real reinstall flow from the repo root into `scripts/install.sh` while preserving the existing root entrypoint as a thin wrapper.",
+      "dependencies": [
+        "feat-067"
+      ],
+      "status": "done",
+      "evidence": "Moved the installer implementation into `scripts/install.sh`, replaced the root `install.sh` with a wrapper that forwards to the new path, and kept the existing reinstall contract intact without modifying `AGENTS.md`. Verified with `bash -n install.sh scripts/install.sh`, `python3 -m json.tool feature-list.json`, `git diff --check`, and `bash install.sh --help`, which reached the real uninstall/install flow before stopping on privileged filesystem deletes and `sudo npm install -g .` in this environment."
     }
   ]
 }

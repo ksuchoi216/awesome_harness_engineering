@@ -3,11 +3,13 @@
 ## Current Product Context
 
 - Goal: Keep AHE's Codex-facing harness workflow compact, explicit, and cheap to resume in chat.
-- Current status: `feat-067 Split deploy and local validation scripts` is complete.
-- Branch / commit: `develop`; the live AHE contracts now install globally, read all existing `docs/*.md` files, use lowercase filenames for product/progress/session artifacts, ship independent Plan Mode and fix-plan exporters, support ordered staged product docs, execute saved ship plans through Antigravity, provide safe git orchestration, publish npm releases from guarded bare-semver tags, and separate real publish from local release validation.
+- Current status: `feat-068 Move install script into scripts directory` is complete.
+- Branch / commit: `develop`; the live AHE contracts now install globally, read all existing `docs/*.md` files, use lowercase filenames for product/progress/session artifacts, ship independent Plan Mode and fix-plan exporters, support ordered staged product docs, execute saved ship plans through Antigravity, provide safe git orchestration, publish npm releases from guarded bare-semver tags, separate real publish from local release validation, and keep the installer implementation under `scripts/`.
 
 ## Last Completed Work
 
+- [x] Moved the real reinstall flow from `install.sh` to `scripts/install.sh`.
+- [x] Left a thin root `install.sh` wrapper in place so existing repo instructions that call `install.sh` keep working without changing `AGENTS.md`.
 - [x] Moved the real npm publish flow into `scripts/deploy.sh`.
 - [x] Added `scripts/test.sh` to run branch-local validation with `npm test` and `npm pack --dry-run` without publishing.
 - [x] Updated `.github/workflows/publish.yml` so npm publish now triggers on bare semver tags like `0.1.8` instead of `v0.1.8`, while still requiring tag/package parity and `master` containment.
@@ -54,6 +56,8 @@
 
 - `.github/workflows/publish.yml` - Publishes `@ksuchoi216/ahe` when a bare semver tag push like `0.1.8` matches `package.json` and points to a commit reachable from `master`.
 - `docs/product.md` - Canonical product and workflow contract for global AHE installation plus no-backup restart/compression behavior.
+- `scripts/install.sh` - Real reinstall script for globally uninstalling, npm-installing, and re-installing the Codex and Antigravity skills.
+- `install.sh` - Thin compatibility wrapper that forwards to `scripts/install.sh` because `AGENTS.md` still instructs future sessions to run `install.sh`.
 - `scripts/deploy.sh` - Explicit real publish script that still performs npm login checks, optional branch switching, dry-run pack, and `npm publish`.
 - `scripts/test.sh` - Local release validation script that runs `npm test` and `npm pack --dry-run` on the current branch without publishing.
 - `bin/ahe` - Installer, doctor, and uninstaller now target the global Codex home.
@@ -82,7 +86,7 @@
 3. Run `./init.sh`.
 4. Add the `NPM_TOKEN` repository secret in GitHub before relying on the new publish workflow.
 5. Create or push future release tags in `<package.json version>` format from `master` so the publish workflow accepts them.
-6. Use `scripts/test.sh` for local release validation and reserve `scripts/deploy.sh` for intentional real npm publishing.
+6. Use `scripts/test.sh` for local release validation, reserve `scripts/deploy.sh` for intentional real npm publishing, and use `scripts/install.sh` for the real reinstall flow.
 
 ## Verification Status
 
@@ -91,6 +95,7 @@
 | Init sanity | `./init.sh` | Pass | Startup check still reports the expected Python-default environment guidance. |
 | Remote tag replacement | `git push origin :refs/tags/v0.1.1`, `git push origin v0.1.7`, `git ls-remote --tags origin 'v0.1.*'` | Pass | Confirmed `origin` no longer has `v0.1.1` and now exposes only `v0.1.7` for the current release tag. |
 | Publish workflow inspection | `sed -n '1,220p' .github/workflows/publish.yml` | Pass | Workflow now triggers on bare semver tags like `0.1.8`, checks `master` containment, enforces tag/package parity, installs `pytest`, and publishes with `NPM_TOKEN`. |
+| Install script relocation | `bash -n install.sh scripts/install.sh`, `bash install.sh --help` | Partial | Syntax is valid and the root wrapper forwards into `scripts/install.sh`; the live run reaches the real uninstall/install flow and then stops on existing privileged filesystem deletes plus `sudo npm install -g .`, which this environment does not permit. |
 | Lint | `ruff check tests/` | Pass | Existing tracked Python test files lint cleanly. |
 | Diff hygiene | `git diff --check` | Pass | No whitespace or patch formatting errors in the workflow/tracking changes. |
 | Full tests | `pytest tests/ -x` | Fail | Pre-existing failure in `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy`; the plan file still exists after `AHE_PLAN_COMPLETE`. |
