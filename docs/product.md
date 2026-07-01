@@ -18,6 +18,9 @@ User-facing chat commands:
 - exact `ahe fix`
 - exact `ahe-fix`
 - exact `$ahe-fix`
+- exact `ahe git`
+- exact `ahe-git`
+- exact `$ahe-git`
 - `ahe fix <query>`
 - `<query> ahe fix`
 - `ahe <query>` (e.g. `ahe compress`)
@@ -34,8 +37,9 @@ Internal workflow skills:
 - `ahe-harness-checker`
 
 The independent user-facing exporter is `ahe-ship`. It detects if the current
-Codex thread is in Plan Mode and exits Plan Mode first. Then it writes the
-latest `<proposed_plan>` into `.plans/{plan_name}.md` and stops there.
+Codex thread is in Plan Mode. If Plan Mode is active, the Codex host must exit
+Plan Mode and replay the command. Outside Plan Mode, it writes the latest
+`<proposed_plan>` into `.plans/{plan_name}.md` and stops there.
 It must not route through the internal AHE agent network.
 
 The independent user-facing fix planner is `ahe-fix`. It writes a concrete
@@ -43,6 +47,11 @@ fix plan into `.plans/{plan_name}.md` for fixing errors or following the
 user's current intention when that intention differs from the previous AHE
 flow. It may call `ahe-converse` when clarification is needed. It must not
 route through `ahe-think`.
+
+The independent user-facing git orchestrator is `ahe-git`. It safely fetches,
+inspects, and commits changes across the active repository and any nested Git
+repositories or submodules. It must not route through the internal AHE agent
+network.
 
 AHE always installs into the global Codex home (`$CODEX_HOME` when set,
 otherwise `~/.codex`). Installed skills, shared files, and hook files must not
@@ -55,13 +64,13 @@ The project uses an internal `packages/` workspace layout, separating `ahe-codex
 The global Codex installation (`ahe-codex`) contains:
 
 - skills: `ahe`, `ahe-new`, `ahe-think`, `ahe-review`, `ahe-converse`,
-  `ahe-harness`, `ahe-feature`, `ahe-fix`, `ahe-solve`, `ahe-ship`, `ahe-compress`, and `ahe-harness-checker`
+  `ahe-harness`, `ahe-feature`, `ahe-fix`, `ahe-git`, `ahe-solve`, `ahe-ship`, `ahe-compress`, and `ahe-harness-checker`
 - shared templates: `AGENTS.md`, `product.md`, `progress.md`,
   `session-handoff.md`, `init.sh`, and `feature-list.json`
 - schemas: `process_status.schema.json` and `feature-list-schema.json`
 - hooks: `hooks.json` and `ahe-hook.js`
 
-The global Antigravity installation (`ahe-antigravity`) installs the `ahe-ship` skill to `~/.gemini/config/skills/ahe-ship` for refreshing a saved plan against the current codebase and then running it through `agy`.
+The global Antigravity installation (`ahe-antigravity`) installs the `ahe-ship` and `ahe-git` skills. `ahe-ship` refreshes a saved plan against the current codebase and executes it. `ahe-git` provides safe git orchestration via the wrapper.
 
 ## 3. Agent Model
 
@@ -72,6 +81,7 @@ The Codex-side model is:
 - exact `ahe new` -> dedicated new-start workflow first, then `ahe-harness` -> `ahe-harness-checker`
 - exact `ahe ship` -> independent plan export workflow
 - exact `ahe fix`, `ahe fix <query>`, or `<query> ahe fix` -> independent fix-plan workflow
+- exact `ahe git` -> independent git orchestration workflow
 
 - `ahe-think` is the central decision layer.
 - Worker agents may call each other directly when that is the logical next
@@ -151,8 +161,9 @@ The Codex-side model is:
 
 ### `ahe-ship`
 
-- Detect if the current conversation is still in Plan Mode and exit Plan Mode first before continuing.
-- Export the most recent Codex Plan Mode `<proposed_plan>` already visible in
+- Detect if the current conversation is still in Plan Mode.
+- If Plan Mode is active, the Codex host must exit Plan Mode and replay the command.
+- Outside Plan Mode, export the most recent Codex Plan Mode `<proposed_plan>` already visible in
   the current conversation.
 - Create `.plans/{plan_name}.md` in the active repository with compact handoff
   context for Antigravity or another LLM platform.
@@ -169,6 +180,14 @@ The Codex-side model is:
 - Call `ahe-converse` when the fix target, scope, or success criteria are
   unclear.
 - Stay independent from `ahe-think` and the normal AHE status workflow.
+
+### `ahe-git`
+
+- Provide safe git orchestration across a repository and its submodules.
+- Stop and ask the user for manual intervention if any repo state is not clean
+  for a fast-forward pull, or if there are conflicts.
+- Do not attempt automatic merge, rebase, or stash operations.
+- Draft and verify concise conventional commit messages based on diffs.
 
 ### `ahe-harness-checker`
 
@@ -189,6 +208,7 @@ The Codex-side model is:
 - Exact `ahe fix`, exact `ahe-fix`, and exact `$ahe-fix` activate the
   independent fix-plan workflow.
 - `ahe fix <query>` and `<query> ahe fix` activate the independent fix-plan workflow.
+- Exact `ahe git`, exact `ahe-git`, and exact `$ahe-git` activate the independent git orchestration workflow.
 - `ahe <query>` and `<query> ahe` activate the thinker-routed query path.
 - Prompts that mention `ahe` in the middle without matching one of those command shapes must not activate AHE.
 - The first response must include a concise status table covering `AGENTS.md`,
@@ -201,7 +221,7 @@ The Codex-side model is:
 
 - AHE installs and runs from the global Codex home, not workspace-local
   `.codex` skill directories.
-- Exact `ahe`, exact `ahe new`, exact `ahe ship`, exact `ahe fix`, and
+- Exact `ahe`, exact `ahe new`, exact `ahe ship`, exact `ahe fix`, exact `ahe git`, and
   the query forms `ahe <query>`, `<query> ahe`, `ahe fix <query>`, and
   `<query> ahe fix` route to their expected workflows.
 - The installer copies the current skill set into the global Codex home and no

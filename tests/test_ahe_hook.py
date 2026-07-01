@@ -173,16 +173,25 @@ def test_exact_ahe_ship_emit_independent_ship_context() -> None:
 
         _assert_codegraph_preflight_present(additional_context)
         assert "AHE plan export activated." in additional_context
-        assert "ahe-think" in additional_context
+        assert "ahe-think" not in additional_context
         assert "ahe-ship" in additional_context
         assert "Detect if the current conversation is still in Plan Mode." in additional_context
-        assert "If Plan Mode is active, exit Plan Mode first before continuing." in additional_context
-        assert "most recent `<proposed_plan>`" in additional_context
+        assert "If Plan Mode is active, the Codex host must exit Plan Mode and replay the command." in additional_context
+        assert "Outside Plan Mode, use the most recent `<proposed_plan>`" in additional_context
         assert ".plans/{plan_name}.md" in additional_context
         assert "write the final markdown and stop" in additional_context
         assert "status report table" not in additional_context
         assert "explicit AHE query" not in additional_context
 
+def test_exact_ahe_git_emit_git_context() -> None:
+    for prompt in ("ahe-git", "ahe git"):
+        additional_context = additional_context_for_prompt(prompt)
+
+        _assert_codegraph_preflight_present(additional_context)
+        assert "AHE Git activated." in additional_context
+        assert "ahe-think" in additional_context
+        assert "ahe-git" in additional_context
+        assert "Do not run the normal AHE harness workflow." in additional_context
 
 def test_exact_ahe_fix_emit_fix_plan_context() -> None:
     for prompt in ("ahe-fix", "ahe-fix"):

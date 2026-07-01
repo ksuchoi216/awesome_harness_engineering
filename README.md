@@ -18,7 +18,7 @@ Here are intuitive flow examples for the primary AHE commands. While `ahe`, `ahe
 
 ### `ahe ship` Flow
 1. **plan mode in codex**: Generate an implementation plan inside Codex.
-2. **ahe-ship calling in codex**: Codex saves the plan to `.plans/` and stops.
+2. **ahe-ship calling in codex**: If in Plan Mode, the Codex host exits Plan Mode and replays the command. Outside Plan Mode, Codex saves the plan to `.plans/` and stops.
 3. **ahe-ship calling in antigravity**: Antigravity refreshes the saved plan against current code, executes it, and cleans it up.
 
 ### `ahe fix` Flow

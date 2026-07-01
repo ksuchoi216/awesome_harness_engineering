@@ -214,6 +214,16 @@
       ],
       "status": "done",
       "evidence": "Added `ahe-harness-checker` internal skill, integrated into `ahe-new`, `ahe-harness`, and `ahe-think` workflows, updated `ahe-hook.js`, and added corresponding tests. Rewrote `ahe-harness-checker/SKILL.md` for robustness."
+    },
+    {
+      "id": "feat-063",
+      "name": "Add ahe-git command",
+      "description": "Add an independent `ahe-git` skill to orchestrate safe git fast-forward pulls and commits across the repository and its submodules.",
+      "dependencies": [
+        "feat-062"
+      ],
+      "status": "done",
+      "evidence": "Added `packages/ahe-codex/.codex/skills/ahe-git/SKILL.md` and `packages/ahe-antigravity/skills/ahe-git/SKILL.md`, updated `packages/ahe-codex/bin/ahe-codex` and `packages/ahe-antigravity/bin/ahe-antigravity` to include `ahe-git`, wired `ahe-hook.js` to route `ahe git` and `ahe-git`, and updated `README.md` and `docs/product.md`. Verified by creating `tests/test_ahe_git_skill_contract.py`, `tests/test_ahe_antigravity_git.py`, and updating command and project setup tests."
     }
   ]
 }

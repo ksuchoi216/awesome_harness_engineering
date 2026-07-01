@@ -105,15 +105,14 @@ const AHE_SHIP_DIRECTIVE = [
   "The user invoked `ahe-ship`.",
   "",
   ...CODEGRAPH_PREFLIGHT_LINES,
-  "2. Route to `ahe-think` first.",
-  "3. `ahe-think` must immediately call the `ahe-ship` skill.",
-  "4. Detect if the current conversation is still in Plan Mode.",
-  "5. If Plan Mode is active, exit Plan Mode first before continuing.",
-  "6. Use the most recent `<proposed_plan>` already visible in this conversation.",
-  "7. Do not ask for the plan again when the latest plan is unambiguous.",
-  "8. Derive `plan_name` from the plan title and create `.plans/{plan_name}.md`.",
-  "9. Add compact handoff context for Antigravity or another LLM platform.",
-  "10. Use `.codex/skills/ahe-ship/scripts/write_plan.py` to write the final markdown and stop.",
+  "2. Immediately call the `ahe-ship` skill.",
+  "3. Detect if the current conversation is still in Plan Mode.",
+  "4. If Plan Mode is active, the Codex host must exit Plan Mode and replay the command.",
+  "5. Outside Plan Mode, use the most recent `<proposed_plan>` already visible in this conversation.",
+  "6. Do not ask for the plan again when the latest plan is unambiguous.",
+  "7. Derive `plan_name` from the plan title and create `.plans/{plan_name}.md`.",
+  "8. Add compact handoff context for Antigravity or another LLM platform.",
+  "9. Use `.codex/skills/ahe-ship/scripts/write_plan.py` to write the final markdown and stop.",
   "",
   "Do not run the normal AHE harness workflow.",
 ].join("\n");
@@ -132,6 +131,19 @@ const AHE_FIX_DIRECTIVE = [
   "6. If the fix goal, scope, or success criteria are unclear, call `ahe-converse` and ask one focused question before writing the plan.",
   "7. Derive `plan_name` from the fix goal and create `.plans/{plan_name}.md`.",
   "8. Use `.codex/skills/ahe-fix/scripts/write_fix_plan.py` to write the final markdown.",
+  "",
+  "Do not run the normal AHE harness workflow.",
+].join("\n");
+
+const AHE_GIT_DIRECTIVE = [
+  AHE_DIRECTIVE_MARKER,
+  "AHE Git activated.",
+  "",
+  "The user invoked `ahe-git`.",
+  "",
+  ...CODEGRAPH_PREFLIGHT_LINES,
+  "2. Route to `ahe-think` first.",
+  "3. `ahe-think` must immediately call the `ahe-git` skill.",
   "",
   "Do not run the normal AHE harness workflow.",
 ].join("\n");
@@ -170,6 +182,11 @@ function isExactAheShipCommand(prompt) {
 function isExactAheFixCommand(prompt) {
   const normalizedPrompt = normalizePrompt(prompt);
   return normalizedPrompt === "ahe-fix" || normalizedPrompt === "ahe fix";
+}
+
+function isExactAheGitCommand(prompt) {
+  const normalizedPrompt = normalizePrompt(prompt);
+  return normalizedPrompt === "ahe-git" || normalizedPrompt === "ahe git";
 }
 
 function isExactAheOverviewCommand(prompt) {
@@ -241,6 +258,18 @@ async function main() {
           hookSpecificOutput: {
             hookEventName: "UserPromptSubmit",
             additionalContext: AHE_FIX_DIRECTIVE,
+          },
+        }) + "\n"
+      );
+      return;
+    }
+
+    if (isExactAheGitCommand(parsed.prompt)) {
+      process.stdout.write(
+        JSON.stringify({
+          hookSpecificOutput: {
+            hookEventName: "UserPromptSubmit",
+            additionalContext: AHE_GIT_DIRECTIVE,
           },
         }) + "\n"
       );

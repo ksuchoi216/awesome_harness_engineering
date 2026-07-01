@@ -27,6 +27,7 @@ readonly MANAGED_SKILLS=(
   "ahe-converse"
   "ahe-feature"
   "ahe-fix"
+  "ahe-git"
   "ahe-harness"
   "ahe-harness-checker"
   "ahe-new"

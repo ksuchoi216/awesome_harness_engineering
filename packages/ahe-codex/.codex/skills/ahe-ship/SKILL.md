@@ -15,8 +15,8 @@ other AHE workflow agent.
 ## Workflow
 
 1. Detect if the current conversation is still in Plan Mode.
-2. If Plan Mode is active, exit Plan Mode first before continuing.
-3. Locate the most recent completed `<proposed_plan>` already visible in the
+2. If Plan Mode is active, the Codex host must exit Plan Mode and replay the command.
+3. Outside Plan Mode, locate the most recent completed `<proposed_plan>` already visible in the
    current conversation.
 4. If the latest plan is clear, use it directly. Do not ask the user to paste
    the plan again.

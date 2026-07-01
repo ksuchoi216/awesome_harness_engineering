@@ -16,8 +16,9 @@ When the user asks to implement or execute a plan, do not scan or implement all 
 
 Perform the following steps:
 1. **Show the title**: Display the title of the selected plan to the user.
-2. **Replan**: Reconcile the selected plan against the current repository state and create a refreshed implementation plan. Overwrite the selected `.plans/{plan_name}.md` file with this refreshed plan. Wait for user approval.
+2. **Replan**: Reconcile the selected plan against the current repository state and create a refreshed implementation plan. Overwrite the selected `.plans/{plan_name}.md` file with this refreshed plan. Do NOT wait for user approval; immediately proceed to the next step.
 3. **Implement**: Execute every listed requirement in the refreshed plan, omitting nothing.
+4. **Cleanup**: After successful execution and before printing `AHE_PLAN_COMPLETE`, execute the hook script `~/.gemini/config/skills/ahe-ship/scripts/post-ship-hook.sh <plan_path>` to clean up the applied plan.
 
 Do not ask to open, read, or restate the `.plans/` file.
 Use the saved AHE plan content already provided in the prompt.
@@ -25,4 +26,3 @@ The Antigravity CLI runs this execution with the model `Gemini 3.1 Pro (High)`.
 
 Print the exact line `AHE_PLAN_COMPLETE` only when the full plan is finished with no skipped work, no unresolved blocker, and no omitted verification.
 Do not print `AHE_PLAN_COMPLETE` when any part of the plan is incomplete, deferred, blocked, or only partially verified.
-After successful execution, remove the plan file.

@@ -17,6 +17,7 @@ def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
             "ahe-converse",
             "ahe-feature",
             "ahe-fix",
+            "ahe-git",
             "ahe-harness",
             "ahe-harness-checker",
             "ahe-new",
@@ -58,6 +59,10 @@ def test_public_command_skills_are_user_facing_commands() -> None:
     assert "ahe-converse" in overview_content
     assert "ahe fix" in overview_content
     assert "ahe ship" in overview_content
+
+    git_content = (SKILL_DIR / "ahe-git/SKILL.md").read_text(encoding="utf-8")
+    assert "ahe-git" in git_content
+    assert "independent" in git_content.lower()
 
     internal_skill_names = (
         "ahe-compress",

@@ -23,6 +23,7 @@ REQUIRED_SKILL_FILES = (
     Path("packages/ahe-codex/.codex/skills/ahe-solve/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-fix/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-fix/scripts/write_fix_plan.py"),
+    Path("packages/ahe-codex/.codex/skills/ahe-git/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-ship/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-ship/scripts/write_plan.py"),
     Path("packages/ahe-codex/.codex/skills/ahe-compress/SKILL.md"),
@@ -39,6 +40,7 @@ REQUIRED_SKILL_FILES = (
     Path("packages/ahe-codex/.codex/hooks/hooks.json"),
     Path("packages/ahe-codex/.codex/hooks/ahe-hook.js"),
     Path("packages/ahe-antigravity/skills/ahe-ship/SKILL.md"),
+    Path("packages/ahe-antigravity/skills/ahe-git/SKILL.md"),
     Path("packages/ahe-antigravity/bin/ahe-antigravity"),
 )
 
@@ -126,6 +128,7 @@ def test_installer_copies_skill_files_into_global_codex_home(tmp_path: Path) -> 
     assert (codex_home / "skills/ahe-harness-checker/SKILL.md").exists()
     assert (codex_home / "skills/ahe-fix/SKILL.md").exists()
     assert (codex_home / "skills/ahe-fix/scripts/write_fix_plan.py").exists()
+    assert (codex_home / "skills/ahe-git/SKILL.md").exists()
     assert (codex_home / "skills/ahe-ship/SKILL.md").exists()
     assert (codex_home / "skills/ahe-ship/scripts/write_plan.py").exists()
     assert (codex_home / "ahe-shared/templates/AGENTS.md").exists()

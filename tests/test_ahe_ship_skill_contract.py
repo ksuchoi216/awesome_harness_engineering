@@ -11,6 +11,6 @@ def test_ship_skill_contract() -> None:
     skill_content = SKILL_PATH.read_text(encoding="utf-8")
 
     assert "Detect if the current conversation is still in Plan Mode." in skill_content
-    assert "If Plan Mode is active, exit Plan Mode first before continuing." in skill_content
-    assert "Locate the most recent completed `<proposed_plan>`" in skill_content
+    assert "If Plan Mode is active, the Codex host must exit Plan Mode and replay the command." in skill_content
+    assert "Outside Plan Mode, locate the most recent completed `<proposed_plan>`" in skill_content
     assert "Write the final markdown through `scripts/write_plan.py`." in skill_content

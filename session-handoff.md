@@ -3,15 +3,16 @@
 ## Current Product Context
 
 - Goal: Keep AHE's Codex-facing harness workflow compact, explicit, and cheap to resume in chat.
-- Current status: `feat-055 Simplify AHE Compress To One User Command` is complete.
-- Branch / commit: `develop`; the live AHE contracts now install globally, read all existing `docs/*.md` files, use lowercase filenames for product/progress/session artifacts, ship independent Plan Mode and fix-plan exporters, support ordered staged product docs, execute saved ship plans through Antigravity, and keep the ship writer compatible with the active Python environment.
+- Current status: `feat-063 Add ahe-git command` is complete.
+- Branch / commit: `develop`; the live AHE contracts now install globally, read all existing `docs/*.md` files, use lowercase filenames for product/progress/session artifacts, ship independent Plan Mode and fix-plan exporters, support ordered staged product docs, execute saved ship plans through Antigravity, and provide safe git orchestration.
 
 ## Last Completed Work
 
-- [x] Removed AHE workflow backup-copy guidance from `.codex/skills/ahe-init/SKILL.md`, `.codex/skills/ahe-compress/SKILL.md`, `.codex/skills/ahe-harness/SKILL.md`, `.codex/hooks/ahe-hook.js`, and `docs/product.md`.
-- [x] Changed the `ahe compress feature-list` contract so old completed entries collapse into one summarized done feature while unfinished work remains detailed.
-- [x] Compressed `feature-list.json` into a historical summary entry plus `feat-043`.
-- [x] Shortened `progress.md` and this handoff so the next session reads only current state, durable decisions, and recent verification.
+- [x] Added `ahe-git` skill directories and `SKILL.md` files for both Codex and Antigravity.
+- [x] Wired Codex hook detection in `ahe-hook.js` for `ahe git` and `ahe-git`.
+- [x] Updated Codex installer and Antigravity wrapper to include `ahe-git` support.
+- [x] Created `tests/test_ahe_git_skill_contract.py` and `tests/test_ahe_antigravity_git.py` and updated existing command/project setup tests.
+- [x] Updated README, docs/product.md, feature-list.json, progress.md, and session-handoff.md for ahe-git.
 - [x] Verified the new contract with `./init.sh`, focused pytest on the changed contract tests, `pytest tests/ -x`, `ruff check src/ tests/`, `bash -n bin/ahe`, `node --check .codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, and `sh .codex/skills/ahe-compress/scripts/check-harness-size.sh`.
 - [x] Changed `bin/ahe` so install, doctor, and uninstall use `$CODEX_HOME` when set and `~/.codex` otherwise.
 - [x] Generated global hook config with an absolute `ahe-hook.js` command so AHE can run from any workspace.
