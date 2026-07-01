@@ -3,11 +3,13 @@
 ## Current Product Context
 
 - Goal: Keep AHE's Codex-facing harness workflow compact, explicit, and cheap to resume in chat.
-- Current status: `feat-068 Move install script into scripts directory` is complete.
-- Branch / commit: `develop`; the live AHE contracts now install globally, read all existing `docs/*.md` files, use lowercase filenames for product/progress/session artifacts, ship independent Plan Mode and fix-plan exporters, support ordered staged product docs, execute saved ship plans through Antigravity, provide safe git orchestration, publish npm releases from guarded bare-semver tags, separate real publish from local release validation, and keep the installer implementation under `scripts/`.
+- Current status: `feat-069 Remove completed Antigravity ship plans` is complete.
+- Branch / commit: `develop`; the live AHE contracts now install globally, read all existing `docs/*.md` files, use lowercase filenames for product/progress/session artifacts, ship independent Plan Mode and fix-plan exporters, support ordered staged product docs, execute saved ship plans through Antigravity with marker-gated cleanup, provide safe git orchestration, publish npm releases from guarded bare-semver tags, separate real publish from local release validation, and keep the installer implementation under `scripts/`.
 
 ## Last Completed Work
 
+- [x] Deleted saved Antigravity ship plans after the required `AHE_PLAN_COMPLETE` marker and verified the formerly failing ship test plus the full pytest suite.
+- [x] Applied the pending repo changes as separated `ahe-git` commits for Antigravity cleanup, install relocation, clone helper relocation, and tracking updates.
 - [x] Moved the real reinstall flow from `install.sh` to `scripts/install.sh`.
 - [x] Left a thin root `install.sh` wrapper in place so existing repo instructions that call `install.sh` keep working without changing `AGENTS.md`.
 - [x] Moved the real npm publish flow into `scripts/deploy.sh`.
@@ -46,7 +48,6 @@
 ## Current Open Questions
 
 - The new GitHub Actions workflow assumes the repository secret is named `NPM_TOKEN`; publish will fail until that secret exists in GitHub.
-- `pytest tests/ -x` currently fails on the pre-existing `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy`, where the temporary plan file still exists after the wrapper reports `AHE_PLAN_COMPLETE`.
 - `mypy src/ --strict` could not run because `mypy` is not installed in this environment.
 - `make check` could not run because this repo has no `check` target.
 - `quick_validate.py .codex/skills/ahe-ship` could not run with system Python because `yaml` is not installed.
@@ -98,7 +99,7 @@
 | Install script relocation | `bash -n install.sh scripts/install.sh`, `bash install.sh --help` | Partial | Syntax is valid and the root wrapper forwards into `scripts/install.sh`; the live run reaches the real uninstall/install flow and then stops on existing privileged filesystem deletes plus `sudo npm install -g .`, which this environment does not permit. |
 | Lint | `ruff check tests/` | Pass | Existing tracked Python test files lint cleanly. |
 | Diff hygiene | `git diff --check` | Pass | No whitespace or patch formatting errors in the workflow/tracking changes. |
-| Full tests | `pytest tests/ -x` | Fail | Pre-existing failure in `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy`; the plan file still exists after `AHE_PLAN_COMPLETE`. |
+| Full tests | `pytest tests/ -x` | Pass | 118 passed after marker-gated Antigravity plan cleanup. |
 | Focused init contract | `pytest tests/test_init_workflow.py -x` | Pass | Confirms no-backup restart wording and summary-based replacement behavior. |
 | Focused hook contract | `pytest tests/test_ahe_hook.py -x` | Pass | Confirms exact `ahe init`, explicit `ahe compress`, and independent `ahe ship` directives match the current contract. |
 | Focused ship contract | `pytest tests/test_ahe_ship_writer.py tests/test_ahe_antigravity_execute.py tests/test_ahe_hook.py -k 'ship or execute' -x` | Pass | 8 passed; confirms writer behavior, wrapper execution, completion-marker cleanup, and direct hook route. |

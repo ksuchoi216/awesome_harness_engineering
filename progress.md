@@ -2,12 +2,13 @@
 
 ## Current Status
 
-**Last Updated:** 2026-07-01 15:32 +0900
-**Session ID:** move-install-script
-**Active Feature:** `feat-068 Move install script into scripts directory`
+**Last Updated:** 2026-07-01 16:56 +0900
+**Session ID:** apply-ahe-git-commit-split
+**Active Feature:** `feat-069 Remove completed Antigravity ship plans`
 
 ## Completed
 
+- [x] Implemented `feat-069 Remove completed Antigravity ship plans` by deleting saved Antigravity ship plans only after `AHE_PLAN_COMPLETE`, then applying the pending work as separated commits through the `ahe-git` workflow.
 - [x] Implemented `feat-068 Move install script into scripts directory` by moving the real installer to `scripts/install.sh` and leaving a root `install.sh` wrapper that forwards to the new path so the existing repo workflow still works.
 - [x] Implemented `feat-067 Split deploy and local validation scripts` by moving the real npm publish flow into `scripts/deploy.sh`, adding `scripts/test.sh` for branch-local validation, and removing the root `deploy.sh`.
 - [x] Implemented `feat-066 Use bare semver release tags for npm publish` by changing the GitHub Actions release trigger from `v*.*.*` tags to bare semver tags like `0.1.8`, and by requiring the pushed tag to exactly match `package.json` without a `v` prefix.
@@ -40,8 +41,8 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-Details: `feat-068 Move install script into scripts directory` is complete.
-Latest: The actual reinstall flow now lives in `scripts/install.sh`, while the root `install.sh` remains a thin compatibility wrapper because `AGENTS.md` still instructs future sessions to run `install.sh`.
+Details: `feat-069 Remove completed Antigravity ship plans` is complete.
+Latest: Antigravity now removes saved ship plans after the completion marker, full pytest passes, and the pending work was committed in separated logical commits.
 Blockers: None.
 
 ## Blocked
@@ -72,6 +73,7 @@ Blockers: None.
 - **Release tags must match package manifests**: The next GitFlow release should use `0.1.8` because the root and workspace `package.json` files now declare `0.1.8`.
 - **Local release validation should never publish**: `scripts/test.sh` is now the local verification entrypoint, while `scripts/deploy.sh` remains the explicit real publish path.
 - **Installer implementation lives under `scripts/`**: `scripts/install.sh` is the real reinstall script; the root `install.sh` only forwards there to preserve the existing documented workflow.
+- **Antigravity plan cleanup is marker-gated**: `packages/ahe-antigravity/bin/ahe-antigravity` removes a saved ship plan only after the exact `AHE_PLAN_COMPLETE` marker appears.
 
 ## Verification
 
@@ -86,15 +88,15 @@ Blockers: None.
 - [x] `python3 -m json.tool feature-list.json`
 - [x] `git diff --check`
 - [x] `bash -n install.sh scripts/install.sh scripts/deploy.sh scripts/test.sh`
-- [x] `bash install.sh --help`
-Details: The root wrapper forwarded into `scripts/install.sh`; the script reached the real uninstall/install flow and then stopped on existing privileged operations (`rm` under `/Users/KC/.codex` and `/Users/KC/.gemini`, then `sudo npm install -g .`) because this environment does not permit them.
 - [x] `bash -n scripts/deploy.sh scripts/test.sh`
 - [ ] `bash scripts/test.sh`
-Details: Stops as designed at the existing `npm test` failure from `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy` before any publish step.
-- [ ] `pytest tests/ -x`
-Details: Fails on the pre-existing `tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy`, where the plan file is not deleted after `AHE_PLAN_COMPLETE`.
+Details: Not rerun in this session because `pytest tests/ -x` now covers the test suite directly and `scripts/test.sh` also performs npm packaging work.
+- [x] `pytest tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy -x`
+- [x] `pytest tests/ -x`
 - [ ] `ruff check src/`
 Details: Not runnable because this repository currently has no `src/` directory.
+- [ ] `mypy src/ --strict`
+Details: Not runnable because `mypy` is not installed in this environment.
 
 ## Change Log
 

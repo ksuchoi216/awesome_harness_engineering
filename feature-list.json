@@ -274,6 +274,16 @@
       ],
       "status": "done",
       "evidence": "Moved the installer implementation into `scripts/install.sh`, replaced the root `install.sh` with a wrapper that forwards to the new path, and kept the existing reinstall contract intact without modifying `AGENTS.md`. Verified with `bash -n install.sh scripts/install.sh`, `python3 -m json.tool feature-list.json`, `git diff --check`, and `bash install.sh --help`, which reached the real uninstall/install flow before stopping on privileged filesystem deletes and `sudo npm install -g .` in this environment."
+    },
+    {
+      "id": "feat-069",
+      "name": "Remove completed Antigravity ship plans",
+      "description": "Delete the saved ship plan after Antigravity reports the required `AHE_PLAN_COMPLETE` marker.",
+      "dependencies": [
+        "feat-056"
+      ],
+      "status": "done",
+      "evidence": "Updated `packages/ahe-antigravity/bin/ahe-antigravity` to remove the plan file only after `AHE_PLAN_COMPLETE`. Verified with `pytest tests/test_ahe_antigravity_ship.py::test_ahe_ship_sends_plan_contents_to_agy -x`, `pytest tests/ -x`, `ruff check tests/`, `bash -n packages/ahe-antigravity/bin/ahe-antigravity`, `./init.sh`, and `git diff --check`. `mypy src/ --strict` is still unavailable because `mypy` is not installed."
     }
   ]
 }
