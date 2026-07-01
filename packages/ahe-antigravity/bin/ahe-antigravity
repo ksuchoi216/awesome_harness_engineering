@@ -115,6 +115,7 @@ ahe_ship_plan() {
 
   case "${combined_output}" in
     *AHE_PLAN_COMPLETE*)
+      rm -f "${plan_path}"
       ;;
     *)
       printf 'agy completed without required marker AHE_PLAN_COMPLETE for %s\n' "${plan_path}" >&2
