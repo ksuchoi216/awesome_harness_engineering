@@ -294,6 +294,17 @@
       ],
       "status": "done",
       "evidence": "Updated the Codex and Antigravity `ahe-git` skill contracts plus `docs/product.md`, and locked the local-ahead dirty behavior in `tests/test_ahe_git_skill_contract.py`. Verified with the red failure from `pytest tests/test_ahe_git_skill_contract.py -x`, then passing `pytest tests/test_ahe_git_skill_contract.py tests/test_ahe_antigravity_git.py -x`, `pytest tests/ -x`, `ruff check tests/`, `python3 -m json.tool feature-list.json`, `git diff --check`, `./init.sh`, shell syntax checks, direct Codex and Antigravity skill reinstalls without npm, installed-skill text inspection, and both package doctor commands."
+    },
+    {
+      "id": "feat-071",
+      "name": "Retire AHE Compression Workflow",
+      "description": "Remove the internal `ahe-compress` skill and the active AHE compression contract so AHE no longer advertises, installs, routes, detects, or tests compression behavior.",
+      "dependencies": [
+        "feat-055",
+        "feat-060"
+      ],
+      "status": "done",
+      "evidence": "Deleted `packages/ahe-codex/.codex/skills/ahe-compress/` and `packages/ahe-codex/.codex/ahe-shared/config.yaml`; updated `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md`, `README.md`, `docs/product.md`, and the affected test suite files to remove compression references and expectations. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check tests/`, `bash -n packages/ahe-codex/bin/ahe-codex`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, `./bin/ahe install --force`, and `./bin/ahe doctor`. `bash scripts/install.sh` reached the documented global reinstall flow but stopped at the host sudo password prompt for `npm install -g .`."
     }
   ]
 }

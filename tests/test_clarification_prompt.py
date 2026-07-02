@@ -10,7 +10,6 @@ SKILL_MD_PATHS = (
 )
 CONVERSATION_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-converse/SKILL.md"
 THINKING_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-think/SKILL.md"
-COMPRESSION_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-compress/SKILL.md"
 REVIEWER_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-review/SKILL.md"
 SOLVER_SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-solve/SKILL.md"
 SKILL_MD_PATH = REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md"
@@ -88,24 +87,9 @@ def test_ahe_thinking_defines_internal_orchestration_protocol() -> None:
     assert "project" in content.lower()
     assert "feature" in content.lower()
     assert "ahe-converse" in content
-    assert "ahe-compress" in content
     assert "ahe-review" in content
     assert "ahe-harness" in content
     assert "ahe-solve" in content
-
-
-def test_ahe_compression_defines_internal_protocol() -> None:
-    content = COMPRESSION_SKILL_MD_PATH.read_text(encoding="utf-8")
-
-    assert "name: ahe-compress" in content
-    assert "internal" in content.lower()
-    assert "not a user-facing command" in content.lower()
-    assert "check-harness-size.sh" in content
-    assert "AGENTS.md" in content
-    assert "docs/product.md" in content
-    assert "feature-list.json" in content
-    assert "COMPRESSION_REQUIRED" in content
-    assert "valid JSON" in content
 
 
 def test_ahe_conversation_and_thinking_split_responsibilities() -> None:
@@ -199,6 +183,5 @@ if __name__ == "__main__":
     test_skill_md_contains_representative_skill_specific_rules()
     test_ahe_conversation_defines_internal_protocol()
     test_ahe_thinking_defines_internal_orchestration_protocol()
-    test_ahe_compression_defines_internal_protocol()
     test_ahe_conversation_and_thinking_split_responsibilities()
     print("test_clarification_prompt.py passed!")

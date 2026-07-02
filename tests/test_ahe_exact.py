@@ -106,7 +106,7 @@ def test_exact_ahe_routes_to_specialized_skills_based_on_need() -> None:
     ctx = additional_context("ahe")
     assert "Call `ahe-review` when repo or code understanding is needed" in ctx
     assert "Call `ahe-converse` when the next safe step is blocked on user input" in ctx
-    assert "Call `ahe-harness` when product docs, instructions, tracking, todo sync, or compression-aware harness maintenance must change" in ctx
+    assert "Call `ahe-harness` when product docs, instructions, tracking, or todo sync must change" in ctx
     assert "Call `ahe-solve` when the next job is solving or planning a feature" in ctx
 
     # Check the thinker's exact same routing rules

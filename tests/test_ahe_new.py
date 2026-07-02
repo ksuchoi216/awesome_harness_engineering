@@ -237,17 +237,6 @@ def test_ahe_new_with_conflict_asks_intention() -> None:
     assert "Do not remove, overwrite, or refresh existing harness files before the user answers" in ctx
 
 
-def test_harness_files_reach_limit_triggers_compression() -> None:
-    """When harness files are oversized, compress is triggered."""
-    thinker = THINKER_SKILL_MD_PATH.read_text(encoding="utf-8")
-    ctx = additional_context("ahe")
-
-    assert "check-harness-size.sh" in thinker
-    assert "COMPRESSION_REQUIRED" in thinker
-    assert "ahe-compress" in thinker
-    assert "ahe-compress" in ctx
-
-
 def test_all_done_then_ahe_new_creates_new_feature_list() -> None:
     """When all done and user calls ahe-new, check completion then handle."""
     harness = HARNESS_SKILL_MD_PATH.read_text(encoding="utf-8")

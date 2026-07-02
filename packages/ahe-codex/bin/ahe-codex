@@ -24,7 +24,6 @@ readonly AHE_CONFIG_BLOCK_START="# BEGIN AHE MANAGED CONFIG"
 readonly AHE_CONFIG_BLOCK_END="# END AHE MANAGED CONFIG"
 readonly MANAGED_SKILLS=(
   "ahe"
-  "ahe-compress"
   "ahe-converse"
   "ahe-feature"
   "ahe-fix"
@@ -253,7 +252,7 @@ Next:
 3. Use exact \`ahe\` to continue existing harness work.
 4. Use \`ahe ship\` after Plan Mode to write the latest plan to .plans.
 5. Use \`ahe fix\` to create a .plans fix plan for errors or changed intent.
-6. Use \`ahe <query>\` for explicit AHE requests such as \`ahe compress\`.
+6. Use \`ahe <query>\` for explicit AHE requests such as \`ahe update product spec\`.
 EOF
 }
 
@@ -277,11 +276,6 @@ doctor() {
       errors=$((errors + 1))
     fi
   done
-
-  if [ ! -f "${target_shared_dir}/config.yaml" ]; then
-    printf 'Missing: %s/config.yaml\n' "${target_shared_dir}" >&2
-    errors=$((errors + 1))
-  fi
 
   if [ ! -d "${target_shared_dir}/templates" ]; then
     printf 'Missing: %s/templates\n' "${target_shared_dir}" >&2

@@ -3,11 +3,15 @@
 ## Current Product Context
 
 - Goal: Keep AHE's Codex-facing harness workflow compact, explicit, and cheap to resume in chat.
-- Current status: `feat-069 Remove completed Antigravity ship plans` is complete.
+- Current status: `feat-071 Retire AHE Compression Workflow` is complete.
 - Branch / commit: `develop`; the live AHE contracts now install globally, read all existing `docs/*.md` files, use lowercase filenames for product/progress/session artifacts, ship independent Plan Mode and fix-plan exporters, support ordered staged product docs, execute saved ship plans through Antigravity with marker-gated cleanup, provide safe git orchestration, publish npm releases from guarded bare-semver tags, separate real publish from local release validation, and keep the installer implementation under `scripts/`.
 
 ## Last Completed Work
 
+- [x] Deleted `packages/ahe-codex/.codex/skills/ahe-compress/` and removed the active compression workflow from the Codex installer allowlist, hook prompt, thinker contract, harness contract, README, and `docs/product.md`.
+- [x] Deleted `tests/test_compression_workflow.py` and `tests/test_compress_detector.py`, then updated the surrounding contract tests to assert that AHE no longer exposes compression behavior.
+- [x] Verified the retired compression contract with `./init.sh`, `pytest tests/ -x`, `ruff check tests/`, `bash -n packages/ahe-codex/bin/ahe-codex`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, `./bin/ahe install --force`, and `./bin/ahe doctor`.
+- [x] Tried the documented reinstall path via `bash scripts/install.sh`; it reached `sudo npm install -g .` and stopped on the host password prompt, so the global skills were restored with `./bin/ahe install --force`.
 - [x] Deleted saved Antigravity ship plans after the required `AHE_PLAN_COMPLETE` marker and verified the formerly failing ship test plus the full pytest suite.
 - [x] Applied the pending repo changes as separated `ahe-git` commits for Antigravity cleanup, install relocation, clone helper relocation, and tracking updates.
 - [x] Moved the real reinstall flow from `install.sh` to `scripts/install.sh`.
@@ -47,6 +51,7 @@
 
 ## Current Open Questions
 
+- The documented global reinstall path still depends on `sudo npm install -g .`; on this machine it stops for an interactive password prompt, so unattended reinstall remains blocked unless sudo is available.
 - The new GitHub Actions workflow assumes the repository secret is named `NPM_TOKEN`; publish will fail until that secret exists in GitHub.
 - `mypy src/ --strict` could not run because `mypy` is not installed in this environment.
 - `make check` could not run because this repo has no `check` target.
@@ -56,20 +61,18 @@
 ## Important Files
 
 - `.github/workflows/publish.yml` - Publishes `@ksuchoi216/ahe` when a bare semver tag push like `0.1.8` matches `package.json` and points to a commit reachable from `master`.
-- `docs/product.md` - Canonical product and workflow contract for global AHE installation plus no-backup restart/compression behavior.
+- `docs/product.md` - Canonical product and workflow contract for global AHE installation and the current non-compression AHE surface.
 - `scripts/install.sh` - Real reinstall script for globally uninstalling, npm-installing, and re-installing the Codex and Antigravity skills.
-- `install.sh` - Thin compatibility wrapper that forwards to `scripts/install.sh` because `AGENTS.md` still instructs future sessions to run `install.sh`.
 - `scripts/deploy.sh` - Explicit real publish script that still performs npm login checks, optional branch switching, dry-run pack, and `npm publish`.
 - `scripts/test.sh` - Local release validation script that runs `npm test` and `npm pack --dry-run` on the current branch without publishing.
 - `bin/ahe` - Installer, doctor, and uninstaller now target the global Codex home.
 - `AGENTS.md` - Startup workflow now tells Codex to read all existing `docs/*.md` files, especially product-style docs.
 - `.codex/skills/ahe-init/SKILL.md` - Restart-scope workflow; now replaces in-scope harness files without creating backup copies and reads all docs context.
-- `.codex/skills/ahe-harness/SKILL.md` - Harness maintenance contract; now summarizes old completed feature history into one done feature and reads all docs context.
+- `.codex/skills/ahe-harness/SKILL.md` - Harness maintenance contract for product, instructions, tracker, and todo sync without compression routing.
 - `.codex/skills/ahe-review/SKILL.md` - Review scope now checks all existing `docs/*.md` files when reviewing harness state.
-- `.codex/skills/ahe-think/SKILL.md`, `.codex/skills/ahe-solve/SKILL.md` - Active product-stage selection and feature-solving contract.
+- `.codex/skills/ahe-think/SKILL.md`, `.codex/skills/ahe-solve/SKILL.md` - Active product-stage selection and feature-solving contract without compression preflight.
 - `.codex/ahe-shared/templates/product.md`, `.codex/ahe-shared/templates/progress.md`, `.codex/ahe-shared/templates/session-handoff.md` - Shared templates now match the lowercase filename contract.
-- `.codex/skills/ahe-compress/SKILL.md` and `.codex/skills/ahe-compress/scripts/check-harness-size.sh` - Compression protocol and detector now include numbered product stage docs.
-- `.codex/hooks/ahe-hook.js` - Exact `ahe init` plus explicit `ahe compress` directive text for the current compression behavior.
+- `.codex/hooks/ahe-hook.js` - Exact `ahe`/`ahe new`/`ahe ship`/`ahe fix`/`ahe git` routing guidance without compression directives.
 - `packages/ahe-codex/.codex/skills/ship/SKILL.md` - Codex-side ship workflow that now writes a plan and runs `ahe-antigravity execute`.
 - `packages/ahe-codex/.codex/skills/ship/scripts/write_plan.py` - Deterministic `.plans/{plan_name}.md` writer with sanitization, overwrite protection, and Python parser compatibility beyond Python 3.11.
 - `packages/ahe-antigravity/bin/ahe-antigravity` - Antigravity wrapper with the new `execute` command for stdin-driven `agy` execution and verified cleanup.
@@ -78,21 +81,29 @@
 - `packages/ahe-codex/.codex/skills/fix/SKILL.md` - Independent user-facing fix-plan workflow for errors or changed intent.
 - `packages/ahe-codex/.codex/skills/fix/scripts/write_fix_plan.py` - Deterministic `.plans/{plan_name}.md` fix-plan writer with sanitization and overwrite protection.
 - `feature-list.json`, `progress.md`, `session-handoff.md` - Compressed live tracking artifacts that keep current state concise.
-- `tests/test_init_workflow.py`, `tests/test_ahe_hook.py`, `tests/test_compression_workflow.py`, `tests/test_ahe_ship_writer.py` - Contract coverage for the restart, compression, hook routing, and plan export rules.
+- `tests/test_init_workflow.py`, `tests/test_ahe_hook.py`, `tests/test_ahe_ship_writer.py`, `tests/test_project_setup.py`, `tests/test_command_set.py` - Contract coverage for restart, hook routing, plan export, installer setup, and the removed compression surface.
 
 ## Next Recommended Action
 
 1. Read `AGENTS.md`.
 2. Read `feature-list.json` and `progress.md`.
 3. Run `./init.sh`.
-4. Add the `NPM_TOKEN` repository secret in GitHub before relying on the new publish workflow.
-5. Create or push future release tags in `<package.json version>` format from `master` so the publish workflow accepts them.
-6. Use `scripts/test.sh` for local release validation, reserve `scripts/deploy.sh` for intentional real npm publishing, and use `scripts/install.sh` for the real reinstall flow.
+4. If you need to refresh the global skills again on this machine, prefer `./bin/ahe install --force` unless you are ready to enter the sudo password for `scripts/install.sh`.
+5. Add the `NPM_TOKEN` repository secret in GitHub before relying on the new publish workflow.
+6. Create or push future release tags in `<package.json version>` format from `master` so the publish workflow accepts them.
 
 ## Verification Status
 
 | Check | Command | Result | Notes |
 |---|---|---|---|
+| Compression retirement full suite | `pytest tests/ -x` | Pass | 106 passed after removing the compression skill, detectors, and compression-only tests. |
+| Compression retirement lint | `ruff check tests/` | Pass | Updated Python test suite remains clean after deleting compression-only coverage. |
+| Compression retirement shell syntax | `bash -n packages/ahe-codex/bin/ahe-codex` | Pass | Installer script parses cleanly after removing `ahe-compress` and `config.yaml` requirements. |
+| Compression retirement hook syntax | `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js` | Pass | Hook parses cleanly after removing compression guidance. |
+| Compression retirement init sanity | `./init.sh` | Pass | Startup check still reports the expected Python-default environment guidance. |
+| Direct global reinstall | `./bin/ahe install --force` | Pass | Restored both Codex and Antigravity skills directly from the checked-out repo after the sudo-blocked installer attempt. |
+| Direct global doctor | `./bin/ahe doctor` | Pass | Both global skill installations report healthy after direct reinstall. |
+| Scripted global reinstall | `bash scripts/install.sh` | Partial | Reached `sudo npm install -g .` and stopped at the host password prompt; no noninteractive sudo path was available. |
 | Init sanity | `./init.sh` | Pass | Startup check still reports the expected Python-default environment guidance. |
 | Remote tag replacement | `git push origin :refs/tags/v0.1.1`, `git push origin v0.1.7`, `git ls-remote --tags origin 'v0.1.*'` | Pass | Confirmed `origin` no longer has `v0.1.1` and now exposes only `v0.1.7` for the current release tag. |
 | Publish workflow inspection | `sed -n '1,220p' .github/workflows/publish.yml` | Pass | Workflow now triggers on bare semver tags like `0.1.8`, checks `master` containment, enforces tag/package parity, installs `pytest`, and publishes with `NPM_TOKEN`. |

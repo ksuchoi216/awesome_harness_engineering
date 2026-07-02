@@ -44,7 +44,6 @@ def test_skill_files_match_expected_command_names() -> None:
         "ahe-converse",
         "ahe-harness",
         "ahe-solve",
-        "ahe-compress",
     ):
         content = (
             REPO_ROOT / f"packages/ahe-codex/.codex/skills/{skill_name}/SKILL.md"

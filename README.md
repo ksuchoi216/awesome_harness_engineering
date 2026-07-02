@@ -4,8 +4,8 @@ AHE installs global Codex and Antigravity skills that manage harness files throu
 public entrypoints stay small: use `ahe new` to start or reset harness work,
 `ahe` to continue existing work, `ahe ship` to save the latest plan (in Codex) or refresh and execute a saved plan (in Antigravity),
 `ahe fix` to create a `.plans` fix plan, and
-`ahe <query>` or `<query> ahe` for explicit AHE requests such as `ahe compress`
-or `compress ahe`. For a detailed in-chat explanation of the AHE architecture and workflows, use `ahe-overview`.
+`ahe <query>` or `<query> ahe` for explicit AHE requests such as `ahe update product spec`.
+For a detailed in-chat explanation of the AHE architecture and workflows, use `ahe-overview`.
 
 ## Core Command Workflows
 
@@ -40,11 +40,10 @@ Here are intuitive flow examples for the primary AHE commands. While `ahe`, `ahe
 | `ahe-think` | Centered internal router that judges what is missing and chooses the next agent. |
 | `ahe-review` | Review agent for repo code, harness state, and CodeGraph context. |
 | `ahe-converse` | Clarification agent for recursive user conversation. |
-| `ahe-harness` | Harness-management agent for product docs, instructions, feature tracking, todo sync, and compression-aware maintenance. |
+| `ahe-harness` | Harness-management agent for product docs, instructions, feature tracking, and todo sync. |
 | `ahe-feature` | Internal helper for deriving feature-list entries from product context. |
 | `ahe-fix` | Independent fix planner that writes `.plans/{plan_name}.md` for errors or changed user intent. |
 | `ahe-solve` | Feature-solving agent that divides and plans implementation work. |
-| `ahe-compress` | Internal helper that detects oversized harness files before broad reads. |
 | `ahe-overview` | Explains the AHE concept, entrypoints, and main workflows in chat with Mermaid diagrams. |
 | `ahe-ship` | In Codex: saves Plan Mode plan to `.plans/`. In Antigravity: refreshes and executes exactly one plan from `.plans/`. |
 
@@ -72,8 +71,6 @@ The Codex-side model is centered but flexible:
 - `ahe fix`
 - `ahe fix stale tests`
 - `stale tests ahe fix`
-- `ahe compress`
-- `compress ahe`
 - `ahe update product spec`
 - `ahe add dashboard export feature`
 

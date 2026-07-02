@@ -26,8 +26,6 @@ REQUIRED_SKILL_FILES = (
     Path("packages/ahe-codex/.codex/skills/ahe-git/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-ship/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-ship/scripts/write_plan.py"),
-    Path("packages/ahe-codex/.codex/skills/ahe-compress/SKILL.md"),
-    Path("packages/ahe-codex/.codex/ahe-shared/config.yaml"),
     Path("packages/ahe-codex/.codex/ahe-shared/templates/AGENTS.md"),
     Path("packages/ahe-codex/.codex/ahe-shared/templates/product.md"),
     Path("packages/ahe-codex/.codex/ahe-shared/templates/INSTRUCTIONS.md"),

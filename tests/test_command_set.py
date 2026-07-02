@@ -13,7 +13,6 @@ def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
     expected_skill_names = sorted(
         [
             "ahe",
-            "ahe-compress",
             "ahe-converse",
             "ahe-feature",
             "ahe-fix",
@@ -65,7 +64,6 @@ def test_public_command_skills_are_user_facing_commands() -> None:
     assert "independent" in git_content.lower()
 
     internal_skill_names = (
-        "ahe-compress",
         "ahe-converse",
         "ahe-harness",
         "ahe-harness-checker",

@@ -27,21 +27,6 @@ Use it as the central decision layer for AHE work.
 - `ahe <query>` and `<query> ahe` mean route the query through `ahe-think`.
 - Broad non-prefixed prompts must not activate AHE.
 
-## Size and Stale-Test Preflight
-
-- Before reading full harness files, run
-  `sh .codex/skills/ahe-compress/scripts/check-harness-size.sh`.
-- Run the test-overlap detector `python .codex/skills/ahe-compress/scripts/detect_stale_tests.py`
-  when the user's explicit AHE query is compression-oriented (e.g., `ahe compress`).
-- Run both compression detectors before choosing the next compression step.
-- If either detector exits with `COMPRESSION_REQUIRED` or code `2`, call
-  `ahe-compress` before normal routing. However, `ahe-compress` must not delete tests directly;
-  for test compression, `ahe-think` must decide whether the next step is `ahe-harness` for
-  harness-file compaction, `ahe-review` for stale-test confirmation and keeper selection,
-  or both in sequence.
-- Do not read oversized harness files wholesale before compression routing is
-  settled.
-
 ## Startup Contract
 
 - Check whether the copied harness files are correct before reading their contents.
@@ -66,8 +51,8 @@ Use it as the central decision layer for AHE work.
 - If the need is understanding repo code, harness drift, progress evidence, or
   CodeGraph context, call `ahe-review`.
 - If the need is user clarification, call `ahe-converse`.
-- If the need is updating harness artifacts, product docs, feature tracking,
-  todo sync, or compression of completed history, call `ahe-harness`.
+- If the need is updating harness artifacts, product docs, feature tracking, or
+  todo sync, call `ahe-harness`.
 - If the need is solving or decomposing feature work, call `ahe-solve`.
 
 ## Interaction Model

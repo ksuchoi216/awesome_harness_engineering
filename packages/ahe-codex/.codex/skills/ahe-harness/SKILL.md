@@ -1,6 +1,6 @@
 ---
 name: ahe-harness
-description: Internal AHE harness workflow for managing product docs, instructions, feature tracking, session artifacts, todo sync, and compression-aware maintenance.
+description: Internal AHE harness workflow for managing product docs, instructions, feature tracking, session artifacts, and todo sync.
 ---
 
 # AHE Harness
@@ -9,7 +9,7 @@ This is an internal AHE workflow skill, not a user-facing command.
 
 Do not treat `$ahe-harness` as a user command.
 Use it when `ahe-think` or another worker decides that harness artifacts must
-be created, updated, reconciled, or compressed. It remains responsible for tracker compression, while test-suite cleanup is routed by `ahe-think` through `ahe-review` first and then `ahe-solve` or `ahe-harness` as needed.
+be created, updated, or reconciled.
 
 ## Command Workflow: harness
 
@@ -54,12 +54,6 @@ be created, updated, reconciled, or compressed. It remains responsible for track
 - Update `feature-list.json` to derive the specific feature items from the updated `docs/product.md`.
 - Update `progress.md`.
 - Update `session-handoff.md`.
-- For `ahe compress`, if the harness-size detector signals compression pressure, replace old completed feature entries with one summarized done feature.
-- Keep the summarized feature valid for the existing schema by preserving its
-  own `id`, `name`, `description`, `dependencies`, `status`, and short
-  evidence.
-- Preserve unfinished, blocked, or active feature items in full detail.
-- Reconcile `feature-list.json` against `docs/product.md` after compression.
 - If no new feature can be derived from `docs/product.md`, call `ahe-converse` to ask what next feature, product direction, or goal should be tracked.
 - If a numbered product stage is active and no new feature can be derived from
   that active product stage, call `ahe-converse` with the same clarification
@@ -70,7 +64,6 @@ be created, updated, reconciled, or compressed. It remains responsible for track
 ### Harness Completion
 
 - Keep `feature-list.json` valid JSON.
-- Do not create backup copies when compressing harness history.
 - Keep `progress.md` focused on current work, decisions that still matter,
   blockers, and recent verification evidence.
 - Keep `session-handoff.md` focused on the next-session startup path.

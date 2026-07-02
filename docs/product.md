@@ -23,8 +23,8 @@ User-facing chat commands:
 - exact `$ahe-git`
 - `ahe fix <query>`
 - `<query> ahe fix`
-- `ahe <query>` (e.g. `ahe compress`)
-- `<query> ahe` (e.g. `compress ahe`)
+- `ahe <query>` (e.g. `ahe update product spec`)
+- `<query> ahe` (e.g. `update product spec ahe`)
 
 Internal workflow skills:
 
@@ -33,7 +33,6 @@ Internal workflow skills:
 - `ahe-converse`
 - `ahe-harness`
 - `ahe-solve`
-- `ahe-compress`
 - `ahe-harness-checker`
 
 The independent user-facing exporter is `ahe-ship`. It detects if the current
@@ -64,7 +63,7 @@ The project uses an internal `packages/` workspace layout, separating `ahe-codex
 The global Codex installation (`ahe-codex`) contains:
 
 - skills: `ahe`, `ahe-new`, `ahe-think`, `ahe-review`, `ahe-converse`,
-  `ahe-harness`, `ahe-feature`, `ahe-fix`, `ahe-git`, `ahe-solve`, `ahe-ship`, `ahe-compress`, and `ahe-harness-checker`
+  `ahe-harness`, `ahe-feature`, `ahe-fix`, `ahe-git`, `ahe-solve`, `ahe-ship`, and `ahe-harness-checker`
 - shared templates: `AGENTS.md`, `product.md`, `progress.md`,
   `session-handoff.md`, `init.sh`, and `feature-list.json`
 - schemas: `process_status.schema.json` and `feature-list-schema.json`
@@ -127,10 +126,6 @@ The Codex-side model is:
 - Apply queued `docs/todo.md` content into the active product source, then
   update `feature-list.json`, `progress.md`, `session-handoff.md`, and
   `status.json`.
-- For `ahe compress`, run both the harness-size detector and the stale-test detector.
-- If the harness-size detector signals compression pressure, replace old
-  completed feature entries with one summarized done feature and preserve
-  unfinished, blocked, or active items in detail.
 - If no new feature can be derived from `docs/product.md`, call
   `ahe-converse` to ask what next feature, product direction, or goal should
   be tracked.
@@ -139,8 +134,6 @@ The Codex-side model is:
 
 - Inspect the current unit as `project`, `feature`, or `sub-feature`.
 - Judge the current unit against `Why`, `What`, and `How`.
-- Use `ahe-compress` before reading full harness files when the detector
-  returns `COMPRESSION_REQUIRED`.
 - Route to `ahe-review`, `ahe-converse`, `ahe-harness`, or `ahe-solve`
   based on the missing need.
 
@@ -152,13 +145,6 @@ The Codex-side model is:
   conversation state.
 - `ahe-solve` divides broad feature work and plans each smaller problem before
   implementation.
-- `ahe-compress` detects oversized harness files and stale overlapping tests. It compacts stale history
-  while preserving active requirements, current decisions, unfinished work,
-  blockers, dependencies, required headers, and valid JSON.
-  Detector markers:
-  - `TEST_COMPRESSION_REQUIRED`
-  - `REVIEW_TEST\t<legacy-file>\tcovered_by=<keeper-files>`
-
 ### `ahe-ship`
 
 - Detect if the current conversation is still in Plan Mode.
