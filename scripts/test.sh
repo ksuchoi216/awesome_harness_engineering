@@ -21,7 +21,20 @@ fi
 echo "Version ${PACKAGE_VERSION} is available."
 echo "---"
 echo "Running package tests..."
-npm test
+if command -v docker >/dev/null 2>&1; then
+    echo "🐳 Docker detected. Running tests in an isolated CI-like container to prevent environment mismatch..."
+    docker run --rm -v "$PWD:/app" -w /app python:3.11-slim bash -c "
+        apt-get update -qq && apt-get install -y -qq nodejs npm && \\
+        pip install -q pytest && \\
+        npm test
+    " || {
+        echo "❌ Tests failed in CI-like container environment!"
+        exit 1
+    }
+else
+    echo "⚠️ Docker not found. Running tests locally (Warning: this might not catch CI-specific environment issues)..."
+    npm test
+fi
 echo "---"
 echo "Running dry-run pack to verify contents..."
 npm pack --dry-run
