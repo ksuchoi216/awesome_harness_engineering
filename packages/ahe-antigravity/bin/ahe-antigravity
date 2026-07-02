@@ -66,9 +66,7 @@ resolve_plan_path() {
     exit 1
   fi
 
-  local plan_dir
-  plan_dir="$(CDPATH= cd -- "$(dirname -- "${plan_path}")" && pwd)"
-  printf '%s/%s\n' "${plan_dir}" "$(basename -- "${plan_path}")"
+  printf '%s\n' "${plan_path}"
 }
 
 read_plan_markdown() {
