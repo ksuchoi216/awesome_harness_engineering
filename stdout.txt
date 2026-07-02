@@ -1,8 +1,0 @@
-Reconcile this saved AHE plan against the current repository state.
-Overwrite the original .plans/ file with the refreshed plan, then execute the refreshed plan exactly.
-
-# Saved Plan
-# Example Plan
-
-When every requirement is fully complete and verified, print the exact line AHE_PLAN_COMPLETE.
-AHE_PLAN_COMPLETE
