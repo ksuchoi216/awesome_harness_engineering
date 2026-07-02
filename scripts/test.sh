@@ -7,6 +7,18 @@ cd "${REPO_ROOT}"
 
 echo "Starting local npm release validation..."
 echo "Current branch: $(git rev-parse --abbrev-ref HEAD)"
+
+PACKAGE_NAME=$(node -p "require('./package.json').name")
+PACKAGE_VERSION=$(node -p "require('./package.json').version")
+
+echo "---"
+echo "Checking if ${PACKAGE_NAME}@${PACKAGE_VERSION} already exists on npm..."
+if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version >/dev/null 2>&1; then
+    echo "Error: Version ${PACKAGE_VERSION} of ${PACKAGE_NAME} already exists on npm registry!"
+    echo "Please bump the version in package.json before proceeding."
+    exit 1
+fi
+echo "Version ${PACKAGE_VERSION} is available."
 echo "---"
 echo "Running package tests..."
 npm test
