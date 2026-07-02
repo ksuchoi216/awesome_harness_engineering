@@ -13,7 +13,8 @@ You interact with AHE using the following user-facing commands:
 - **`ahe` / `ahe <query>`**: Automatically inspects the harness state and routes to the correct next step. For example: `ahe`, `ahe update product spec`, or `ahe compress`.
 - **`ahe new` / `ahe-new`**: Starts the initialization or reset flow for a workspace.
 - **`ahe fix` / `ahe fix <query>`**: Starts fix planning when an error occurs or user intent shifts, skipping normal continuation. For example: `ahe fix stale tests`.
-- **`ahe ship`**: Writes out the latest Plan Mode plan into `.plans/{plan_name}.md` without automatically executing it.
+- **`ahe ship`**: In Codex, saves the latest Plan Mode plan into `.plans/{plan_name}.md` without automatically executing it. In Antigravity, refreshes and executes exactly one plan from `.plans/`.
+- **`ahe-git`**: In Antigravity, safely pulls and commits all nested repositories.
 
 ## Thinker-Centered Routing Model
 
@@ -65,7 +66,9 @@ graph TD;
     Clarify -- Yes --> Write[Write Fix Plan]
 ```
 
-### 4. `ahe ship` (Export Plan)
+### 4. `ahe ship` (Export / Execute Plan)
+
+**In Codex (Export):**
 ```mermaid
 graph TD;
     User[User: ahe ship] --> Hook[ahe-hook.js]
@@ -73,3 +76,44 @@ graph TD;
     Think --> Ship[ahe-ship]
     Ship --> Write[Write .plans/*.md]
 ```
+
+**In Antigravity (Execute):**
+```mermaid
+graph TD;
+    User[User: ahe-ship] --> Antigravity
+    Antigravity --> ShipSkill[ahe-ship skill]
+    ShipSkill --> Read[Read .plans/*.md]
+    Read --> Execute[Execute Plan]
+```
+
+### 5. `ahe-git` (Repository Sync)
+
+**In Antigravity:**
+```mermaid
+graph TD;
+    User[User: ahe-git] --> Antigravity
+    Antigravity --> GitSkill[ahe-git skill]
+    GitSkill --> Pull[Pull Remote]
+    Pull --> Commit[Commit Local Changes]
+```
+
+## Example of How to Use
+
+### Harness Engineering
+1. `ahe new`
+(initialize the workspace)
+2. `ahe update product spec`
+(update product documentation)
+3. `ahe add dashboard export feature`
+(implement a specific feature)
+
+### ahe-ship in Codex and Antigravity
+after planning in codex
+1. `ahe-ship` in codex
+(save the plan to .plans)
+2. `ahe-ship` in antigravity
+(implement one of plans in .plans)
+
+### ahe-git
+1. `ahe-git` in antigravity
+(safely pull and commit all nested repositories)

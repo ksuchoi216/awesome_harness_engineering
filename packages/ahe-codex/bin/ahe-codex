@@ -19,6 +19,7 @@ readonly PACKAGE_ROOT="$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)"
 readonly SOURCE_SKILLS_DIR="${PACKAGE_ROOT}/.codex/skills"
 readonly SOURCE_SHARED_DIR="${PACKAGE_ROOT}/.codex/ahe-shared"
 readonly SOURCE_HOOKS_DIR="${PACKAGE_ROOT}/.codex/hooks"
+readonly SOURCE_AGENTS_DIR="${PACKAGE_ROOT}/.codex/agents"
 readonly AHE_CONFIG_BLOCK_START="# BEGIN AHE MANAGED CONFIG"
 readonly AHE_CONFIG_BLOCK_END="# END AHE MANAGED CONFIG"
 readonly MANAGED_SKILLS=(
@@ -147,6 +148,7 @@ install_skill() {
   local target_skills_dir="${target_codex_home}/skills"
   local target_shared_dir="${target_codex_home}/ahe-shared"
   local target_hooks_dir="${target_codex_home}/hooks"
+  local target_agents_dir="${target_codex_home}/agents"
   local target_config_path="${target_codex_home}/config.toml"
   local backup_dir="${target_codex_home}/_backups"
   local skill_name=""
@@ -212,6 +214,15 @@ EOF
   done
   cp -R "${SOURCE_SHARED_DIR}" "${target_shared_dir}"
   cp -R "${SOURCE_HOOKS_DIR}" "${target_hooks_dir}"
+  mkdir -p "${target_agents_dir}"
+  cp -R "${SOURCE_AGENTS_DIR}"/* "${target_agents_dir}/"
+
+  cat <<EOF >> "${target_config_path}"
+${AHE_CONFIG_BLOCK_START}
+[agents.ahe-harness-manager]
+config_file = "${target_agents_dir}/ahe-harness-manager.toml"
+${AHE_CONFIG_BLOCK_END}
+EOF
   cat > "${target_hooks_dir}/hooks.json" <<EOF
 {
   "hooks": {
@@ -255,6 +266,8 @@ doctor() {
   local target_skills_dir="${target_codex_home}/skills"
   local target_shared_dir="${target_codex_home}/ahe-shared"
   local target_hooks_dir="${target_codex_home}/hooks"
+  local target_agents_dir="${target_codex_home}/agents"
+  local target_config_path="${target_codex_home}/config.toml"
   local skill_name=""
   local errors=0
 
@@ -305,6 +318,16 @@ doctor() {
     errors=$((errors + 1))
   fi
 
+  if [ ! -f "${target_agents_dir}/ahe-harness-manager.toml" ]; then
+    printf 'Missing: %s/ahe-harness-manager.toml\n' "${target_agents_dir}" >&2
+    errors=$((errors + 1))
+  fi
+
+  if ! grep -q '\[agents\.ahe-harness-manager\]' "${target_config_path}" 2>/dev/null; then
+    printf 'Missing: [agents.ahe-harness-manager] in %s\n' "${target_config_path}" >&2
+    errors=$((errors + 1))
+  fi
+
   if [ "${errors}" -gt 0 ]; then
     printf 'AHE Codex skill installation is unhealthy (%d errors).\n' "${errors}" >&2
     exit 1
@@ -320,6 +343,7 @@ uninstall_skill() {
   local target_skills_dir="${target_codex_home}/skills"
   local target_shared_dir="${target_codex_home}/ahe-shared"
   local target_hooks_dir="${target_codex_home}/hooks"
+  local target_agents_dir="${target_codex_home}/agents"
   local target_config_path="${target_codex_home}/config.toml"
   local skill_name=""
 
@@ -331,6 +355,7 @@ uninstall_skill() {
 
   rm -rf "${target_shared_dir}"
   rm -rf "${target_hooks_dir}"
+  rm -f "${target_agents_dir}/ahe-harness-manager.toml"
   cleanup_ahe_config_entries "${target_config_path}"
 
   echo "AHE skills uninstalled successfully."

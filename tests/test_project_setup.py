@@ -39,6 +39,7 @@ REQUIRED_SKILL_FILES = (
     Path("packages/ahe-codex/.codex/ahe-shared/schemas/feature-list-schema.json"),
     Path("packages/ahe-codex/.codex/hooks/hooks.json"),
     Path("packages/ahe-codex/.codex/hooks/ahe-hook.js"),
+    Path("packages/ahe-codex/.codex/agents/ahe-harness-manager.toml"),
     Path("packages/ahe-antigravity/skills/ahe-ship/SKILL.md"),
     Path("packages/ahe-antigravity/skills/ahe-git/SKILL.md"),
     Path("packages/ahe-antigravity/bin/ahe-antigravity"),
@@ -134,6 +135,9 @@ def test_installer_copies_skill_files_into_global_codex_home(tmp_path: Path) -> 
     assert (codex_home / "ahe-shared/templates/AGENTS.md").exists()
     assert (codex_home / "hooks/hooks.json").exists()
     assert (codex_home / "hooks/ahe-hook.js").exists()
+    assert (codex_home / "agents/ahe-harness-manager.toml").exists()
+    config_content = (codex_home / "config.toml").read_text(encoding="utf-8")
+    assert "[agents.ahe-harness-manager]" in config_content
     assert not (workspace_root / ".codex/skills/ahe-new/SKILL.md").exists()
 
 
@@ -191,7 +195,7 @@ def test_installer_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
     config_content = config_path.read_text(encoding="utf-8")
     assert "ahe-next-step-reviewer" not in config_content
     assert "ahe:hooks/hooks.json" not in config_content
-    assert "AHE MANAGED CONFIG" not in config_content
+    assert "ahe@local" not in config_content
     assert "[agents.explorer]" in config_content
     assert "omo@sisyphuslabs" in config_content
 
@@ -245,6 +249,7 @@ def test_uninstaller_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
     assert not (codex_home / "skills/ahe-new").exists()
     assert not (codex_home / "ahe-shared").exists()
     assert not (codex_home / "hooks").exists()
+    assert not (codex_home / "agents/ahe-harness-manager.toml").exists()
 
 
 def test_installer_supports_local_npx_package_flow(tmp_path: Path) -> None:

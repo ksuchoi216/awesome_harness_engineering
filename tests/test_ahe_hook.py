@@ -67,6 +67,7 @@ def test_exact_ahe_prompt_emits_auto_operation_context() -> None:
     assert "ask the user" in additional_context
     assert "ahe-new" in additional_context
     assert "ahe-think" in additional_context
+    assert "@ahe-harness-manager" in additional_context
 
 
 def test_auto_operation_requires_first_response_status_table() -> None:
@@ -157,6 +158,7 @@ def test_exact_ahe_new_prompt_emits_new_start_context() -> None:
         assert "AHE automatic operation activated." in additional_context
         assert "ahe-new" in additional_context
         assert "ahe-think" in additional_context
+        assert "@ahe-harness-manager" in additional_context
         assert "If no AHE-managed harness files exist, start initialization normally." in additional_context
         assert "If any AHE-managed harness file exists, read the existing files" in additional_context
         assert "ask what restart scope the user wants" in additional_context
@@ -174,6 +176,7 @@ def test_exact_ahe_ship_emit_independent_ship_context() -> None:
         _assert_codegraph_preflight_present(additional_context)
         assert "AHE plan export activated." in additional_context
         assert "ahe-think" not in additional_context
+        assert "@ahe-harness-manager" not in additional_context
         assert "ahe-ship" in additional_context
         assert "Detect if the current conversation is still in Plan Mode." in additional_context
         assert "If Plan Mode is active, the Codex host must exit Plan Mode and replay the command." in additional_context
@@ -190,6 +193,7 @@ def test_exact_ahe_git_emit_git_context() -> None:
         _assert_codegraph_preflight_present(additional_context)
         assert "AHE Git activated." in additional_context
         assert "ahe-think" in additional_context
+        assert "@ahe-harness-manager" not in additional_context
         assert "ahe-git" in additional_context
         assert "Do not run the normal AHE harness workflow." in additional_context
 
@@ -200,6 +204,7 @@ def test_exact_ahe_fix_emit_fix_plan_context() -> None:
         _assert_codegraph_preflight_present(additional_context)
         assert "AHE fix planning activated." in additional_context
         assert "ahe-think" in additional_context
+        assert "@ahe-harness-manager" in additional_context
         assert "ahe-fix" in additional_context
         assert ".plans/{plan_name}.md" in additional_context
         assert "fixing errors or following the user's intention" in additional_context
