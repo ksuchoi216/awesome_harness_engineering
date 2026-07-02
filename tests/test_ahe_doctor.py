@@ -24,6 +24,13 @@ def test_root_doctor_passes_when_both_pass(tmp_path: Path) -> None:
     env["CODEX_HOME"] = str(tmp_path / "codex")
     env["HOME"] = str(tmp_path / "home")
     
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    agy_path = bin_dir / "agy"
+    agy_path.write_text("#!/bin/sh\nexit 0", encoding="utf-8")
+    agy_path.chmod(0o755)
+    env["PATH"] = f"{bin_dir}:{env.get('PATH', '')}"
+    
     subprocess.run((str(ROOT_AHE_BIN), "install"), env=env, check=True, capture_output=True)
     
     res = run_doctor(ROOT_AHE_BIN, env=env)
