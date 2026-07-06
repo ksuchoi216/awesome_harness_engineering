@@ -24,9 +24,9 @@ readonly AHE_CONFIG_BLOCK_START="# BEGIN AHE MANAGED CONFIG"
 readonly AHE_CONFIG_BLOCK_END="# END AHE MANAGED CONFIG"
 readonly MANAGED_SKILLS=(
   "ahe"
+  "ahe-clean"
   "ahe-converse"
   "ahe-feature"
-  "ahe-fix"
   "ahe-git"
   "ahe-harness"
   "ahe-harness-checker"
@@ -79,31 +79,38 @@ cleanup_ahe_config_entries() {
   temp_path="${config_path}.ahe-cleanup"
   awk -v block_start="${AHE_CONFIG_BLOCK_START}" -v block_end="${AHE_CONFIG_BLOCK_END}" '
     function is_ahe_header(line) {
-      return line ~ /^\[agents\."?ahe[-_][^]]*"?\]$/ ||
-        line ~ /^\[hooks\.state\."ahe[^"]*"\]$/ ||
+      return line ~ /^\[hooks\.state\."ahe[^"]*"\]$/ ||
         line ~ /^\[plugins\."?ahe[^]]*"?\]$/ ||
         line ~ /^\[plugins\."@ksuchoi216\/ahe[^"]*"\]$/
     }
 
     $0 == block_start {
-      skip = 1
+      in_block = 1
       next
     }
 
     $0 == block_end {
-      skip = 0
+      in_block = 0
+      next
+    }
+
+    in_block == 1 {
       next
     }
 
     /^\[/ {
       if (is_ahe_header($0)) {
-        skip = 1
+        skip_section = 1
         next
       }
-      skip = 0
+      skip_section = 0
     }
 
-    skip != 1 {
+    skip_section == 1 {
+      next
+    }
+
+    {
       print
     }
   ' "${config_path}" > "${temp_path}"
@@ -248,11 +255,10 @@ Global Codex home:
 
 Next:
 1. Open Codex chat in any workspace.
-2. Use \`ahe new\` for a new start.
-3. Use exact \`ahe\` to continue existing harness work.
-4. Use \`ahe ship\` after Plan Mode to write the latest plan to .plans.
-5. Use \`ahe fix\` to create a .plans fix plan for errors or changed intent.
-6. Use \`ahe <query>\` for explicit AHE requests such as \`ahe update product spec\`.
+2. Use exact \`ahe\` to continue existing harness work or start a new harness when the workspace has none.
+3. Use \`ahe ship\` after Plan Mode to write the latest plan to .plans.
+4. Use \`ahe git\` for the safe git orchestration workflow.
+5. Use \`ahe <query>\` for explicit AHE requests such as \`ahe update product spec\`.
 EOF
 }
 

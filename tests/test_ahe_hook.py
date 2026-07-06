@@ -68,6 +68,7 @@ def test_exact_ahe_prompt_emits_auto_operation_context() -> None:
     assert "ahe-new" in additional_context
     assert "ahe-think" in additional_context
     assert "@ahe-harness-manager" in additional_context
+    assert "ahe-think" in additional_context
 
 
 def test_auto_operation_requires_first_response_status_table() -> None:
@@ -104,6 +105,8 @@ def test_auto_operation_routes_through_thinker_network() -> None:
     assert "Do not include the next step inside the table." in additional_context
     assert "Continue automatically after classification." in additional_context
     assert "ahe-think" in additional_context
+    assert "let `ahe-think` decide whether `@ahe-harness-manager` supervision is needed" in additional_context
+    assert "ahe-clean" in additional_context
     assert "ahe-review" in additional_context
     assert "ahe-converse" in additional_context
     assert "ahe-harness" in additional_context
@@ -150,23 +153,20 @@ def test_uppercase_ahe_prompt_emits_auto_operation_context() -> None:
     assert "AHE automatic operation activated." in additional_context
 
 
-def test_exact_ahe_new_prompt_emits_new_start_context() -> None:
-    for prompt in ("ahe-new", "ahe-new"):
+def test_ahe_query_forms_route_through_normal_ahe_context() -> None:
+    for prompt in (
+        "ahe new",
+        "ahe stale tests",
+        "ahe update product spec",
+        "update product spec ahe",
+    ):
         additional_context = additional_context_for_prompt(prompt)
 
         _assert_codegraph_preflight_present(additional_context)
         assert "AHE automatic operation activated." in additional_context
-        assert "ahe-new" in additional_context
         assert "ahe-think" in additional_context
-        assert "@ahe-harness-manager" in additional_context
-        assert "If no AHE-managed harness files exist, start initialization normally." in additional_context
-        assert "If any AHE-managed harness file exists, read the existing files" in additional_context
-        assert "ask what restart scope the user wants" in additional_context
-        assert "Do not remove, overwrite, or refresh existing harness files before the user answers" in additional_context
-        assert "instead of creating backup copies" in additional_context
-        assert "Product/instructions specification details belong in `docs/product.md` and `docs/INSTRUCTIONS.md`, not `AGENTS.md`." in additional_context
-        assert "ahe-harness" in additional_context
-        assert ".ahe/backups/" not in additional_context
+        assert "Decide the next AHE workflow with `ahe-think`" in additional_context
+        assert "If no harness files exist, route to `ahe-new`." in additional_context
 
 
 def test_exact_ahe_ship_emit_independent_ship_context() -> None:
@@ -197,20 +197,9 @@ def test_exact_ahe_git_emit_git_context() -> None:
         assert "ahe-git" in additional_context
         assert "Do not run the normal AHE harness workflow." in additional_context
 
-def test_exact_ahe_fix_emit_fix_plan_context() -> None:
-    for prompt in ("ahe-fix", "ahe-fix"):
-        additional_context = additional_context_for_prompt(prompt)
-
-        _assert_codegraph_preflight_present(additional_context)
-        assert "AHE fix planning activated." in additional_context
-        assert "ahe-think" in additional_context
-        assert "@ahe-harness-manager" in additional_context
-        assert "ahe-fix" in additional_context
-        assert ".plans/{plan_name}.md" in additional_context
-        assert "fixing errors or following the user's intention" in additional_context
-        assert "ahe-converse" in additional_context
-        assert "status report table" not in additional_context
-        assert "explicit AHE query" not in additional_context
+def test_removed_exact_ahe_new_and_fix_aliases_do_not_trigger() -> None:
+    for prompt in ("ahe-new", "ahe-fix"):
+        assert hook_output_for_prompt(prompt) is None
 
 
 def test_exact_ahe_overview_emit_overview_context() -> None:
@@ -227,6 +216,15 @@ def test_exact_ahe_overview_emit_overview_context() -> None:
 
 def test_middle_ahe_mention_does_not_trigger() -> None:
     assert hook_output_for_prompt("please explain ahe commands today") is None
+
+
+def test_only_alias_style_ahe_clean_prompts_are_blocked() -> None:
+    additional_context = additional_context_for_prompt("ahe clean")
+    assert "AHE automatic operation activated." in additional_context
+    assert "ahe-think" in additional_context
+
+    for prompt in ("ahe-clean", "$ahe-clean"):
+        assert hook_output_for_prompt(prompt) is None
 
 
 def test_malformed_json_emits_nothing() -> None:

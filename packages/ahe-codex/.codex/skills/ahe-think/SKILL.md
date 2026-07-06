@@ -13,18 +13,22 @@ Use it as the central decision layer for AHE work.
 ## Purpose
 
 - Judge what is missing before another agent acts.
+- Optionally invoke `@ahe-harness-manager` as a pre-routing supervisor when the
+  harness state itself is unclear or contradictory.
+- Optionally invoke `ahe-clean` when tracking artifacts are valid but noisy
+  enough that stale completed history makes the current next step harder to see.
 - Judge the active `project`, `feature`, or `sub-feature`.
 - Decide which of `Why`, `What`, and `How` are still missing.
-- Choose the next internal agent: `ahe-review`, `ahe-converse`,
+- Choose the next internal agent: `ahe-clean`, `ahe-review`, `ahe-converse`,
   `ahe-harness`, or `ahe-solve`.
 - Receive each agent result, reassess the state, and decide the next step.
 
 ## Routing Inputs
 
 - Exact `ahe` means continue existing harness work.
-- Exact `ahe init`, exact `ahe-new`, and exact `$ahe-new` stay on the
-  `$ahe-new` path.
 - `ahe <query>` and `<query> ahe` mean route the query through `ahe-think`.
+- New-start intent such as `ahe new` arrives through the normal `ahe` query
+  path, and `ahe-think` decides whether to call `ahe-new`.
 - Broad non-prefixed prompts must not activate AHE.
 
 ## Startup Contract
@@ -48,11 +52,29 @@ Use it as the central decision layer for AHE work.
 - Choose the active product source as the lowest-numbered stage whose derived
   feature work is not complete, or `docs/product.md` when no numbered stage
   exists.
+- Use `@ahe-harness-manager` as an optional pre-routing supervisor when:
+  - missing or invalid harness artifacts;
+  - `docs/*.md`, `feature-list.json`, `progress.md`, `session-handoff.md`, and
+    code appear to disagree;
+  - all tracked features are done but likely next work exists;
+  - the harness state is ambiguous enough that `ahe-review` vs `ahe-harness` vs `ahe-converse` is not yet clear.
+- Keep `@ahe-harness-manager` advisory. It reports findings back to
+  `ahe-think`; it does not replace `ahe-think` as the decision layer.
+- Use `ahe-clean` when the harness is valid but noisy, including:
+  - too many `done` entries in `feature-list.json` that are unrelated to active work;
+  - too many stale bullets in `session-handoff.md`;
+  - current next work is harder to identify because old completed detail dominates the trackers.
+- Treat `ahe-clean` as distinct from `@ahe-harness-manager` escalation:
+  `ahe-clean` handles valid but noisy tracking state, while
+  `@ahe-harness-manager` handles missing, invalid, mismatched, or otherwise
+  ambiguous harness state.
 - If the need is understanding repo code, harness drift, progress evidence, or
   CodeGraph context, call `ahe-review`.
 - If the need is user clarification, call `ahe-converse`.
 - If the need is updating harness artifacts, product docs, feature tracking, or
   todo sync, call `ahe-harness`.
+- If the need is compacting stale completed tracking history without changing
+  product or instruction content, call `ahe-clean`.
 - If the need is solving or decomposing feature work, call `ahe-solve`.
 
 ## Interaction Model
@@ -60,6 +82,8 @@ Use it as the central decision layer for AHE work.
 - `ahe-think` is centered, but direct worker-to-worker calls are allowed when
   they are the obvious next step.
 - Typical loops:
+  - `ahe-think -> @ahe-harness-manager -> ahe-think`
+  - `ahe-think -> ahe-clean -> ahe-think`
   - `ahe-think -> ahe-review -> ahe-think`
   - `ahe-think -> ahe-harness -> ahe-think`
   - `ahe-think -> ahe-converse -> ahe-think`
@@ -78,7 +102,9 @@ Use it as the central decision layer for AHE work.
 
 - Use `ahe-review` for review-first requests.
 - Use `ahe-harness` for product, instructions, progress, feature-list, todo, or
-  compression maintenance.
+  tracker-policy maintenance.
+- Use `ahe-clean` for reducing stale completed history in `feature-list.json`
+  and `session-handoff.md`.
 - Use `ahe-solve` for feature implementation planning or execution work.
 - Use `ahe-converse` when no safe next step exists without user input.
 

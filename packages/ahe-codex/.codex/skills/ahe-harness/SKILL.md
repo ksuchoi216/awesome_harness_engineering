@@ -54,6 +54,12 @@ be created, updated, or reconciled.
 - Update `feature-list.json` to derive the specific feature items from the updated `docs/product.md`.
 - Update `progress.md`.
 - Update `session-handoff.md`.
+- Treat `feature-list.json` and `session-handoff.md` as current-work artifacts,
+  not archival logs; they are current-work artifacts, and unrelated completed
+  history may be compacted when it no longer helps the active work.
+- unrelated completed feature entries may be compacted.
+- unrelated completed handoff bullets may be compacted.
+- current-work-relevant completed context must remain.
 - If no new feature can be derived from `docs/product.md`, call `ahe-converse` to ask what next feature, product direction, or goal should be tracked.
 - If a numbered product stage is active and no new feature can be derived from
   that active product stage, call `ahe-converse` with the same clarification
@@ -67,6 +73,8 @@ be created, updated, or reconciled.
 - Keep `progress.md` focused on current work, decisions that still matter,
   blockers, and recent verification evidence.
 - Keep `session-handoff.md` focused on the next-session startup path.
+- Keep tracking artifacts concise enough that the current next step is easy to
+  identify.
 - Keep `status.json` aligned with the active workflow.
 - When harness files are created or refreshed, hand off to `ahe-harness-checker` before considering the harness ready.
 

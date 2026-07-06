@@ -5,7 +5,10 @@ description: Initialize AHE in the current workspace and create the base harness
 
 # AHE New
 
-Use this skill when the user invokes `$ahe-new`.
+This is an internal AHE workflow skill, not a user-facing command.
+
+Use this skill when `ahe-think` decides the workspace needs bootstrap or
+restart handling.
 
 ## Command Workflow: new
 
@@ -26,7 +29,8 @@ Use this skill when the user invokes `$ahe-new`.
 
 ### Sequential Conversation Flow
 
-- Treat exact `ahe new` as a possible new start request.
+- Treat new-start or reset intent arriving through the normal `ahe` path as a
+  possible new start request.
 - If no AHE-managed harness files exist, start initialization normally without asking a restart-scope question.
 - If any AHE-managed harness file already exists, read the existing files first.
 - When existing harness files are present, summarize the current project purpose and product specification state, then ask what restart scope the user wants before removing, overwriting, or refreshing existing harness files.

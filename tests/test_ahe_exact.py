@@ -43,6 +43,7 @@ def test_exact_ahe_uses_thinker_as_primary_orchestrator() -> None:
     ctx = additional_context("ahe")
     assert "Use `ahe-think` as the internal decision layer before choosing the next action" in ctx
     assert "Decide the next AHE workflow with `ahe-think`" in ctx
+    assert "let `ahe-think` decide whether `@ahe-harness-manager` supervision is needed" in ctx
 
 
 # ===========================================================================
@@ -104,6 +105,7 @@ def test_exact_ahe_handles_missing_or_invalid_feature_list() -> None:
 def test_exact_ahe_routes_to_specialized_skills_based_on_need() -> None:
     # Check the hook's routing directives for exact ahe
     ctx = additional_context("ahe")
+    assert "Call `ahe-clean` when stale completed tracking history makes the current next step harder to see" in ctx
     assert "Call `ahe-review` when repo or code understanding is needed" in ctx
     assert "Call `ahe-converse` when the next safe step is blocked on user input" in ctx
     assert "Call `ahe-harness` when product docs, instructions, tracking, or todo sync must change" in ctx
@@ -111,6 +113,14 @@ def test_exact_ahe_routes_to_specialized_skills_based_on_need() -> None:
 
     # Check the thinker's exact same routing rules
     thinker = THINKER_SKILL_MD_PATH.read_text(encoding="utf-8")
+    assert "ahe-harness-manager" in thinker
+    assert "optional pre-routing supervisor" in thinker
+    assert "missing or invalid harness artifacts" in thinker
+    assert "all tracked features are done but likely next work exists" in thinker
+    assert "ahe-review` vs `ahe-harness` vs `ahe-converse`" in thinker
+    assert "too many `done` entries in `feature-list.json`" in thinker
+    assert "too many stale bullets in `session-handoff.md`" in thinker
+    assert "ahe-clean" in thinker
     assert "ahe-review" in thinker
     assert "ahe-converse" in thinker
     assert "ahe-harness" in thinker

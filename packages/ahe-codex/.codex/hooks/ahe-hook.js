@@ -50,14 +50,14 @@ const AHE_PROGRESS_DIRECTIVE = [
   AHE_DIRECTIVE_MARKER,
   "AHE automatic operation activated.",
   "",
-  "The user sent the exact AHE command. Operate as the Awesome Harness Engineering router:",
+  "The user sent an AHE continuation request. Operate as the Awesome Harness Engineering router:",
   "",
   ...CODEGRAPH_PREFLIGHT_LINES,
   ...COMMON_ROUTING_LINES,
   "",
   "4. Decide the next AHE workflow with `ahe-think`:",
-  "   - Automatically invoke `@ahe-harness-manager` before `ahe-think` chooses the next workflow if the harness state needs supervision (missing/invalid harness files, unfinished features, completed trackers with possible next work, or code/docs/tracker mismatch).",
   "   - Route through `ahe-think` first.",
+  "   - let `ahe-think` decide whether `@ahe-harness-manager` supervision is needed before choosing the next workflow.",
   "   - If no harness files exist, route to `ahe-new`.",
   "   - If `docs/product.md` or `docs/INSTRUCTIONS.md` is missing or empty, classify the state as `harness engineering not enough`.",
   "   - If `feature-list.json` is missing or invalid, generating an empty one from template is allowed, but do not write specific features until `docs/product.md` and `docs/INSTRUCTIONS.md` are created and organized.",
@@ -66,6 +66,7 @@ const AHE_PROGRESS_DIRECTIVE = [
   "   - If any feature in `feature-list.json` has a status other than `done`, classify the state as `in the middle of building features` and continue the first unfinished feature whose dependencies are satisfied.",
   "   - If all features are `done` and no obvious harness gap remains, classify the state as `completed all` and ask the user for the next task.",
   "   - Call `ahe-review` when repo or code understanding is needed.",
+  "   - Call `ahe-clean` when stale completed tracking history makes the current next step harder to see.",
   "   - Call `ahe-converse` when the next safe step is blocked on user input.",
   "   - Call `ahe-harness` when product docs, instructions, tracking, or todo sync must change.",
   "   - Call `ahe-harness-checker` to validate and repair generated harness artifacts after bootstrap or harness maintenance work.",
@@ -77,27 +78,6 @@ const AHE_PROGRESS_DIRECTIVE = [
   "   - Do not include the next step inside the table.",
   "   - Continue automatically after classification.",
 ];
-
-const AHE_NEW_DIRECTIVE = [
-  AHE_DIRECTIVE_MARKER,
-  "AHE automatic operation activated.",
-  "",
-  "The user sent the exact AHE new command. Treat this as a possible new start request:",
-  "",
-  ...CODEGRAPH_PREFLIGHT_LINES,
-  "2. Route to `ahe-think` first.",
-  "3. `ahe-think` must route to `ahe-new`.",
-  "4. Automatically invoke `@ahe-harness-manager` only when existing harness files need review before determining the restart scope.",
-  "5. If no AHE-managed harness files exist, start initialization normally.",
-  "6. If any AHE-managed harness file exists, read the existing files, summarize the current project purpose and product specification state, and ask what restart scope the user wants.",
-  "7. Do not remove, overwrite, or refresh existing harness files before the user answers the restart-scope question.",
-  "8. If the chosen restart scope replaces prior harness history, summarize that replaced state in the refreshed tracking artifacts instead of creating backup copies.",
-  "9. Interpret the restart scope from the user's free-form answer; examples like `purpose` and `product` are not a closed list.",
-  "10. Product/instructions specification details belong in `docs/product.md` and `docs/INSTRUCTIONS.md`, not `AGENTS.md`.",
-  "11. After setup, call `ahe-harness` to build the initial product, instructions, and tracking state, and end with `ahe-harness-checker` validation/fix before the harness is considered usable.",
-  "12. Use `ahe-think` before clarification when the next setup step is uncertain.",
-  "13. If clarification is needed, call `ahe-converse` for the exact missing detail.",
-].join("\n");
 
 const AHE_SHIP_DIRECTIVE = [
   AHE_DIRECTIVE_MARKER,
@@ -114,25 +94,6 @@ const AHE_SHIP_DIRECTIVE = [
   "7. Derive `plan_name` from the plan title and create `.plans/{plan_name}.md`.",
   "8. Add compact handoff context for Antigravity or another LLM platform.",
   "9. Use `.codex/skills/ahe-ship/scripts/write_plan.py` to write the final markdown and stop.",
-  "",
-  "Do not run the normal AHE harness workflow.",
-].join("\n");
-
-const AHE_FIX_DIRECTIVE = [
-  AHE_DIRECTIVE_MARKER,
-  "AHE fix planning activated.",
-  "",
-  "The user invoked `ahe-fix`.",
-  "",
-  ...CODEGRAPH_PREFLIGHT_LINES,
-  "2. Route to `ahe-think` first.",
-  "3. `ahe-think` must immediately call the `ahe-fix` skill.",
-  "4. Automatically invoke `@ahe-harness-manager` only when the fix target may conflict with current harness state.",
-  "5. Understand the user's error, bug, mismatch, or intended change from the current conversation and repository context.",
-  "6. Create a concrete fix plan for fixing errors or following the user's intention when it differs from normal AHE continuation.",
-  "7. If the fix goal, scope, or success criteria are unclear, call `ahe-converse` and ask one focused question before writing the plan.",
-  "8. Derive `plan_name` from the fix goal and create `.plans/{plan_name}.md`.",
-  "9. Use `.codex/skills/ahe-fix/scripts/write_fix_plan.py` to write the final markdown.",
   "",
   "Do not run the normal AHE harness workflow.",
 ].join("\n");
@@ -171,19 +132,9 @@ function isExactAheCommand(prompt) {
   return normalizePrompt(prompt) === "ahe";
 }
 
-function isExactAheNewCommand(prompt) {
-  const normalizedPrompt = normalizePrompt(prompt);
-  return normalizedPrompt === "ahe-new" || normalizedPrompt === "ahe new";
-}
-
 function isExactAheShipCommand(prompt) {
   const normalizedPrompt = normalizePrompt(prompt);
   return normalizedPrompt === "ahe-ship" || normalizedPrompt === "ahe ship";
-}
-
-function isExactAheFixCommand(prompt) {
-  const normalizedPrompt = normalizePrompt(prompt);
-  return normalizedPrompt === "ahe-fix" || normalizedPrompt === "ahe fix";
 }
 
 function isExactAheGitCommand(prompt) {
@@ -193,6 +144,21 @@ function isExactAheGitCommand(prompt) {
 
 function isExactAheOverviewCommand(prompt) {
   return normalizePrompt(prompt) === "ahe-overview";
+}
+
+function isAheQueryCommand(prompt) {
+  const normalizedPrompt = normalizePrompt(prompt);
+
+  if (
+    isExactAheCommand(prompt) ||
+    isExactAheShipCommand(prompt) ||
+    isExactAheGitCommand(prompt) ||
+    isExactAheOverviewCommand(prompt)
+  ) {
+    return false;
+  }
+
+  return /^ahe .+/.test(normalizedPrompt) || /^.+ ahe$/.test(normalizedPrompt);
 }
 
 async function main() {
@@ -230,12 +196,12 @@ async function main() {
       return;
     }
 
-    if (isExactAheNewCommand(parsed.prompt)) {
+    if (isAheQueryCommand(parsed.prompt)) {
       process.stdout.write(
         JSON.stringify({
           hookSpecificOutput: {
             hookEventName: "UserPromptSubmit",
-            additionalContext: AHE_NEW_DIRECTIVE,
+            additionalContext: AHE_PROGRESS_DIRECTIVE.join("\n"),
           },
         }) + "\n"
       );
@@ -248,18 +214,6 @@ async function main() {
           hookSpecificOutput: {
             hookEventName: "UserPromptSubmit",
             additionalContext: AHE_SHIP_DIRECTIVE,
-          },
-        }) + "\n"
-      );
-      return;
-    }
-
-    if (isExactAheFixCommand(parsed.prompt)) {
-      process.stdout.write(
-        JSON.stringify({
-          hookSpecificOutput: {
-            hookEventName: "UserPromptSubmit",
-            additionalContext: AHE_FIX_DIRECTIVE,
           },
         }) + "\n"
       );

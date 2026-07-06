@@ -10,24 +10,23 @@ SOLVER_SKILL_MD_PATH = SKILL_DIR / "ahe-solve/SKILL.md"
 
 def test_repository_contains_only_the_expected_ahe_skill_names() -> None:
     actual_skill_names = sorted(path.parent.name for path in SKILL_DIR.glob("*/SKILL.md"))
-    expected_skill_names = sorted(
-        [
-            "ahe",
-            "ahe-converse",
-            "ahe-feature",
-            "ahe-fix",
-            "ahe-git",
-            "ahe-harness",
-            "ahe-harness-checker",
-            "ahe-new",
-            "ahe-overview",
-            "ahe-review",
-            "ahe-ship",
-            "ahe-solve",
-            "ahe-think",
-        ]
-    )
-    assert actual_skill_names == expected_skill_names
+    assert "ahe-fix" not in actual_skill_names
+    for expected_skill_name in (
+        "ahe",
+        "ahe-clean",
+        "ahe-converse",
+        "ahe-feature",
+        "ahe-git",
+        "ahe-harness",
+        "ahe-harness-checker",
+        "ahe-new",
+        "ahe-overview",
+        "ahe-review",
+        "ahe-ship",
+        "ahe-solve",
+        "ahe-think",
+    ):
+        assert expected_skill_name in actual_skill_names
 
 
 def test_public_command_skills_are_user_facing_commands() -> None:
@@ -36,7 +35,7 @@ def test_public_command_skills_are_user_facing_commands() -> None:
     assert "ahe-think" in ahe_content
 
     init_content = (SKILL_DIR / "ahe-new/SKILL.md").read_text(encoding="utf-8")
-    assert "ahe-new" in init_content
+    assert "not a user-facing command" in init_content.lower()
 
     ship_content = (SKILL_DIR / "ahe-ship/SKILL.md").read_text(encoding="utf-8")
     assert "ahe-ship" in ship_content
@@ -44,19 +43,12 @@ def test_public_command_skills_are_user_facing_commands() -> None:
     assert "independent" in ship_content.lower()
     assert "plan" in ship_content.lower()
 
-    fix_content = (SKILL_DIR / "ahe-fix/SKILL.md").read_text(encoding="utf-8")
-    assert "ahe-fix" in fix_content
-    assert "ahe-fix" in fix_content
-    assert ".plans/{plan_name}.md" in fix_content
-    assert "converse" in fix_content
-
     overview_content = (SKILL_DIR / "ahe-overview/SKILL.md").read_text(encoding="utf-8")
     assert "ahe-overview" in overview_content
     assert "ahe-think" in overview_content
     assert "ahe-harness" in overview_content
     assert "ahe-review" in overview_content
     assert "ahe-converse" in overview_content
-    assert "ahe fix" in overview_content
     assert "ahe ship" in overview_content
 
     git_content = (SKILL_DIR / "ahe-git/SKILL.md").read_text(encoding="utf-8")
@@ -64,9 +56,11 @@ def test_public_command_skills_are_user_facing_commands() -> None:
     assert "independent" in git_content.lower()
 
     internal_skill_names = (
+        "ahe-clean",
         "ahe-converse",
         "ahe-harness",
         "ahe-harness-checker",
+        "ahe-new",
         "ahe-review",
         "ahe-solve",
         "ahe-think",
@@ -93,6 +87,7 @@ def test_split_skill_set_covers_required_context_docs() -> None:
         assert required_file in combined_content, f"Missing file reference '{required_file}'"
 
     for required_skill_name in (
+        "ahe-clean",
         "ahe-think",
         "ahe-review",
         "ahe-converse",

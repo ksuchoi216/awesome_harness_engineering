@@ -12,6 +12,7 @@ CODEX_PACKAGE_ROOT = REPO_ROOT / "packages/ahe-codex/.codex"
 ANTIGRAVITY_PACKAGE_ROOT = REPO_ROOT / "packages/ahe-antigravity"
 REQUIRED_SKILL_FILES = (
     Path("packages/ahe-codex/.codex/skills/ahe/SKILL.md"),
+    Path("packages/ahe-codex/.codex/skills/ahe-clean/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-new/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-overview/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-converse/SKILL.md"),
@@ -21,8 +22,6 @@ REQUIRED_SKILL_FILES = (
     Path("packages/ahe-codex/.codex/skills/ahe-harness-checker/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-feature/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-solve/SKILL.md"),
-    Path("packages/ahe-codex/.codex/skills/ahe-fix/SKILL.md"),
-    Path("packages/ahe-codex/.codex/skills/ahe-fix/scripts/write_fix_plan.py"),
     Path("packages/ahe-codex/.codex/skills/ahe-git/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-ship/SKILL.md"),
     Path("packages/ahe-codex/.codex/skills/ahe-ship/scripts/write_plan.py"),
@@ -59,6 +58,9 @@ def test_repository_contains_installed_skill_scaffold() -> None:
     ]
 
     assert not missing_files, missing_files
+    assert not (
+        REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-fix/SKILL.md"
+    ).exists()
 
 
 def test_installer_package_metadata_exists() -> None:
@@ -119,14 +121,14 @@ def test_installer_copies_skill_files_into_global_codex_home(tmp_path: Path) -> 
     assert "AHE Codex skill installed." in completed_process.stdout
     assert str(codex_home) in completed_process.stdout
     assert (codex_home / "skills/ahe/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-clean/SKILL.md").exists()
     assert (codex_home / "skills/ahe-new/SKILL.md").exists()
     assert (codex_home / "skills/ahe-overview/SKILL.md").exists()
     assert (codex_home / "skills/ahe-converse/SKILL.md").exists()
     assert (codex_home / "skills/ahe-think/SKILL.md").exists()
     assert (codex_home / "skills/ahe-harness/SKILL.md").exists()
     assert (codex_home / "skills/ahe-harness-checker/SKILL.md").exists()
-    assert (codex_home / "skills/ahe-fix/SKILL.md").exists()
-    assert (codex_home / "skills/ahe-fix/scripts/write_fix_plan.py").exists()
+    assert not (codex_home / "skills/ahe-fix/SKILL.md").exists()
     assert (codex_home / "skills/ahe-git/SKILL.md").exists()
     assert (codex_home / "skills/ahe-ship/SKILL.md").exists()
     assert (codex_home / "skills/ahe-ship/scripts/write_plan.py").exists()
@@ -135,7 +137,9 @@ def test_installer_copies_skill_files_into_global_codex_home(tmp_path: Path) -> 
     assert (codex_home / "hooks/ahe-hook.js").exists()
     assert (codex_home / "agents/ahe-harness-manager.toml").exists()
     config_content = (codex_home / "config.toml").read_text(encoding="utf-8")
+    assert "# BEGIN AHE MANAGED CONFIG" in config_content
     assert "[agents.ahe-harness-manager]" in config_content
+    assert "# END AHE MANAGED CONFIG" in config_content
     assert not (workspace_root / ".codex/skills/ahe-new/SKILL.md").exists()
 
 
@@ -158,8 +162,8 @@ def test_installer_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
     config_path.write_text(
         "\n".join(
             (
-                "[agents.ahe-next-step-reviewer]",
-                'config_file = "./agents/ahe-next-step-reviewer.toml"',
+                "[agents.ahe-custom]",
+                'config_file = "./agents/ahe-custom.toml"',
                 "",
                 '[hooks.state."ahe:hooks/hooks.json:user_prompt_submit:0:0"]',
                 'trusted_hash = "sha256:stale"',
@@ -191,11 +195,14 @@ def test_installer_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
 
     assert completed_process.returncode == 0, completed_process.stderr
     config_content = config_path.read_text(encoding="utf-8")
-    assert "ahe-next-step-reviewer" not in config_content
+    assert "[agents.ahe-custom]" in config_content
     assert "ahe:hooks/hooks.json" not in config_content
     assert "ahe@local" not in config_content
     assert "[agents.explorer]" in config_content
     assert "omo@sisyphuslabs" in config_content
+    assert "[agents.ahe-harness-manager]" in config_content
+    assert "# BEGIN AHE MANAGED CONFIG" in config_content
+    assert "# END AHE MANAGED CONFIG" in config_content
 
 
 def test_uninstaller_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
@@ -216,12 +223,26 @@ def test_uninstaller_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
     shutil.copytree(package_root / "packages/ahe-codex/.codex/skills", codex_home / "skills")
     shutil.copytree(package_root / "packages/ahe-codex/.codex/ahe-shared", codex_home / "ahe-shared")
     shutil.copytree(package_root / "packages/ahe-codex/.codex/hooks", codex_home / "hooks")
+    agents_dir = codex_home / "agents"
+    agents_dir.mkdir()
+    shutil.copy2(
+        package_root / "packages/ahe-codex/.codex/agents/ahe-harness-manager.toml",
+        agents_dir / "ahe-harness-manager.toml",
+    )
 
     config_path.write_text(
         "\n".join(
             (
+                "# BEGIN AHE MANAGED CONFIG",
+                "[agents.ahe-harness-manager]",
+                f'config_file = "{agents_dir / "ahe-harness-manager.toml"}"',
+                "# END AHE MANAGED CONFIG",
+                "",
                 '[plugins."@ksuchoi216/ahe"]',
                 "enabled = true",
+                "",
+                "[agents.ahe-custom]",
+                'config_file = "./agents/ahe-custom.toml"',
                 "",
                 '[plugins."other"]',
                 "enabled = true",
@@ -243,6 +264,10 @@ def test_uninstaller_removes_stale_ahe_config_entries(tmp_path: Path) -> None:
     assert completed_process.returncode == 0, completed_process.stderr
     config_content = config_path.read_text(encoding="utf-8")
     assert "@ksuchoi216/ahe" not in config_content
+    assert "[agents.ahe-harness-manager]" not in config_content
+    assert "# BEGIN AHE MANAGED CONFIG" not in config_content
+    assert "# END AHE MANAGED CONFIG" not in config_content
+    assert "[agents.ahe-custom]" in config_content
     assert '[plugins."other"]' in config_content
     assert not (codex_home / "skills/ahe-new").exists()
     assert not (codex_home / "ahe-shared").exists()
@@ -295,6 +320,7 @@ def test_installer_supports_local_npx_package_flow(tmp_path: Path) -> None:
     assert completed_process.returncode == 0, completed_process.stderr
     assert "AHE Codex skill installed." in completed_process.stdout
     assert (codex_home / "skills/ahe/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-clean/SKILL.md").exists()
     assert (codex_home / "skills/ahe-harness/SKILL.md").exists()
     assert (codex_home / "skills/ahe-converse/SKILL.md").exists()
     assert (codex_home / "skills/ahe-think/SKILL.md").exists()
@@ -329,6 +355,7 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
 
     assert install_process.returncode == 0, install_process.stderr
     assert (codex_home / "skills/ahe/SKILL.md").exists()
+    assert (codex_home / "skills/ahe-clean/SKILL.md").exists()
     assert (codex_home / "skills/ahe-harness/SKILL.md").exists()
     assert (codex_home / "skills/ahe-converse/SKILL.md").exists()
     assert (codex_home / "skills/ahe-think/SKILL.md").exists()
@@ -367,7 +394,7 @@ def test_helper_scripts_target_global_codex_home(tmp_path: Path) -> None:
     assert not (codex_home / "ahe-shared").exists()
     assert not (codex_home / "hooks").exists()
     config_content = config_path.read_text(encoding="utf-8")
-    assert "ahe-architecture-reviewer" not in config_content
+    assert "ahe-architecture-reviewer" in config_content
     assert "[agents.explorer]" in config_content
 
 

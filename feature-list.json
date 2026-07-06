@@ -305,6 +305,60 @@
       ],
       "status": "done",
       "evidence": "Deleted `packages/ahe-codex/.codex/skills/ahe-compress/` and `packages/ahe-codex/.codex/ahe-shared/config.yaml`; updated `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md`, `README.md`, `docs/product.md`, and the affected test suite files to remove compression references and expectations. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check tests/`, `bash -n packages/ahe-codex/bin/ahe-codex`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, `./bin/ahe install --force`, and `./bin/ahe doctor`. `bash scripts/install.sh` reached the documented global reinstall flow but stopped at the host sudo password prompt for `npm install -g .`."
+    },
+    {
+      "id": "feat-072",
+      "name": "Route Harness Manager Through AHE Think",
+      "description": "Keep `ahe-harness-manager` as an installed advisory agent, but make `ahe-think` decide when it runs and tighten install/uninstall ownership so only the explicit AHE-managed Codex config block is removed.",
+      "dependencies": [
+        "feat-060",
+        "feat-062"
+      ],
+      "status": "done",
+      "evidence": "Updated `packages/ahe-codex/bin/ahe-codex` so install/uninstall manage only the explicit `# BEGIN AHE MANAGED CONFIG` block, preserve user-owned `[agents.ahe-*]` sections outside that block, and remove only the managed block plus `agents/ahe-harness-manager.toml` on uninstall. Updated `packages/ahe-codex/.codex/hooks/ahe-hook.js` to defer harness-manager invocation to `ahe-think`, updated `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md` with the optional supervisor rules, aligned `docs/product.md`, and added regression coverage in `tests/test_project_setup.py`, `tests/test_ahe_hook.py`, and `tests/test_ahe_exact.py`. Verified with `./init.sh`, `pytest tests/ -x`, `ruff check tests/`, `bash -n packages/ahe-codex/bin/ahe-codex`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, and `git diff --check`."
+    },
+    {
+      "id": "feat-073",
+      "name": "Add Internal AHE Clean Tracker Compaction Worker",
+      "description": "Add internal `ahe-clean` so `ahe-think` can compact stale completed history in `feature-list.json` and `session-handoff.md` under the tracker-maintenance policy owned by `ahe-harness`.",
+      "dependencies": [
+        "feat-060",
+        "feat-072"
+      ],
+      "status": "done",
+      "evidence": "Added `packages/ahe-codex/.codex/skills/ahe-clean/SKILL.md`, registered it in `packages/ahe-codex/bin/ahe-codex`, updated `packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, and `docs/product.md`, and expanded contract/install coverage in `tests/test_command_set.py`, `tests/test_project_setup.py`, `tests/test_ahe_hook.py`, `tests/test_ahe_exact.py`, and `tests/test_ahe_clean_contract.py`. Verified with `./init.sh`, focused contract pytest, `pytest tests/ -x`, `ruff check tests/`, `bash -n packages/ahe-codex/bin/ahe-codex`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, and `git diff --check`."
+    },
+    {
+      "id": "feat-074",
+      "name": "Prepare v0.1.11 package metadata",
+      "description": "Bump the root and workspace package manifests to `0.1.11` so local release validation clears the npm published-version check and package metadata stays aligned.",
+      "dependencies": [
+        "feat-067"
+      ],
+      "status": "done",
+      "evidence": "Updated `package.json`, `packages/ahe-codex/package.json`, and `packages/ahe-antigravity/package.json` to `0.1.11`. Verified npm registry state with `npm view @ksuchoi216/ahe version` (`0.1.10`) and `npm view @ksuchoi216/ahe@0.1.11 version` (404 not found), then ran `sh scripts/test.sh`, `python3 -m json.tool package.json`, `python3 -m json.tool packages/ahe-codex/package.json`, `python3 -m json.tool packages/ahe-antigravity/package.json`, and `git diff --check`."
+    },
+    {
+      "id": "feat-075",
+      "name": "Retire standalone ahe-new and ahe-fix entrypoints",
+      "description": "Reduce the operational public AHE command surface to `ahe`, `ahe-ship`, and `ahe-git` by routing new-start and follow-up intent through the normal `ahe` path, keeping `ahe-new` internal under `ahe-think`, and retiring `ahe-fix` from the managed install surface.",
+      "dependencies": [
+        "feat-060",
+        "feat-063",
+        "feat-072"
+      ],
+      "status": "done",
+      "evidence": "Updated `packages/ahe-codex/.codex/hooks/ahe-hook.js` so `ahe new`, `ahe fix`, `ahe clean`, `ahe <query>`, and `<query> ahe` route through the normal `ahe` continuation directive while `ahe-new` and `ahe-fix` alias prompts no longer activate the hook. Updated `packages/ahe-codex/bin/ahe-codex` to stop managing `ahe-fix`, refreshed `packages/ahe-codex/.codex/skills/ahe/SKILL.md`, `ahe-think/SKILL.md`, `ahe-new/SKILL.md`, and `ahe-overview/SKILL.md`, and aligned `README.md`, `docs/product.md`, and the contract/install tests. Verified with `pytest tests/test_ahe_hook.py tests/test_command_set.py tests/test_chat_command_routing.py tests/test_project_setup.py -x`, `pytest tests/ -x`, `ruff check tests/`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, `bash -n packages/ahe-codex/bin/ahe-codex`, and `./init.sh`."
+    },
+    {
+      "id": "feat-076",
+      "name": "Delete shipped ahe-fix files",
+      "description": "Remove the remaining `ahe-fix` skill files and writer test from the repository so the deleted fix workflow is not shipped or test-covered as latent functionality.",
+      "dependencies": [
+        "feat-075"
+      ],
+      "status": "done",
+      "evidence": "Deleted `packages/ahe-codex/.codex/skills/ahe-fix/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-fix/scripts/write_fix_plan.py`, and `tests/test_ahe_fix_writer.py`. Updated `README.md`, `docs/product.md`, and `tests/test_ahe_hook.py` to use ordinary `ahe` query examples such as `ahe stale tests` instead of naming `ahe fix` as a mode. Tightened `tests/test_command_set.py` and `tests/test_project_setup.py` to assert that the repo and installed skill set no longer contain `ahe-fix`. Verified with `pytest tests/test_command_set.py tests/test_project_setup.py tests/test_ahe_hook.py -x`, `pytest tests/ -x`, `ruff check tests/`, `python3 -m json.tool feature-list.json`, `git diff --check`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, `bash -n packages/ahe-codex/bin/ahe-codex`, and `./init.sh`."
     }
   ]
 }

@@ -10,11 +10,11 @@ AHE is a framework and set of managed skills designed to maintain project harnes
 ## Public Entrypoints
 
 You interact with AHE using the following user-facing commands:
-- **`ahe` / `ahe <query>`**: Automatically inspects the harness state and routes to the correct next step. For example: `ahe`, `ahe update product spec`, or `ahe compress`.
-- **`ahe new` / `ahe-new`**: Starts the initialization or reset flow for a workspace.
-- **`ahe fix` / `ahe fix <query>`**: Starts fix planning when an error occurs or user intent shifts, skipping normal continuation. For example: `ahe fix stale tests`.
+- **`ahe` / `ahe <query>` / `<query> ahe`**: Automatically inspects the harness state and routes to the correct next step. This same entrypoint covers new-workspace bootstrap, normal continuation, and user-directed follow-up such as `ahe update product spec` or `ahe fix stale tests`.
 - **`ahe ship`**: In Codex, saves the latest Plan Mode plan into `.plans/{plan_name}.md` without automatically executing it. In Antigravity, refreshes and executes exactly one plan from `.plans/`.
 - **`ahe-git`**: In Antigravity, safely pulls and commits all nested repositories.
+
+`ahe-overview` remains an explanation helper, not part of the normal work-routing surface.
 
 ## Thinker-Centered Routing Model
 
@@ -24,7 +24,7 @@ AHE operates through a central decision layer: **`ahe-think`**. This internal ag
 - **`ahe-converse`**: Pauses and asks the user for clarification when blocked.
 - **`ahe-feature`**: Sizes and extracts new features from product documentation.
 - **`ahe-solve`**: Solves or plans specific features.
-- **`ahe-compress`**: Handles artifact size reduction when the harness grows too large.
+- **`ahe-new`**: Internal bootstrap worker used when `ahe-think` detects that the workspace has no usable harness yet.
 
 These internal sub-skills are not user-facing commands.
 
@@ -41,32 +41,9 @@ graph TD;
     State -- Need Context --> Review[ahe-review]
     State -- Blocked --> Converse[ahe-converse]
     State -- Harness Work --> Harness[ahe-harness]
-    State -- Compress --> Compress[ahe-compress]
 ```
 
-### 2. `ahe new` (Initialization)
-```mermaid
-graph TD;
-    User[User: ahe new] --> Hook[ahe-hook.js]
-    Hook --> Think[ahe-think]
-    Think --> New[ahe-new]
-    New --> Scope{Check Scope}
-    Scope -- Clarification --> Converse[ahe-converse]
-    Scope -- Done --> Harness[ahe-harness]
-```
-
-### 3. `ahe fix` (Fix Planning)
-```mermaid
-graph TD;
-    User[User: ahe fix] --> Hook[ahe-hook.js]
-    Hook --> Think[ahe-think]
-    Think --> Fix[ahe-fix]
-    Fix --> Clarify{Clear?}
-    Clarify -- No --> Converse[ahe-converse]
-    Clarify -- Yes --> Write[Write Fix Plan]
-```
-
-### 4. `ahe ship` (Export / Execute Plan)
+### 2. `ahe ship` (Export / Execute Plan)
 
 **In Codex (Export):**
 ```mermaid
@@ -86,7 +63,7 @@ graph TD;
     Read --> Execute[Execute Plan]
 ```
 
-### 5. `ahe-git` (Repository Sync)
+### 3. `ahe-git` (Repository Sync)
 
 **In Antigravity:**
 ```mermaid
@@ -100,8 +77,8 @@ graph TD;
 ## Example of How to Use
 
 ### Harness Engineering
-1. `ahe new`
-(initialize the workspace)
+1. `ahe`
+(in a workspace with no harness, `ahe-think` routes internally to `ahe-new`)
 2. `ahe update product spec`
 (update product documentation)
 3. `ahe add dashboard export feature`

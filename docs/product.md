@@ -8,27 +8,20 @@ that internally splits logic into `packages/ahe-codex` and `packages/ahe-antigra
 
 User-facing chat commands:
 
-- `$ahe-new`
-- exact `ahe new`
-- exact `ahe-new`
 - exact `ahe`
 - exact `ahe ship`
 - exact `ahe-ship`
 - exact `$ahe-ship`
-- exact `ahe fix`
-- exact `ahe-fix`
-- exact `$ahe-fix`
 - exact `ahe git`
 - exact `ahe-git`
 - exact `$ahe-git`
-- `ahe fix <query>`
-- `<query> ahe fix`
 - `ahe <query>` (e.g. `ahe update product spec`)
 - `<query> ahe` (e.g. `update product spec ahe`)
 
 Internal workflow skills:
 
 - `ahe-think`
+- `ahe-clean`
 - `ahe-review`
 - `ahe-converse`
 - `ahe-harness`
@@ -40,12 +33,6 @@ Codex thread is in Plan Mode. If Plan Mode is active, the Codex host must exit
 Plan Mode and replay the command. Outside Plan Mode, it writes the latest
 `<proposed_plan>` into `.plans/{plan_name}.md` and stops there.
 It must not route through the internal AHE agent network.
-
-The independent user-facing fix planner is `ahe-fix`. It writes a concrete
-fix plan into `.plans/{plan_name}.md` for fixing errors or following the
-user's current intention when that intention differs from the previous AHE
-flow. It may call `ahe-converse` when clarification is needed. It must not
-route through `ahe-think`.
 
 The independent user-facing git orchestrator is `ahe-git`. It safely fetches,
 inspects, and commits changes across the active repository and any nested Git
@@ -63,7 +50,8 @@ The project uses an internal `packages/` workspace layout, separating `ahe-codex
 The global Codex installation (`ahe-codex`) contains:
 
 - skills: `ahe`, `ahe-new`, `ahe-think`, `ahe-review`, `ahe-converse`,
-  `ahe-harness`, `ahe-feature`, `ahe-fix`, `ahe-git`, `ahe-solve`, `ahe-ship`, and `ahe-harness-checker`
+  `ahe-harness`, `ahe-feature`, `ahe-git`, `ahe-solve`, `ahe-ship`, and `ahe-harness-checker`
+- agent config: `ahe-harness-manager` as an installed Codex agent
 - shared templates: `AGENTS.md`, `product.md`, `progress.md`,
   `session-handoff.md`, `init.sh`, and `feature-list.json`
 - schemas: `process_status.schema.json` and `feature-list-schema.json`
@@ -75,14 +63,17 @@ The global Antigravity installation (`ahe-antigravity`) installs the `ahe-ship` 
 
 The Codex-side model is:
 
-- exact `ahe` -> `ahe-think` -> `ahe-review | ahe-converse | ahe-harness | ahe-solve`
-- `ahe <query>` or `<query> ahe` -> `ahe-think` -> `ahe-review | ahe-converse | ahe-harness | ahe-solve`
-- exact `ahe new` -> dedicated new-start workflow first, then `ahe-harness` -> `ahe-harness-checker`
+- exact `ahe` -> `ahe-think` -> `ahe-clean | ahe-review | ahe-converse | ahe-harness | ahe-solve`
+- `ahe <query>` or `<query> ahe` -> `ahe-think` -> `ahe-clean | ahe-review | ahe-converse | ahe-harness | ahe-solve`
+- `ahe-think` may call internal `ahe-new` when the workspace needs bootstrap or restart handling
 - exact `ahe ship` -> independent plan export workflow
-- exact `ahe fix`, `ahe fix <query>`, or `<query> ahe fix` -> independent fix-plan workflow
 - exact `ahe git` -> independent git orchestration workflow
 
 - `ahe-think` is the central decision layer.
+- `ahe-think` decides whether `@ahe-harness-manager` should run as an advisory
+  pre-routing supervisor.
+- `ahe-think` decides whether `ahe-clean` should compact stale completed
+  tracking history before normal routing.
 - Worker agents may call each other directly when that is the logical next
   action.
 - Direct handoffs must still provide a clear result back to the broader AHE
@@ -90,8 +81,9 @@ The Codex-side model is:
 
 ## 4. Responsibilities
 
-### `$ahe-new`
+### `ahe-new`
 
+- Position as an internal, non-user-facing worker skill.
 - Initialize the harness in the current workspace from the global AHE skill
   installation.
 - If no AHE-managed harness files exist, start initialization normally.
@@ -126,6 +118,11 @@ The Codex-side model is:
 - Apply queued `docs/todo.md` content into the active product source, then
   update `feature-list.json`, `progress.md`, `session-handoff.md`, and
   `status.json`.
+- Treat `feature-list.json` and `session-handoff.md` as current-work artifacts,
+  not long-form archives.
+- Allow unrelated completed feature entries and unrelated completed handoff
+  bullets to be compacted when they no longer help the active work.
+- Keep current-work-relevant completed context intact.
 - If no new feature can be derived from `docs/product.md`, call
   `ahe-converse` to ask what next feature, product direction, or goal should
   be tracked.
@@ -134,8 +131,30 @@ The Codex-side model is:
 
 - Inspect the current unit as `project`, `feature`, or `sub-feature`.
 - Judge the current unit against `Why`, `What`, and `How`.
-- Route to `ahe-review`, `ahe-converse`, `ahe-harness`, or `ahe-solve`
+- Invoke `@ahe-harness-manager` only when harness supervision is needed before
+  normal routing, such as missing or invalid harness artifacts, mismatches
+  across docs/tracking/code, likely next work after all tracked features are
+  done, or ambiguity about whether review, harness maintenance, or user
+  clarification should happen first.
+- Invoke `ahe-clean` when harness artifacts are valid but tracker noise reduces
+  clarity, such as too many unrelated `done` features in `feature-list.json`
+  or too many stale completed bullets in `session-handoff.md`.
+- Keep `ahe-clean` distinct from harness-manager escalation: cleanup handles
+  valid-but-noisy tracking state, while harness-manager handles invalid or
+  ambiguous harness state.
+- Route to `ahe-clean`, `ahe-review`, `ahe-converse`, `ahe-harness`, or `ahe-solve`
   based on the missing need.
+
+### `ahe-clean`
+
+- Position as an internal, non-user-facing worker skill.
+- Reduce stale completed history in `feature-list.json` and
+  `session-handoff.md` when that history no longer helps the active work.
+- Preserve unfinished work, active work, dependency-relevant completed work,
+  and completed context needed to understand the active product stage or next
+  recommended step.
+- Replace removed completed history with one stable summary entry or summary
+  bullet rather than deleting it without trace.
 
 ### Other Internal Skills
 
@@ -155,17 +174,6 @@ The Codex-side model is:
   context for Antigravity or another LLM platform.
 - Stay independent from `ahe-think`, `ahe-harness`, `ahe-solve`, and the
   normal AHE status workflow.
-
-### `ahe-fix`
-
-- Create a concrete fix plan for errors, bugs, broken behavior, or changed user
-  intention.
-- Create `.plans/{plan_name}.md` in the active repository.
-- Include fix goal, current evidence, assumptions, scope, steps, verification
-  plan, risks, and next-agent instructions.
-- Call `ahe-converse` when the fix target, scope, or success criteria are
-  unclear.
-- Stay independent from `ahe-think` and the normal AHE status workflow.
 
 ### `ahe-git`
 
@@ -190,18 +198,18 @@ The Codex-side model is:
 ## 5. Hook Behavior
 
 - Exact `ahe` activates the progress router.
-- Exact `ahe new`, exact `ahe-new`, and exact `$ahe-new` activate the new
-  start router.
 - Exact `ahe ship`, exact `ahe-ship`, and exact `$ahe-ship` activate the
   independent plan export workflow.
-- Exact `ahe fix`, exact `ahe-fix`, and exact `$ahe-fix` activate the
-  independent fix-plan workflow.
-- `ahe fix <query>` and `<query> ahe fix` activate the independent fix-plan workflow.
 - Exact `ahe git`, exact `ahe-git`, and exact `$ahe-git` activate the independent git orchestration workflow.
 - `ahe <query>` and `<query> ahe` activate the thinker-routed query path.
+- New-start intent such as `ahe new` and follow-up intent such as `ahe stale tests` arrive through the normal `ahe` query path.
 - Prompts that mention `ahe` in the middle without matching one of those command shapes must not activate AHE.
 - The first response must include a concise status table covering `AGENTS.md`,
   `product.md`, `INSTRUCTIONS.md`, `feature-list.json`, and `progress.md`.
+- The hook must defer the harness-manager decision to `ahe-think`; it must not
+  directly own that supervision choice.
+- The hook must not expose a direct `ahe clean` command; cleanup remains an
+  internal `ahe-think` routing choice.
 - Product routing must inspect all `docs/*.md` files, treat `docs/product.md`
   as overview context, and choose the active staged product source from
   `docs/product1.md`, `docs/product2.md`, and later numeric files when present.
@@ -210,9 +218,10 @@ The Codex-side model is:
 
 - AHE installs and runs from the global Codex home, not workspace-local
   `.codex` skill directories.
-- Exact `ahe`, exact `ahe new`, exact `ahe ship`, exact `ahe fix`, exact `ahe git`, and
-  the query forms `ahe <query>`, `<query> ahe`, `ahe fix <query>`, and
-  `<query> ahe fix` route to their expected workflows.
+- `ahe uninstall` removes only AHE-managed Codex config and must not delete
+  unrelated user-owned `ahe-*` agent entries outside the managed AHE block.
+- Exact `ahe`, exact `ahe ship`, exact `ahe git`, and the query forms
+  `ahe <query>` and `<query> ahe` route to their expected workflows.
 - The installer copies the current skill set into the global Codex home and no
   longer depends on removed legacy skills.
 - Tests validate the split-skill structure, staged product-doc contract, and

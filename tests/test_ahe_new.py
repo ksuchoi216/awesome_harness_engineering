@@ -225,20 +225,16 @@ def test_all_features_done_triggers_completion_check() -> None:
 
 
 def test_ahe_new_with_conflict_asks_intention() -> None:
-    """When features not all done but user calls ahe-new, ask about conflict."""
     init = NEW_SKILL_MD_PATH.read_text(encoding="utf-8")
 
-    # New skill asks restart scope when existing harness exists
     assert "ask what restart scope the user wants before removing, overwriting, or refreshing existing harness files" in init
     assert "Interpret the restart scope from the user's free-form answer" in init
-    # The hook also enforces the restart-scope question
-    ctx = additional_context("ahe-new")
-    assert "ask what restart scope the user wants" in ctx
-    assert "Do not remove, overwrite, or refresh existing harness files before the user answers" in ctx
+    ctx = additional_context("ahe new")
+    assert "Decide the next AHE workflow with `ahe-think`" in ctx
+    assert "If no harness files exist, route to `ahe-new`." in ctx
 
 
 def test_all_done_then_ahe_new_creates_new_feature_list() -> None:
-    """When all done and user calls ahe-new, check completion then handle."""
     harness = HARNESS_SKILL_MD_PATH.read_text(encoding="utf-8")
     ctx = additional_context("ahe")
 

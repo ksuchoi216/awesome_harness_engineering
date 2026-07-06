@@ -2,12 +2,17 @@
 
 ## Current Status
 
-**Last Updated:** 2026-07-02 20:35 +0900
-**Session ID:** retire-ahe-compress
-**Active Feature:** `feat-071 Retire AHE Compression Workflow`
+**Last Updated:** 2026-07-02 18:14 +0900
+**Session ID:** feat-076-delete-ahe-fix-files
+**Active Feature:** `feat-076 Delete shipped ahe-fix files`
 
 ## Completed
 
+- [x] Implemented `feat-076 Delete shipped ahe-fix files` by deleting the remaining `packages/ahe-codex/.codex/skills/ahe-fix/` files and `tests/test_ahe_fix_writer.py`, replacing active `ahe fix` examples with ordinary `ahe` query wording, and updating the install/contract tests plus live tracker guidance so the repository no longer ships `ahe-fix` at all.
+- [x] Implemented `feat-075 Retire standalone ahe-new and ahe-fix entrypoints` by routing `ahe new`, `ahe fix`, and other explicit follow-up prompts through the normal `ahe` hook path, keeping `ahe-new` internal under `ahe-think`, retiring `ahe-fix` from the managed install surface, and updating the README, product spec, skills, installer text, and contract tests to reflect that `ahe`, `ahe-ship`, and `ahe-git` are the only operational public entrypoints.
+- [x] Implemented `feat-074 Prepare v0.1.11 package metadata` by bumping the root and workspace package manifests to `0.1.11` so local release validation clears the npm published-version check while keeping package metadata aligned.
+- [x] Implemented `feat-073 Add Internal AHE Clean Tracker Compaction Worker` by adding internal `ahe-clean`, making `ahe-think` route cleanup for noisy-but-valid tracker state, and making `ahe-harness` explicitly own the policy that tracking artifacts stay current-work-focused instead of acting as long-form archives.
+- [x] Implemented `feat-072 Route Harness Manager Through AHE Think` by moving harness-manager invocation authority into `ahe-think`, making the manager advisory-only, tightening Codex config ownership to the explicit AHE-managed block, and preserving unrelated user-owned `[agents.ahe-*]` config during install and uninstall.
 - [x] Implemented `feat-071 Retire AHE Compression Workflow` by deleting the internal `ahe-compress` skill and detector assets, removing compression references from the installer, hook, thinker, harness contract, README, product spec, and deleting compression-only tests.
 - [x] Implemented `feat-070 Allow AHE Git Local-Ahead Dirty Commits` by clarifying that dirty repos which are only locally ahead of upstream continue to commit-message review, while dirty repos that need upstream commits still block.
 - [x] Implemented `feat-069 Remove completed Antigravity ship plans` by deleting saved Antigravity ship plans only after `AHE_PLAN_COMPLETE`, then applying the pending work as separated commits through the `ahe-git` workflow.
@@ -43,8 +48,8 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-Details: `feat-071 Retire AHE Compression Workflow` is complete.
-Latest: AHE no longer installs, advertises, routes, or tests compression behavior.
+Details: `feat-076 Delete shipped ahe-fix files` is complete.
+Latest: the repository no longer ships `packages/ahe-codex/.codex/skills/ahe-fix/`, and active docs now treat stale-test follow-up as an ordinary `ahe` query rather than a named fix mode.
 Blockers: None.
 
 ## Blocked
@@ -61,22 +66,27 @@ Blockers: None.
 - **Only AGENTS stays uppercase**: AHE harness artifacts now use `docs/product.md`, `progress.md`, and `session-handoff.md`; template copies follow the same lowercase filenames except `AGENTS.md`.
 - **AHE ship stays independent**: `ahe ship`, `ahe-ship`, and `$ahe-ship` export the latest Codex Plan Mode `<proposed_plan>` to `.plans/{plan_name}.md` without entering the `ahe-think` routed AHE agent network.
 - **Product docs can be staged**: `docs/product.md` is overview context; `docs/product1.md`, `docs/product2.md`, and later numeric docs run in order; non-numeric product docs do not affect stage order.
-- **AHE fix stays independent**: `ahe fix`, `ahe-fix`, and `$ahe-fix` create a concrete `.plans/{plan_name}.md` fix plan for errors or changed user intent without entering the normal `ahe-think` workflow.
+- **AHE no longer ships a dedicated fix workflow**: `ahe-fix` is deleted from the repository, and fix-oriented follow-up should be phrased as ordinary `ahe` queries rather than as a separate exported plan writer.
 - **AHE ship is save-only**: `ahe ship` writes `.plans/{plan_name}.md` and stops. It no longer automatically executes the plan through Antigravity.
 - **AHE state tracking uses root status.json**: The workflow state tracking now uses `status.json` instead of `.ahe/process_status.json`, removing `.ahe` as a workspace concept.
 - **AHE ship must follow the active Python environment**: The ship writer path should not depend on a hardcoded `python3` binary because the active Conda environment may expose `python` while `python3` still resolves to the system interpreter.
 - **AHE ship must use the high Gemini model in Antigravity**: The Antigravity wrapper now runs saved ship plans with `agy --model "Gemini 3.1 Pro (High)"` so ship execution does not drift with the CLI default model.
 - **AHE compress should stay as one user command**: `ahe compress` is now the only documented compression entrypoint, and it always checks both harness-file pressure and stale overlapping tests before routing follow-up work.
-- **AHE query matching is bidirectional**: thinker-routed continuation now accepts both `ahe <query>` and `<query> ahe`, while fix planning accepts `ahe fix <query>` and `<query> ahe fix` without routing those fix queries through `ahe-think`.
+- **AHE query matching is bidirectional**: thinker-routed continuation accepts both `ahe <query>` and `<query> ahe`, including follow-up requests such as stale-test cleanup phrased as normal `ahe` queries.
 - **AHE installer cleans old skill aliases**: `ahe install` and `ahe uninstall` remove AHE-owned legacy skill directories (`new`, `fix`, `ship`, old `ahe-*` aliases) from the global Codex home so the skills picker shows only the current global `ahe-*` set.
 - **AHE is now a real global skill entry**: the Codex installer manages `/Users/KC/.codex/skills/ahe` as a first-class user-facing continuation skill instead of relying on the repo's `bin/ahe` path to appear in search results.
 - **AHE git orchestrates git safely**: `ahe git`, `ahe-git`, and `$ahe-git` provide safe git orchestration across a repository and its submodules without routing through `ahe-think`. It enforces fast-forward pulls, halts on conflicts, and allows commit review when a dirty repo is only locally ahead of upstream.
 - **AHE compression is retired**: `ahe-compress` and the documented `ahe compress` workflow are removed from the active product surface, installer allowlist, hook guidance, and contract tests.
-- **npm releases are tag-driven**: GitHub Actions should publish only on bare semver tag pushes like `0.1.8`, only when the tagged commit is on `master`, and only when the pushed tag exactly matches the root `package.json` version.
-- **Release tags must match package manifests**: The next GitFlow release should use `0.1.8` because the root and workspace `package.json` files now declare `0.1.8`.
+- **Harness-manager routing belongs to `ahe-think`**: `@ahe-harness-manager` stays installed as an advisory Codex agent, but hook prompts must defer the decision to `ahe-think`, which invokes it only when harness state is missing, invalid, mismatched, or otherwise ambiguous.
+- **AHE uninstall owns only the managed config block**: installer cleanup and uninstall may remove the explicit `# BEGIN AHE MANAGED CONFIG` block and AHE-owned plugin/hook sections, but must leave unrelated user-managed `[agents.ahe-*]` entries outside that block untouched.
+- **Tracker cleanup is internal and policy-driven**: `ahe-clean` is an internal worker only; `ahe-think` decides when stale completed history is hurting clarity, and `ahe-harness` owns the rule that `feature-list.json` and `session-handoff.md` should stay current-work-focused rather than serve as long-form archives.
+- **npm releases are tag-driven**: GitHub Actions should publish only on bare semver tag pushes like `0.1.11`, only when the tagged commit is on `master`, and only when the pushed tag exactly matches the root `package.json` version.
+- **Release tags must match package manifests**: The next GitFlow release should use `0.1.11` because the root and workspace `package.json` files now declare `0.1.11`.
 - **Local release validation should never publish**: `scripts/test.sh` is now the local verification entrypoint, while `scripts/deploy.sh` remains the explicit real publish path.
 - **Installer implementation lives under `scripts/`**: `scripts/install.sh` is the real reinstall script; the root `install.sh` only forwards there to preserve the existing documented workflow.
 - **Antigravity plan cleanup is marker-gated**: `packages/ahe-antigravity/bin/ahe-antigravity` removes a saved ship plan only after the exact `AHE_PLAN_COMPLETE` marker appears.
+- **AHE public routing is reduced to three operational entrypoints**: normal work, bootstrap intent, and follow-up intent all enter through `ahe`; only `ahe-ship` and `ahe-git` remain separate operational public commands, while `ahe-new` stays internal and `ahe-fix` is retired from the managed install surface.
+- **AHE fix files are deleted, not dormant**: there is no shipped `ahe-fix` skill or writer script left in the repo, so future work should not treat fix-plan export as latent functionality.
 
 ## Verification
 
@@ -95,6 +105,8 @@ Blockers: None.
 - [x] `ruff check tests/`
 - [x] `bash -n packages/ahe-codex/bin/ahe-codex`
 - [x] `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`
+- [x] `pytest tests/test_command_set.py tests/test_project_setup.py tests/test_ahe_hook.py tests/test_ahe_exact.py tests/test_ahe_clean_contract.py -x`
+- [x] `git diff --check`
 - [x] `./bin/ahe install --force`
 - [x] `./bin/ahe doctor`
 - [ ] `bash scripts/install.sh`
@@ -105,10 +117,23 @@ Details: Reached the documented reinstall flow, but `sudo npm install -g .` stop
 - [x] `python3 -m json.tool package.json`
 - [x] `python3 -m json.tool packages/ahe-codex/package.json`
 - [x] `python3 -m json.tool packages/ahe-antigravity/package.json`
+- [x] `sh scripts/test.sh`
 - [x] `rg -n '"version"\s*:\s*"0\.1\.8"' package.json packages -g 'package.json'`
 - [x] `python3 -m json.tool feature-list.json`
 - [x] `git diff --check`
 - [x] `bash -n install.sh scripts/install.sh scripts/deploy.sh scripts/test.sh`
+- [x] `pytest tests/test_ahe_hook.py tests/test_command_set.py tests/test_chat_command_routing.py tests/test_project_setup.py -x`
+- [x] `pytest tests/ -x`
+- [x] `ruff check tests/`
+- [x] `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`
+- [x] `bash -n packages/ahe-codex/bin/ahe-codex`
+- [x] `./init.sh`
+- [x] `date '+%Y-%m-%d %H:%M %z'`
+- [x] `pytest tests/test_command_set.py tests/test_project_setup.py tests/test_ahe_hook.py -x`
+- [x] `pytest tests/ -x`
+- [x] `ruff check tests/`
+- [x] `python3 -m json.tool feature-list.json`
+- [x] `git diff --check`
 - [x] `bash -n scripts/deploy.sh scripts/test.sh`
 - [ ] `bash scripts/test.sh`
 Details: Not rerun in this session because `pytest tests/ -x` now covers the test suite directly and `scripts/test.sh` also performs npm packaging work.
@@ -144,4 +169,9 @@ Details: Not runnable because `mypy` is not installed in this environment.
 - `packages/ahe-codex/.codex/skills/ahe-git/SKILL.md` [NEW], `packages/ahe-antigravity/skills/ahe-git/SKILL.md` [NEW], `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-antigravity/bin/ahe-antigravity`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `README.md`, `docs/product.md`, `feature-list.json`, `tests/test_ahe_git_skill_contract.py`, `tests/test_ahe_antigravity_git.py`, `tests/test_command_set.py`, `tests/test_project_setup.py`, `tests/test_ahe_hook.py` - Added independent git orchestration workflow and corresponding tests.
 - `packages/ahe-codex/.codex/skills/ahe-git/SKILL.md`, `packages/ahe-antigravity/skills/ahe-git/SKILL.md`, `docs/product.md`, `tests/test_ahe_git_skill_contract.py`, `feature-list.json`, `progress.md` - Clarified that dirty repos which are only locally ahead of upstream continue to commit review, while dirty repos that need upstream commits still block.
 - `packages/ahe-codex/.codex/skills/ahe-compress/` [DELETED], `packages/ahe-codex/.codex/ahe-shared/config.yaml` [DELETED], `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md`, `README.md`, `docs/product.md`, `tests/test_command_set.py`, `tests/test_project_setup.py`, `tests/test_chat_command_routing.py`, `tests/test_clarification_prompt.py`, `tests/test_ahe_new.py`, `tests/test_ahe_exact.py`, `tests/test_compression_workflow.py` [DELETED], `tests/test_compress_detector.py` [DELETED] - Removed the active AHE compression workflow and its contract/test surface.
+- `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md`, `docs/product.md`, `tests/test_project_setup.py`, `tests/test_ahe_hook.py`, `tests/test_ahe_exact.py`, `feature-list.json`, `progress.md`, `session-handoff.md` - Moved harness-manager routing ownership into `ahe-think`, restricted uninstall cleanup to the explicit AHE-managed Codex config block, and added regression coverage for preserving user-owned `ahe-*` agents outside that block.
+- `packages/ahe-codex/.codex/skills/ahe-clean/SKILL.md` [NEW], `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `docs/product.md`, `tests/test_command_set.py`, `tests/test_project_setup.py`, `tests/test_ahe_hook.py`, `tests/test_ahe_exact.py`, `tests/test_ahe_clean_contract.py`, `feature-list.json`, `progress.md`, `session-handoff.md` - Added internal `ahe-clean`, made `ahe-think` route tracker compaction for noisy-but-valid harness state, and made `ahe-harness` explicitly own the policy that current-work tracking artifacts may compact unrelated completed history.
 - `.github/workflows/publish.yml`, `feature-list.json`, `progress.md`, `session-handoff.md` - Added the npm publish workflow for `v*.*.*` tags, enforced tag/package version parity plus `master` containment, and recorded the corrected remote tag move from `v0.1.1` to `v0.1.7`.
+- `package.json`, `packages/ahe-codex/package.json`, `packages/ahe-antigravity/package.json`, `feature-list.json`, `progress.md`, `session-handoff.md` - Bumped the release metadata to `0.1.11`, aligned the internal workspace manifests with the published package version, and recorded the passing local release validation evidence.
+- `packages/ahe-codex/.codex/hooks/ahe-hook.js`, `packages/ahe-codex/bin/ahe-codex`, `packages/ahe-codex/.codex/skills/ahe/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-new/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-overview/SKILL.md`, `README.md`, `docs/product.md`, `tests/test_ahe_hook.py`, `tests/test_ahe_new.py`, `tests/test_command_set.py`, `tests/test_chat_command_routing.py`, `tests/test_project_setup.py`, `feature-list.json`, `progress.md` - Retired standalone `ahe-new` and `ahe-fix` public entrypoints, routed `ahe new` and `ahe fix` through the normal `ahe` continuation surface, kept `ahe-new` internal, and removed `ahe-fix` from the managed install set.
+- `packages/ahe-codex/.codex/skills/ahe-fix/SKILL.md` [DELETED], `packages/ahe-codex/.codex/skills/ahe-fix/scripts/write_fix_plan.py` [DELETED], `tests/test_ahe_fix_writer.py` [DELETED], `README.md`, `docs/product.md`, `tests/test_ahe_hook.py`, `tests/test_command_set.py`, `tests/test_project_setup.py`, `feature-list.json`, `progress.md`, `session-handoff.md` - Deleted the remaining shipped `ahe-fix` implementation files and replaced active `ahe fix` mode wording with ordinary `ahe` query wording.

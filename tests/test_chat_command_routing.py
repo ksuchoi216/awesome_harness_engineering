@@ -6,7 +6,6 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILL_PATHS = (
     REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-new/SKILL.md",
-    REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-fix/SKILL.md",
     REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md",
     REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-solve/SKILL.md",
 )
@@ -36,7 +35,7 @@ def test_skill_files_match_expected_command_names() -> None:
     init_content = (
         REPO_ROOT / "packages/ahe-codex/.codex/skills/ahe-new/SKILL.md"
     ).read_text(encoding="utf-8")
-    assert "$ahe-new" in init_content
+    assert "not a user-facing command" in init_content.lower()
 
     for skill_name in (
         "ahe-think",

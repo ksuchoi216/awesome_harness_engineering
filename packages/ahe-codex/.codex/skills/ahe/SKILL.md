@@ -14,7 +14,9 @@ work in the current workspace.
 - `ahe <query>` and `<query> ahe` mean continue AHE work with the user's
   explicit query.
 - `ahe` must route through `ahe-think` as the central decision layer.
-- `ahe` must not replace the dedicated `ahe-new`, `ahe-fix`, or `ahe-ship`
+- `ahe-think` may call `ahe-new` internally when the workspace has no usable
+  harness yet.
+- `ahe` must stay separate from the dedicated `ahe-ship` and `ahe-git`
   workflows when the user's prompt matches those command contracts.
 
 ## Routing
@@ -30,5 +32,5 @@ work in the current workspace.
 ## Scope
 
 - Use this skill for ongoing harness work, product updates, and explicit AHE
-  requests such as `ahe compress`.
-- Do not use this skill for standalone fix-plan export or ship-plan export.
+  requests such as `ahe update product spec` or `ahe fix stale tests`.
+- Do not use this skill for standalone ship-plan export or git orchestration.

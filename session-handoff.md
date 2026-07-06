@@ -3,11 +3,23 @@
 ## Current Product Context
 
 - Goal: Keep AHE's Codex-facing harness workflow compact, explicit, and cheap to resume in chat.
-- Current status: `feat-071 Retire AHE Compression Workflow` is complete.
-- Branch / commit: `develop`; the live AHE contracts now install globally, read all existing `docs/*.md` files, use lowercase filenames for product/progress/session artifacts, ship independent Plan Mode and fix-plan exporters, support ordered staged product docs, execute saved ship plans through Antigravity with marker-gated cleanup, provide safe git orchestration, publish npm releases from guarded bare-semver tags, separate real publish from local release validation, and keep the installer implementation under `scripts/`.
+- Current status: `feat-076 Delete shipped ahe-fix files` is complete.
+- Branch / commit: `develop`; the live AHE contracts now install globally, read all existing `docs/*.md` files, use lowercase filenames for product/progress/session artifacts, keep `ahe ship` and `ahe git` independent, route harness-manager supervision through `ahe-think`, route tracker compaction through internal `ahe-clean`, preserve user-owned Codex agents outside the explicit AHE-managed config block, and keep the installer implementation under `scripts/`.
 
 ## Last Completed Work
 
+- [x] Bumped `package.json`, `packages/ahe-codex/package.json`, and `packages/ahe-antigravity/package.json` to `0.1.11` so the published package version and the internal workspace manifests are aligned again.
+- [x] Deleted `packages/ahe-codex/.codex/skills/ahe-fix/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-fix/scripts/write_fix_plan.py`, and `tests/test_ahe_fix_writer.py` so the repository no longer ships the removed fix-plan workflow.
+- [x] Updated `README.md`, `docs/product.md`, `tests/test_ahe_hook.py`, `tests/test_command_set.py`, and `tests/test_project_setup.py` so active docs/examples use ordinary `ahe` query wording and the repo/install tests now assert that `ahe-fix` is absent.
+- [x] Verified the npm registry still publishes `@ksuchoi216/ahe@0.1.10`, confirmed `0.1.11` is free, then ran `sh scripts/test.sh` successfully through the version gate, `pytest tests/ -x`, and `npm pack --dry-run`.
+- [x] Added `packages/ahe-codex/.codex/skills/ahe-clean/SKILL.md` as an internal-only worker that compacts stale completed history in `feature-list.json` and `session-handoff.md` while preserving active, unfinished, dependency-relevant, and next-step-relevant context.
+- [x] Updated `packages/ahe-codex/.codex/skills/ahe-harness/SKILL.md` so tracker maintenance explicitly owns the rule that `feature-list.json` and `session-handoff.md` are current-work artifacts rather than long-form archives.
+- [x] Updated `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md`, `packages/ahe-codex/.codex/hooks/ahe-hook.js`, and `docs/product.md` so cleanup is an internal `ahe-think` routing decision for noisy-but-valid tracker state and stays distinct from `@ahe-harness-manager` escalation.
+- [x] Updated `packages/ahe-codex/bin/ahe-codex`, `tests/test_command_set.py`, `tests/test_project_setup.py`, `tests/test_ahe_hook.py`, `tests/test_ahe_exact.py`, and `tests/test_ahe_clean_contract.py` so `ahe-clean` installs with the Codex skill set, remains non-user-facing, and its contract is locked in tests.
+- [x] Updated `packages/ahe-codex/bin/ahe-codex` so install and uninstall remove only the explicit `# BEGIN AHE MANAGED CONFIG` block, preserve user-owned `[agents.ahe-*]` sections outside that block, and delete only the installed `agents/ahe-harness-manager.toml` file on uninstall.
+- [x] Updated `packages/ahe-codex/.codex/hooks/ahe-hook.js` so hook guidance no longer auto-invokes `@ahe-harness-manager` and instead tells Codex that `ahe-think` decides whether supervision is needed.
+- [x] Updated `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md` so `@ahe-harness-manager` is an optional advisory pre-routing supervisor only for missing, invalid, mismatched, done-but-next, or otherwise ambiguous harness state.
+- [x] Updated `docs/product.md`, `tests/test_project_setup.py`, `tests/test_ahe_hook.py`, and `tests/test_ahe_exact.py` so the documented ownership, hook wording, uninstall safety boundary, and thinker contract all match the implemented behavior.
 - [x] Deleted `packages/ahe-codex/.codex/skills/ahe-compress/` and removed the active compression workflow from the Codex installer allowlist, hook prompt, thinker contract, harness contract, README, and `docs/product.md`.
 - [x] Deleted `tests/test_compression_workflow.py` and `tests/test_compress_detector.py`, then updated the surrounding contract tests to assert that AHE no longer exposes compression behavior.
 - [x] Verified the retired compression contract with `./init.sh`, `pytest tests/ -x`, `ruff check tests/`, `bash -n packages/ahe-codex/bin/ahe-codex`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, `python3 -m json.tool feature-list.json`, `./bin/ahe install --force`, and `./bin/ahe doctor`.
@@ -60,11 +72,16 @@
 
 ## Important Files
 
+- `packages/ahe-codex/.codex/skills/ahe-clean/SKILL.md` - Internal worker contract for compacting stale completed tracker history into stable summaries without disturbing active work clarity.
+- `packages/ahe-codex/.codex/skills/ahe-think/SKILL.md` - `ahe-think` now owns the decision about whether `@ahe-harness-manager` runs and documents the exact trigger conditions for that advisory supervisor.
+- `packages/ahe-codex/.codex/agents/ahe-harness-manager.toml` - Installed advisory agent definition that remains subordinate to `ahe-think` rather than being auto-invoked by the hook.
+- `packages/ahe-codex/bin/ahe-codex` - Installer/uninstaller now remove only the explicit AHE-managed config block and preserve unrelated user-owned `[agents.ahe-*]` entries outside it.
 - `.github/workflows/publish.yml` - Publishes `@ksuchoi216/ahe` when a bare semver tag push like `0.1.8` matches `package.json` and points to a commit reachable from `master`.
 - `docs/product.md` - Canonical product and workflow contract for global AHE installation and the current non-compression AHE surface.
 - `scripts/install.sh` - Real reinstall script for globally uninstalling, npm-installing, and re-installing the Codex and Antigravity skills.
 - `scripts/deploy.sh` - Explicit real publish script that still performs npm login checks, optional branch switching, dry-run pack, and `npm publish`.
 - `scripts/test.sh` - Local release validation script that runs `npm test` and `npm pack --dry-run` on the current branch without publishing.
+- `package.json`, `packages/ahe-codex/package.json`, `packages/ahe-antigravity/package.json` - Root publish metadata and internal workspace manifests now all declare `0.1.11` for the next release.
 - `bin/ahe` - Installer, doctor, and uninstaller now target the global Codex home.
 - `AGENTS.md` - Startup workflow now tells Codex to read all existing `docs/*.md` files, especially product-style docs.
 - `.codex/skills/ahe-init/SKILL.md` - Restart-scope workflow; now replaces in-scope harness files without creating backup copies and reads all docs context.
@@ -72,14 +89,12 @@
 - `.codex/skills/ahe-review/SKILL.md` - Review scope now checks all existing `docs/*.md` files when reviewing harness state.
 - `.codex/skills/ahe-think/SKILL.md`, `.codex/skills/ahe-solve/SKILL.md` - Active product-stage selection and feature-solving contract without compression preflight.
 - `.codex/ahe-shared/templates/product.md`, `.codex/ahe-shared/templates/progress.md`, `.codex/ahe-shared/templates/session-handoff.md` - Shared templates now match the lowercase filename contract.
-- `.codex/hooks/ahe-hook.js` - Exact `ahe`/`ahe new`/`ahe ship`/`ahe fix`/`ahe git` routing guidance without compression directives.
+- `.codex/hooks/ahe-hook.js` - Exact `ahe`/`ahe ship`/`ahe git` routing guidance plus the normal `ahe <query>` continuation path, without compression directives or a dedicated fix workflow.
 - `packages/ahe-codex/.codex/skills/ship/SKILL.md` - Codex-side ship workflow that now writes a plan and runs `ahe-antigravity execute`.
 - `packages/ahe-codex/.codex/skills/ship/scripts/write_plan.py` - Deterministic `.plans/{plan_name}.md` writer with sanitization, overwrite protection, and Python parser compatibility beyond Python 3.11.
 - `packages/ahe-antigravity/bin/ahe-antigravity` - Antigravity wrapper with the new `execute` command for stdin-driven `agy` execution and verified cleanup.
 - `tests/test_ahe_antigravity_ship.py` - Ship execution contract coverage, including the explicit `Gemini 3.1 Pro (High)` model selection.
 - `packages/ahe-antigravity/skills/execute/SKILL.md` - Execution contract that gates success on the exact `AHE_PLAN_COMPLETE` marker.
-- `packages/ahe-codex/.codex/skills/fix/SKILL.md` - Independent user-facing fix-plan workflow for errors or changed intent.
-- `packages/ahe-codex/.codex/skills/fix/scripts/write_fix_plan.py` - Deterministic `.plans/{plan_name}.md` fix-plan writer with sanitization and overwrite protection.
 - `feature-list.json`, `progress.md`, `session-handoff.md` - Compressed live tracking artifacts that keep current state concise.
 - `tests/test_init_workflow.py`, `tests/test_ahe_hook.py`, `tests/test_ahe_ship_writer.py`, `tests/test_project_setup.py`, `tests/test_command_set.py` - Contract coverage for restart, hook routing, plan export, installer setup, and the removed compression surface.
 
@@ -89,8 +104,10 @@
 2. Read `feature-list.json` and `progress.md`.
 3. Run `./init.sh`.
 4. If you need to refresh the global skills again on this machine, prefer `./bin/ahe install --force` unless you are ready to enter the sudo password for `scripts/install.sh`.
-5. Add the `NPM_TOKEN` repository secret in GitHub before relying on the new publish workflow.
-6. Create or push future release tags in `<package.json version>` format from `master` so the publish workflow accepts them.
+5. Keep `ahe-clean` internal-only; do not add a direct `ahe clean` public hook command unless the product contract explicitly changes.
+6. Do not reintroduce wildcard cleanup for `[agents.ahe-*]`; only the explicit AHE-managed config block is AHE-owned.
+7. Add the `NPM_TOKEN` repository secret in GitHub before relying on the new publish workflow.
+8. Create or push the next release tag as `0.1.11` from `master` so the publish workflow accepts it.
 
 ## Verification Status
 
