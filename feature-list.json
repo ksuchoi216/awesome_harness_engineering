@@ -359,6 +359,16 @@
       ],
       "status": "done",
       "evidence": "Deleted `packages/ahe-codex/.codex/skills/ahe-fix/SKILL.md`, `packages/ahe-codex/.codex/skills/ahe-fix/scripts/write_fix_plan.py`, and `tests/test_ahe_fix_writer.py`. Updated `README.md`, `docs/product.md`, and `tests/test_ahe_hook.py` to use ordinary `ahe` query examples such as `ahe stale tests` instead of naming `ahe fix` as a mode. Tightened `tests/test_command_set.py` and `tests/test_project_setup.py` to assert that the repo and installed skill set no longer contain `ahe-fix`. Verified with `pytest tests/test_command_set.py tests/test_project_setup.py tests/test_ahe_hook.py -x`, `pytest tests/ -x`, `ruff check tests/`, `python3 -m json.tool feature-list.json`, `git diff --check`, `node --check packages/ahe-codex/.codex/hooks/ahe-hook.js`, `bash -n packages/ahe-codex/bin/ahe-codex`, and `./init.sh`."
+    },
+    {
+      "id": "feat-077",
+      "name": "Verify package version alignment in test script",
+      "description": "Add a check in `scripts/test.sh` and a Python unit test to ensure all workspace and root package versions match.",
+      "dependencies": [
+        "feat-076"
+      ],
+      "status": "done",
+      "evidence": "Added workspace package version consistency check to `scripts/test.sh` to fail fast if versions mismatch. Added `test_all_package_versions_are_aligned` to `tests/test_project_setup.py` to assert version parity. Aligned the version in `package.json` and `packages/ahe-antigravity/package.json` to `0.1.12`. Verified that local validation blocks on mismatch and passes when aligned, and ran `pytest tests/ -x` and `ruff check tests/` successfully."
     }
   ]
 }

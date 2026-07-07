@@ -11,6 +11,22 @@ echo "Current branch: $(git rev-parse --abbrev-ref HEAD)"
 PACKAGE_NAME=$(node -p "require('./package.json').name")
 PACKAGE_VERSION=$(node -p "require('./package.json').version")
 
+echo "Checking package version alignment..."
+CODEX_VERSION=$(node -p "require('./packages/ahe-codex/package.json').version")
+ANTIGRAVITY_VERSION=$(node -p "require('./packages/ahe-antigravity/package.json').version")
+
+if [ "${PACKAGE_VERSION}" != "${CODEX_VERSION}" ]; then
+    echo "Error: Root package version (${PACKAGE_VERSION}) does not match @ahe/codex version (${CODEX_VERSION})!" >&2
+    exit 1
+fi
+
+if [ "${PACKAGE_VERSION}" != "${ANTIGRAVITY_VERSION}" ]; then
+    echo "Error: Root package version (${PACKAGE_VERSION}) does not match @ahe/antigravity version (${ANTIGRAVITY_VERSION})!" >&2
+    exit 1
+fi
+echo "Package version alignment verified successfully (${PACKAGE_VERSION})."
+
+
 echo "---"
 echo "Checking if ${PACKAGE_NAME}@${PACKAGE_VERSION} already exists on npm..."
 if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version >/dev/null 2>&1; then

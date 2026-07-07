@@ -409,3 +409,17 @@ def test_template_directory_keeps_only_agents_filename_uppercase() -> None:
     existing_forbidden_names = forbidden_names.intersection(actual_names)
     assert not missing_required_names, missing_required_names
     assert not existing_forbidden_names, existing_forbidden_names
+
+
+def test_all_package_versions_are_aligned() -> None:
+    root_pj = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))
+    codex_pj = json.loads((REPO_ROOT / "packages/ahe-codex/package.json").read_text(encoding="utf-8"))
+    antigravity_pj = json.loads((REPO_ROOT / "packages/ahe-antigravity/package.json").read_text(encoding="utf-8"))
+
+    assert root_pj["version"] == codex_pj["version"], (
+        f"Root version ({root_pj['version']}) does not match codex version ({codex_pj['version']})"
+    )
+    assert root_pj["version"] == antigravity_pj["version"], (
+        f"Root version ({root_pj['version']}) does not match antigravity version ({antigravity_pj['version']})"
+    )
+

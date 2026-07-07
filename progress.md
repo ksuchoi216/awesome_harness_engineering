@@ -2,12 +2,13 @@
 
 ## Current Status
 
-**Last Updated:** 2026-07-02 18:14 +0900
-**Session ID:** feat-076-delete-ahe-fix-files
-**Active Feature:** `feat-076 Delete shipped ahe-fix files`
+**Last Updated:** 2026-07-07 10:10 +0900
+**Session ID:** feat-077-verify-package-version-alignment
+**Active Feature:** None
 
 ## Completed
 
+- [x] Implemented `feat-077 Verify package version alignment in test script` by checking package.json versions in `scripts/test.sh` and adding a python unit test to ensure all workspace manifests match the root. Bumped root `package.json` and `packages/ahe-antigravity/package.json` to version `0.1.12`.
 - [x] Implemented `feat-076 Delete shipped ahe-fix files` by deleting the remaining `packages/ahe-codex/.codex/skills/ahe-fix/` files and `tests/test_ahe_fix_writer.py`, replacing active `ahe fix` examples with ordinary `ahe` query wording, and updating the install/contract tests plus live tracker guidance so the repository no longer ships `ahe-fix` at all.
 - [x] Implemented `feat-075 Retire standalone ahe-new and ahe-fix entrypoints` by routing `ahe new`, `ahe fix`, and other explicit follow-up prompts through the normal `ahe` hook path, keeping `ahe-new` internal under `ahe-think`, retiring `ahe-fix` from the managed install surface, and updating the README, product spec, skills, installer text, and contract tests to reflect that `ahe`, `ahe-ship`, and `ahe-git` are the only operational public entrypoints.
 - [x] Implemented `feat-074 Prepare v0.1.11 package metadata` by bumping the root and workspace package manifests to `0.1.11` so local release validation clears the npm published-version check while keeping package metadata aligned.
@@ -30,7 +31,7 @@
 - [x] Refreshed `progress.md` and `session-handoff.md` to keep only current state, durable decisions, and recent verification evidence.
 - [x] Implemented `feat-044 Global AHE Skill Installation and Docs Read Contract` by changing `ahe install` to target `$CODEX_HOME` or `~/.codex`, documenting global operation, and requiring AHE workflows to read all existing `docs/*.md` files as supporting project context.
 - [x] Implemented `feat-045 Lowercase Harness Artifact Filenames` by renaming product/progress/session artifacts to lowercase filenames while keeping `AGENTS.md` uppercase, and updating all AHE contracts, templates, tests, and compression detection.
-- [x] Implemented `feat-046 Independent AHE Ship Plan Export` by adding the standalone `ahe-ship` skill, direct `ahe ship` hook route, deterministic `.plans/{plan_name}.md` writer, installer allowlist entry, docs, and focused tests.
+- [x] Implemented `feat-046 Independent AHE Skill Plan Export` by adding the standalone `ahe-ship` skill, direct `ahe ship` hook route, deterministic `.plans/{plan_name}.md` writer, installer allowlist entry, docs, and focused tests.
 - [x] Implemented `feat-047 Staged Product Docs` by treating `docs/product.md` as overview context and optional numbered docs like `docs/product1.md` and `docs/product2.md` as ordered product stages.
 - [x] Implemented `feat-048 Independent AHE Fix Plan Export` by adding the standalone `ahe-fix` skill, direct `ahe fix` hook route, deterministic `.plans/{plan_name}.md` fix-plan writer, installer allowlist entry, docs, and focused tests.
 - [x] Implemented `feat-050 AHE Ship Executes Saved Plans Through Antigravity` by updating `ahe ship` to write `.plans/{plan_name}.md`, run `ahe-antigravity execute` through `agy`, and delete the plan only after `AHE_PLAN_COMPLETE` verifies full completion.
@@ -48,8 +49,8 @@
 ## In Progress
 
 - [ ] No active implementation in progress.
-Details: `feat-076 Delete shipped ahe-fix files` is complete.
-Latest: the repository no longer ships `packages/ahe-codex/.codex/skills/ahe-fix/`, and active docs now treat stale-test follow-up as an ordinary `ahe` query rather than a named fix mode.
+Details: `feat-077 Verify package version alignment in test script` is complete.
+Latest: package versions in all package.json files are aligned to 0.1.12, checked in `scripts/test.sh` and python unit tests.
 Blockers: None.
 
 ## Blocked
@@ -80,8 +81,9 @@ Blockers: None.
 - **Harness-manager routing belongs to `ahe-think`**: `@ahe-harness-manager` stays installed as an advisory Codex agent, but hook prompts must defer the decision to `ahe-think`, which invokes it only when harness state is missing, invalid, mismatched, or otherwise ambiguous.
 - **AHE uninstall owns only the managed config block**: installer cleanup and uninstall may remove the explicit `# BEGIN AHE MANAGED CONFIG` block and AHE-owned plugin/hook sections, but must leave unrelated user-managed `[agents.ahe-*]` entries outside that block untouched.
 - **Tracker cleanup is internal and policy-driven**: `ahe-clean` is an internal worker only; `ahe-think` decides when stale completed history is hurting clarity, and `ahe-harness` owns the rule that `feature-list.json` and `session-handoff.md` should stay current-work-focused rather than serve as long-form archives.
-- **npm releases are tag-driven**: GitHub Actions should publish only on bare semver tag pushes like `0.1.11`, only when the tagged commit is on `master`, and only when the pushed tag exactly matches the root `package.json` version.
-- **Release tags must match package manifests**: The next GitFlow release should use `0.1.11` because the root and workspace `package.json` files now declare `0.1.11`.
+- **npm releases are tag-driven**: GitHub Actions should publish only on bare semver tag pushes like `0.1.12`, only when the tagged commit is on `master`, and only when the pushed tag exactly matches the root `package.json` version.
+- **Release tags must match package manifests**: The next GitFlow release should use `0.1.12` because the root and workspace `package.json` files now declare `0.1.12`.
+- **Workspace package versions must align**: `scripts/test.sh` and Python unit tests now enforce that all package versions match the root `package.json` to prevent mismatched tags from failing at release time.
 - **Local release validation should never publish**: `scripts/test.sh` is now the local verification entrypoint, while `scripts/deploy.sh` remains the explicit real publish path.
 - **Installer implementation lives under `scripts/`**: `scripts/install.sh` is the real reinstall script; the root `install.sh` only forwards there to preserve the existing documented workflow.
 - **Antigravity plan cleanup is marker-gated**: `packages/ahe-antigravity/bin/ahe-antigravity` removes a saved ship plan only after the exact `AHE_PLAN_COMPLETE` marker appears.
@@ -90,8 +92,8 @@ Blockers: None.
 
 ## Verification
 
-- [x] `pytest tests/test_ahe_git_skill_contract.py -x`
-- [x] `pytest tests/test_ahe_git_skill_contract.py tests/test_ahe_antigravity_git.py -x`
+- [x] `sh scripts/test.sh`
+- [x] `pytest tests/test_project_setup.py -k test_all_package_versions_are_aligned`
 - [x] `pytest tests/ -x`
 - [x] `ruff check tests/`
 - [x] `bash -n install.sh scripts/install.sh packages/ahe-codex/bin/ahe-codex packages/ahe-antigravity/bin/ahe-antigravity bin/ahe`
